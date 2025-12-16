@@ -34,6 +34,26 @@ npm run build
 npm run preview
 ```
 
+## GitHub Pages Deployment
+
+This project is configured to automatically deploy to GitHub Pages when changes are pushed to the main branch.
+
+### Setup Instructions
+
+1. Go to your repository settings on GitHub
+2. Navigate to **Pages** in the left sidebar
+3. Under **Source**, select **GitHub Actions**
+4. Push changes to the main branch to trigger the deployment
+
+The site will be available at: `https://voku.github.io/your_agent_config/`
+
+### Manual Deployment
+
+The deployment workflow can also be triggered manually:
+1. Go to the **Actions** tab in your repository
+2. Select the "Deploy to GitHub Pages" workflow
+3. Click "Run workflow"
+
 ## How It Works
 
 1. Fill in your project details in the left panel
