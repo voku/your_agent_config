@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AgentConfig, ProjectPhase, AIStyle, DocMapItem } from './types';
-import { Card, Label, Input, TextArea, Button, MagicWandIcon, TrashIcon, CopyIcon, DownloadIcon, BrainIcon, ExternalLinkIcon, ImportIcon } from './components/UIComponents';
-import { refineText, generateDocsSuggestions } from './services/gemini';
+import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon } from './components/UIComponents';
 
 const INITIAL_STATE: AgentConfig = {
   projectName: "My Awesome Project",
@@ -24,7 +23,6 @@ const INITIAL_STATE: AgentConfig = {
 const App: React.FC = () => {
   const [config, setConfig] = useState<AgentConfig>(INITIAL_STATE);
   const [activeTab, setActiveTab] = useState<'markdown' | 'prompt' | 'helpers'>('markdown');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [newNeverItem, setNewNeverItem] = useState("");
   
   // State for the "Import JSON" textareas in the helper tab
@@ -34,27 +32,6 @@ const App: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setConfig(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleRefine = async (field: keyof AgentConfig, context: string) => {
-    setIsProcessing(true);
-    const result = await refineText(String(config[field]), context);
-    setConfig(prev => ({ ...prev, [field]: result }));
-    setIsProcessing(false);
-  };
-
-  const handleSuggestDocs = async () => {
-    setIsProcessing(true);
-    const suggestions = await generateDocsSuggestions(config.languages + " " + config.frameworks);
-    if (suggestions.length > 0) {
-      const newDocs = suggestions.map((path, i) => ({
-        id: Date.now().toString() + i,
-        path,
-        description: 'Auto-detected key file'
-      }));
-      setConfig(prev => ({ ...prev, docMap: [...prev.docMap, ...newDocs] }));
-    }
-    setIsProcessing(false);
   };
 
   const addNeverItem = () => {
@@ -253,6 +230,24 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
     { "path": "prisma/schema.prisma", "description": "Database schema" }
   ]
 }`
+    },
+    {
+      title: "📂 Key Files Detector",
+      description: "Identifies important files AI agents should read. Returns JSON to add to context map.",
+      prompt: `I am using the following tech stack:
+- Languages: ${config.languages}
+- Frameworks: ${config.frameworks}
+- State Management: ${config.stateManagement}
+- Backend: ${config.backend}
+
+Based on this stack, suggest 3-5 key file paths that an AI coding agent should read to understand the architecture and conventions of this project.
+CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+{
+  "docMap": [
+    { "path": "src/types.ts", "description": "Type definitions and interfaces" },
+    { "path": "prisma/schema.prisma", "description": "Database schema" }
+  ]
+}`
     }
   ], [config]);
 
@@ -293,18 +288,8 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
               </div>
               <div>
                 <Label htmlFor="mission">Mission Statement</Label>
-                <div className="flex gap-2">
-                  <TextArea name="mission" value={config.mission} onChange={handleInputChange} />
-                  <Button 
-                    variant="icon" 
-                    onClick={() => handleRefine('mission', 'software project mission statement')}
-                    disabled={isProcessing}
-                    title="Refine with AI (Requires API Key)"
-                    className="self-start mt-1 text-primary"
-                  >
-                    <MagicWandIcon />
-                  </Button>
-                </div>
+                <TextArea name="mission" value={config.mission} onChange={handleInputChange} />
+                <p className="text-xs text-textMuted mt-1">💡 Use the "LLM Helpers" tab to generate a refined mission statement</p>
               </div>
               <div>
                 <Label htmlFor="northStar">North Star Principle (Tie-breaker)</Label>
@@ -386,9 +371,7 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
                     <Input name="packageManager" value={config.packageManager} onChange={handleInputChange} />
                   </div>
                </div>
-               <Button onClick={handleSuggestDocs} disabled={isProcessing} variant="secondary" className="w-full text-xs">
-                 <BrainIcon /> Auto-detect Key Files (Gemini)
-               </Button>
+               <p className="text-xs text-textMuted mt-2">💡 Use the "LLM Helpers" tab to get AI suggestions for your tech stack</p>
             </div>
           </Card>
 
