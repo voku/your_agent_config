@@ -1,0 +1,5 @@
+{
+  "name": "Agent Context Architect",
+  "description": "A sophisticated tool to generate high-quality AGENTS.md files, ensuring AI coding agents (Cursor, Windsurf, Copilot) perfectly understand your project's architecture, constraints, and mission.",
+  "requestFramePermissions": []
+}
