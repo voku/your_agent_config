@@ -351,16 +351,16 @@ ${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}
 
 > **⚠️ SYSTEM CONTEXT FILE**
 > This file governs the behavior of AI agents (Cursor, Copilot, Windsurf) within this repository.
-${additionalResourcesSection}${developmentPrinciplesSection}
+${additionalResourcesSection ? '\n' + additionalResourcesSection : ''}${developmentPrinciplesSection ? '\n' + developmentPrinciplesSection : ''}
 ## 1. Project Identity & Mission
 **Goal:** ${config.mission}
 **North Star:** ${config.northStar}
-${preImplementationChecklistSection}
+${preImplementationChecklistSection ? '\n' + preImplementationChecklistSection : ''}
 ## 2. Status & Stability
 **Phase:** ${isProto ? '🌱 PROTOTYPE' : '🌳 PRODUCTION'}
 **Breaking Changes:** ${isProto ? '✅ ALLOWED (Improve architecture freely)' : '⛔ FORBIDDEN (Strict backward compatibility)'}
 **Refactoring Policy:** ${isProto ? 'Aggressive refactoring encouraged.' : 'Conservative. Discuss before large changes.'}
-${aiWorkflowSection}
+${aiWorkflowSection ? '\n' + aiWorkflowSection : ''}
 ## 3. Tech Stack & Architecture
 - **Languages:** ${config.languages}
 - **Frameworks:** ${config.frameworks}
@@ -368,7 +368,7 @@ ${aiWorkflowSection}
 - **Styling:** ${config.styling}
 - **State Management:** ${config.stateManagement}
 - **Backend/Services:** ${config.backend}
-${llmOptimizedPatternsSection}
+${llmOptimizedPatternsSection ? '\n' + llmOptimizedPatternsSection : ''}
 ## 4. Project Structure
 **Key Directories:**
 \`\`\`
@@ -377,7 +377,7 @@ ${config.directoryStructure}
 
 **Context Map:**
 ${config.docMap.map(d => `- \`${d.path}\`: ${d.description}`).join('\n')}
-${shellCommandsSection}
+${shellCommandsSection ? '\n' + shellCommandsSection : ''}
 ## 5. Rules of Engagement
 ### ⛔ The NEVER List
 ${config.neverList.map(item => `- **NEVER** ${item}`).join('\n')}
@@ -386,7 +386,7 @@ ${!isProto ? '- **NEVER** Change database schemas without migrations\n- **NEVER*
 ### Testing & Quality
 - **Strategy:** ${config.testingStrategy}
 - **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".
-${mistakesToAvoidSection}${questionsToAskSection}${blindSpotsSection}
+${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}
 ## 6. Interaction Style
 **Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}
 `;
