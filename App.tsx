@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { AgentConfig, ProjectPhase, AIStyle, DocMapItem } from './types';
+import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand } from './types';
 import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon } from './components/UIComponents';
 
 const INITIAL_STATE: AgentConfig = {
@@ -17,7 +17,17 @@ const INITIAL_STATE: AgentConfig = {
   docMap: [{ id: '1', path: 'docs/architecture.md', description: 'System Overview' }],
   neverList: ["Commit .env files", "Use 'any' type", "Inline styles"],
   testingStrategy: "Unit tests for utilities, E2E for critical flows",
-  aiStyle: AIStyle.EXPLANATORY
+  aiStyle: AIStyle.EXPLANATORY,
+  // New fields
+  additionalResources: [],
+  developmentPrinciples: [],
+  preImplementationChecklist: [],
+  aiWorkflowEnabled: false,
+  llmOptimizedPatternsEnabled: false,
+  shellCommands: [],
+  mistakesToAvoid: [],
+  questionsToAsk: [],
+  blindSpots: []
 };
 
 const App: React.FC = () => {
@@ -54,6 +64,65 @@ const App: React.FC = () => {
   const removeDocMap = (id: string) => {
     setConfig(prev => ({ ...prev, docMap: prev.docMap.filter(item => item.id !== id) }));
   };
+
+  // Helper functions for list item management
+  const addListItem = (field: 'developmentPrinciples' | 'preImplementationChecklist' | 'mistakesToAvoid' | 'questionsToAsk' | 'blindSpots', text: string) => {
+    if (!text.trim()) return;
+    const newItem: ListItem = { id: Date.now().toString(), text: text.trim() };
+    setConfig(prev => ({ ...prev, [field]: [...prev[field], newItem] }));
+  };
+
+  const removeListItem = (field: 'developmentPrinciples' | 'preImplementationChecklist' | 'mistakesToAvoid' | 'questionsToAsk' | 'blindSpots', id: string) => {
+    setConfig(prev => ({ ...prev, [field]: prev[field].filter(item => item.id !== id) }));
+  };
+
+  const updateListItem = (field: 'developmentPrinciples' | 'preImplementationChecklist' | 'mistakesToAvoid' | 'questionsToAsk' | 'blindSpots', id: string, text: string) => {
+    setConfig(prev => ({
+      ...prev,
+      [field]: prev[field].map(item => item.id === id ? { ...item, text } : item)
+    }));
+  };
+
+  // Shell commands management
+  const addShellCommand = (command: string, description: string) => {
+    if (!command.trim()) return;
+    const newCmd: ShellCommand = { id: Date.now().toString(), command: command.trim(), description: description.trim() };
+    setConfig(prev => ({ ...prev, shellCommands: [...prev.shellCommands, newCmd] }));
+  };
+
+  const removeShellCommand = (id: string) => {
+    setConfig(prev => ({ ...prev, shellCommands: prev.shellCommands.filter(cmd => cmd.id !== id) }));
+  };
+
+  const updateShellCommand = (id: string, field: 'command' | 'description', value: string) => {
+    setConfig(prev => ({
+      ...prev,
+      shellCommands: prev.shellCommands.map(cmd => cmd.id === id ? { ...cmd, [field]: value } : cmd)
+    }));
+  };
+
+  // Additional resources management
+  const addAdditionalResource = (title: string, path: string, description: string) => {
+    if (!title.trim() || !path.trim()) return;
+    const newRes: AdditionalResource = { id: Date.now().toString(), title: title.trim(), path: path.trim(), description: description.trim() };
+    setConfig(prev => ({ ...prev, additionalResources: [...prev.additionalResources, newRes] }));
+  };
+
+  const removeAdditionalResource = (id: string) => {
+    setConfig(prev => ({ ...prev, additionalResources: prev.additionalResources.filter(res => res.id !== id) }));
+  };
+
+  const updateAdditionalResource = (id: string, field: 'title' | 'path' | 'description', value: string) => {
+    setConfig(prev => ({
+      ...prev,
+      additionalResources: prev.additionalResources.map(res => res.id === id ? { ...res, [field]: value } : res)
+    }));
+  };
+
+  // State for new item inputs
+  const [newInputs, setNewInputs] = useState<{[key: string]: string}>({});
+  const [newShellCmd, setNewShellCmd] = useState({ command: '', description: '' });
+  const [newResource, setNewResource] = useState({ title: '', path: '', description: '' });
 
   // Logic to parse and merge pasted JSON
   const handleImportJson = (index: number) => {
@@ -96,6 +165,66 @@ const App: React.FC = () => {
             next.docMap = [...next.docMap, ...newDocs];
         }
 
+        // Handle new list item types
+        if (data.developmentPrinciples && Array.isArray(data.developmentPrinciples)) {
+            const newItems = data.developmentPrinciples.map((text: string, i: number) => ({
+                id: Date.now().toString() + "-principle-" + i,
+                text: text
+            }));
+            next.developmentPrinciples = [...next.developmentPrinciples, ...newItems];
+        }
+
+        if (data.mistakesToAvoid && Array.isArray(data.mistakesToAvoid)) {
+            const newItems = data.mistakesToAvoid.map((text: string, i: number) => ({
+                id: Date.now().toString() + "-mistake-" + i,
+                text: text
+            }));
+            next.mistakesToAvoid = [...next.mistakesToAvoid, ...newItems];
+        }
+
+        if (data.questionsToAsk && Array.isArray(data.questionsToAsk)) {
+            const newItems = data.questionsToAsk.map((text: string, i: number) => ({
+                id: Date.now().toString() + "-question-" + i,
+                text: text
+            }));
+            next.questionsToAsk = [...next.questionsToAsk, ...newItems];
+        }
+
+        if (data.blindSpots && Array.isArray(data.blindSpots)) {
+            const newItems = data.blindSpots.map((text: string, i: number) => ({
+                id: Date.now().toString() + "-blindspot-" + i,
+                text: text
+            }));
+            next.blindSpots = [...next.blindSpots, ...newItems];
+        }
+
+        if (data.preImplementationChecklist && Array.isArray(data.preImplementationChecklist)) {
+            const newItems = data.preImplementationChecklist.map((text: string, i: number) => ({
+                id: Date.now().toString() + "-checklist-" + i,
+                text: text
+            }));
+            next.preImplementationChecklist = [...next.preImplementationChecklist, ...newItems];
+        }
+
+        if (data.shellCommands && Array.isArray(data.shellCommands)) {
+            const newCmds = data.shellCommands.map((cmd: any, i: number) => ({
+                id: Date.now().toString() + "-cmd-" + i,
+                command: cmd.command || "",
+                description: cmd.description || ""
+            }));
+            next.shellCommands = [...next.shellCommands, ...newCmds];
+        }
+
+        if (data.additionalResources && Array.isArray(data.additionalResources)) {
+            const newRes = data.additionalResources.map((res: any, i: number) => ({
+                id: Date.now().toString() + "-resource-" + i,
+                title: res.title || "",
+                path: res.path || "",
+                description: res.description || ""
+            }));
+            next.additionalResources = [...next.additionalResources, ...newRes];
+        }
+
         return next;
       });
       
@@ -112,20 +241,126 @@ const App: React.FC = () => {
   const generatedMarkdown = useMemo(() => {
     const isProto = config.phase === ProjectPhase.PROTOTYPE;
     
+    // Build optional sections
+    const additionalResourcesSection = config.additionalResources.length > 0 ? `
+### Additional Resources
+${config.additionalResources.map(r => `- **${r.title}**: See \`${r.path}\` ${r.description ? `for ${r.description}` : ''}`).join('\n')}
+` : '';
+
+    const developmentPrinciplesSection = config.developmentPrinciples.length > 0 ? `
+## Development Principles
+${config.developmentPrinciples.map(p => `- ✅ **${p.text}**`).join('\n')}
+` : '';
+
+    const preImplementationChecklistSection = config.preImplementationChecklist.length > 0 ? `
+### Pre-Implementation Checklist
+**Complete ALL items before writing code:**
+${config.preImplementationChecklist.map(item => `- [ ] ${item.text}`).join('\n')}
+` : '';
+
+    const aiWorkflowSection = config.aiWorkflowEnabled ? `
+## AI Assistant Workflow
+
+**IMPORTANT**: AI assistants must follow this step-by-step approach:
+
+### 1. Discovery Phase (ALWAYS do this first)
+- **Read documentation completely** to understand the current priorities
+- **Examine the existing codebase structure** using exploration commands
+- **Study similar existing files** - look for patterns, naming conventions, and architectural decisions
+- **Run the test suite** to understand current functionality
+- **Check dependencies and configuration files**
+
+### 2. Planning Phase (Before any implementation)
+- **Create a detailed implementation plan** that explains:
+  - Which files need to be created/modified
+  - What existing patterns you'll follow
+  - How your changes integrate with current architecture
+  - What tests need to be added/updated
+- **Identify potential breaking changes** and mitigation strategies
+- **Plan your testing approach**
+
+### 3. Implementation Phase
+- **Start with tests** when adding new functionality (TDD approach)
+- **Make small, incremental changes** - don't implement everything at once
+- **Follow existing code patterns exactly**
+- **Test continuously** - run relevant tests after each significant change
+
+### 4. Verification Phase (MANDATORY)
+- **Run the full test suite** - all tests must pass
+- **Verify type checking** - no TypeScript errors
+- **Test the actual functionality** - don't assume it works because tests pass
+- **Check for integration issues** - ensure your changes work with existing features
+` : '';
+
+    const llmOptimizedPatternsSection = config.llmOptimizedPatternsEnabled ? `
+## LLM-Optimized Code Patterns
+
+**IMPORTANT**: This codebase should be optimized for LLM understanding and modification.
+
+### Code Optimization Principles for LLMs
+
+1. **Prefer Standard Library APIs Over Custom Abstractions**
+   - Use standard APIs like \`Date.now()\`, \`.filter()\`, \`.map()\` instead of custom wrappers
+   - Standard APIs are trained knowledge - LLMs understand them instantly
+   - Avoid custom abstractions that require "mental mapping"
+
+2. **When to Extract Functions (LLM-Optimized)**
+   - Extract when logic is complex AND used multiple times
+   - Extract when the function name clearly describes what it does
+   - Don't extract simple one-liners
+   - Don't create wrapper functions around standard APIs
+
+3. **Duplication Guidelines**
+   - Small duplications are OK for standard patterns
+   - Large duplications should be extracted
+   - Business logic should be centralized with named constants
+
+4. **Token Efficiency**
+   - Standard patterns require less cognitive load than custom abstractions
+   - Shorter code isn't always better - clarity matters more
+` : '';
+
+    const shellCommandsSection = config.shellCommands.length > 0 ? `
+## Commands to Run
+
+\`\`\`bash
+${config.shellCommands.map(cmd => `# ${cmd.description}\n${cmd.command}`).join('\n\n')}
+\`\`\`
+` : '';
+
+    const mistakesToAvoidSection = config.mistakesToAvoid.length > 0 ? `
+## Common AI Assistant Mistakes to Avoid
+
+${config.mistakesToAvoid.map((m, i) => `${i + 1}. **${m.text}**`).join('\n')}
+` : '';
+
+    const questionsToAskSection = config.questionsToAsk.length > 0 ? `
+## Questions AI Assistants Should Ask
+
+Before starting implementation, consider:
+${config.questionsToAsk.map(q => `- "${q.text}"`).join('\n')}
+` : '';
+
+    const blindSpotsSection = config.blindSpots.length > 0 ? `
+## AI Assistant Blind Spots and Mitigations
+
+${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}
+` : '';
+    
     return `# ${config.projectName} - AGENTS.md
 
 > **⚠️ SYSTEM CONTEXT FILE**
 > This file governs the behavior of AI agents (Cursor, Copilot, Windsurf) within this repository.
-
+${additionalResourcesSection ? '\n' + additionalResourcesSection : ''}${developmentPrinciplesSection ? '\n' + developmentPrinciplesSection : ''}
 ## 1. Project Identity & Mission
 **Goal:** ${config.mission}
 **North Star:** ${config.northStar}
-
+${preImplementationChecklistSection ? '\n' + preImplementationChecklistSection : ''}
 ## 2. Status & Stability
 **Phase:** ${isProto ? '🌱 PROTOTYPE' : '🌳 PRODUCTION'}
 **Breaking Changes:** ${isProto ? '✅ ALLOWED (Improve architecture freely)' : '⛔ FORBIDDEN (Strict backward compatibility)'}
 **Refactoring Policy:** ${isProto ? 'Aggressive refactoring encouraged.' : 'Conservative. Discuss before large changes.'}
-
+${aiWorkflowSection ? '\n' + aiWorkflowSection : ''}
 ## 3. Tech Stack & Architecture
 - **Languages:** ${config.languages}
 - **Frameworks:** ${config.frameworks}
@@ -133,7 +368,7 @@ const App: React.FC = () => {
 - **Styling:** ${config.styling}
 - **State Management:** ${config.stateManagement}
 - **Backend/Services:** ${config.backend}
-
+${llmOptimizedPatternsSection ? '\n' + llmOptimizedPatternsSection : ''}
 ## 4. Project Structure
 **Key Directories:**
 \`\`\`
@@ -142,7 +377,7 @@ ${config.directoryStructure}
 
 **Context Map:**
 ${config.docMap.map(d => `- \`${d.path}\`: ${d.description}`).join('\n')}
-
+${shellCommandsSection ? '\n' + shellCommandsSection : ''}
 ## 5. Rules of Engagement
 ### ⛔ The NEVER List
 ${config.neverList.map(item => `- **NEVER** ${item}`).join('\n')}
@@ -151,7 +386,7 @@ ${!isProto ? '- **NEVER** Change database schemas without migrations\n- **NEVER*
 ### Testing & Quality
 - **Strategy:** ${config.testingStrategy}
 - **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".
-
+${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}
 ## 6. Interaction Style
 **Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}
 `;
@@ -247,6 +482,60 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
     { "path": "src/types.ts", "description": "Type definitions and interfaces" },
     { "path": "prisma/schema.prisma", "description": "Database schema" }
   ]
+}`
+    },
+    {
+      title: "🎯 Development Principles Generator",
+      description: "Generate core development principles. Returns JSON to add to principles list.",
+      prompt: `I am building "${config.projectName}" with the following mission:
+${config.mission}
+
+North Star: ${config.northStar}
+Phase: ${config.phase}
+
+Please suggest 5-7 core development principles that should guide all development decisions.
+CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+{
+  "developmentPrinciples": ["Zero downtime deployments", "Security first", "User experience over features", ...]
+}`
+    },
+    {
+      title: "⚠️ AI Mistakes Generator",
+      description: "Generate common mistakes AI should avoid. Returns JSON to add to mistakes list.",
+      prompt: `I am using the following stack:
+- Languages: ${config.languages}
+- Frameworks: ${config.frameworks}
+- Backend: ${config.backend}
+
+Please suggest 5-7 common mistakes AI assistants make when working with this tech stack.
+CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+{
+  "mistakesToAvoid": ["Don't implement without understanding existing patterns", "Don't skip the discovery phase", ...]
+}`
+    },
+    {
+      title: "❓ Questions Generator",
+      description: "Generate self-check questions for AI. Returns JSON to add to questions list.",
+      prompt: `I am building a ${config.phase} project called "${config.projectName}".
+
+Please suggest 5-7 questions an AI assistant should ask itself before starting any implementation.
+CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+{
+  "questionsToAsk": ["What similar functionality already exists?", "What existing tests can guide my understanding?", ...]
+}`
+    },
+    {
+      title: "👁️ Blind Spots Generator",
+      description: "Generate AI blind spots and mitigations. Returns JSON to add to blind spots list.",
+      prompt: `I am using:
+- Languages: ${config.languages}
+- Frameworks: ${config.frameworks}
+- Backend: ${config.backend}
+
+Please suggest 5-7 potential blind spots an AI assistant might have when working on this project, along with mitigation strategies.
+CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+{
+  "blindSpots": ["Local environment unknown – confirm tool availability before relying on them", "Hidden dependencies – request explicit dependency lists", ...]
 }`
     }
   ], [config]);
@@ -444,6 +733,329 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
                 <Label htmlFor="testingStrategy">Testing Strategy</Label>
                 <TextArea name="testingStrategy" value={config.testingStrategy} onChange={handleInputChange} />
              </div>
+          </Card>
+
+          {/* Advanced AI Workflow Options */}
+          <Card title="6. AI Workflow Options">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-surfaceHighlight rounded-lg border border-border">
+                <div>
+                  <Label>Enable AI Workflow Phases</Label>
+                  <p className="text-xs text-textMuted">Adds Discovery, Planning, Implementation, and Verification phases</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.aiWorkflowEnabled}
+                  onChange={(e) => setConfig(prev => ({ ...prev, aiWorkflowEnabled: e.target.checked }))}
+                  className="w-5 h-5 rounded border-border"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-surfaceHighlight rounded-lg border border-border">
+                <div>
+                  <Label>Enable LLM-Optimized Patterns</Label>
+                  <p className="text-xs text-textMuted">Adds guidelines for writing code optimized for LLM understanding</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.llmOptimizedPatternsEnabled}
+                  onChange={(e) => setConfig(prev => ({ ...prev, llmOptimizedPatternsEnabled: e.target.checked }))}
+                  className="w-5 h-5 rounded border-border"
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Development Principles */}
+          <Card title="7. Development Principles">
+            <p className="text-xs text-textMuted mb-4">Core principles that guide all development decisions</p>
+            <div className="space-y-2 mb-4">
+              {config.developmentPrinciples.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
+                  <span className="text-green-400 text-xs font-bold px-2 py-0.5 bg-green-900/20 rounded">✅</span>
+                  <input
+                    type="text"
+                    value={item.text}
+                    onChange={(e) => updateListItem('developmentPrinciples', item.id, e.target.value)}
+                    className="flex-1 text-sm bg-transparent border-none focus:outline-none text-textMain"
+                  />
+                  <button onClick={() => removeListItem('developmentPrinciples', item.id)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity">
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input 
+                value={newInputs['principle'] || ''} 
+                onChange={(e) => setNewInputs(prev => ({...prev, principle: e.target.value}))} 
+                placeholder="e.g. Zero downtime deployments" 
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addListItem('developmentPrinciples', newInputs['principle'] || '');
+                    setNewInputs(prev => ({...prev, principle: ''}));
+                  }
+                }}
+              />
+              <Button onClick={() => {
+                addListItem('developmentPrinciples', newInputs['principle'] || '');
+                setNewInputs(prev => ({...prev, principle: ''}));
+              }} variant="secondary">Add</Button>
+            </div>
+          </Card>
+
+          {/* Pre-Implementation Checklist */}
+          <Card title="8. Pre-Implementation Checklist">
+            <p className="text-xs text-textMuted mb-4">Items AI must complete before writing code</p>
+            <div className="space-y-2 mb-4">
+              {config.preImplementationChecklist.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
+                  <span className="text-blue-400 text-xs font-bold px-2 py-0.5 bg-blue-900/20 rounded">☐</span>
+                  <input
+                    type="text"
+                    value={item.text}
+                    onChange={(e) => updateListItem('preImplementationChecklist', item.id, e.target.value)}
+                    className="flex-1 text-sm bg-transparent border-none focus:outline-none text-textMain"
+                  />
+                  <button onClick={() => removeListItem('preImplementationChecklist', item.id)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity">
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input 
+                value={newInputs['checklist'] || ''} 
+                onChange={(e) => setNewInputs(prev => ({...prev, checklist: e.target.value}))} 
+                placeholder="e.g. Read the TODO.md completely" 
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addListItem('preImplementationChecklist', newInputs['checklist'] || '');
+                    setNewInputs(prev => ({...prev, checklist: ''}));
+                  }
+                }}
+              />
+              <Button onClick={() => {
+                addListItem('preImplementationChecklist', newInputs['checklist'] || '');
+                setNewInputs(prev => ({...prev, checklist: ''}));
+              }} variant="secondary">Add</Button>
+            </div>
+          </Card>
+
+          {/* Shell Commands */}
+          <Card title="9. Shell Commands">
+            <p className="text-xs text-textMuted mb-4">Commands to build, test, and lint the project</p>
+            <div className="space-y-3 mb-4">
+              {config.shellCommands.map((cmd) => (
+                <div key={cmd.id} className="flex gap-2 items-start bg-surfaceHighlight p-3 rounded-lg border border-border group">
+                  <div className="flex-1 space-y-2">
+                    <Input 
+                      value={cmd.command} 
+                      onChange={(e) => updateShellCommand(cmd.id, 'command', e.target.value)} 
+                      placeholder="npm run build"
+                      className="font-mono text-xs"
+                    />
+                    <Input 
+                      value={cmd.description} 
+                      onChange={(e) => updateShellCommand(cmd.id, 'description', e.target.value)} 
+                      placeholder="Description (e.g. Build the project)"
+                    />
+                  </div>
+                  <button onClick={() => removeShellCommand(cmd.id)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity mt-2">
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1 space-y-2">
+                <Input 
+                  value={newShellCmd.command} 
+                  onChange={(e) => setNewShellCmd(prev => ({...prev, command: e.target.value}))} 
+                  placeholder="npm run test"
+                  className="font-mono text-xs"
+                />
+                <Input 
+                  value={newShellCmd.description} 
+                  onChange={(e) => setNewShellCmd(prev => ({...prev, description: e.target.value}))} 
+                  placeholder="Description"
+                />
+              </div>
+              <Button onClick={() => {
+                addShellCommand(newShellCmd.command, newShellCmd.description);
+                setNewShellCmd({ command: '', description: '' });
+              }} variant="secondary" className="self-end">Add</Button>
+            </div>
+          </Card>
+
+          {/* Additional Resources */}
+          <Card title="10. Additional Resources">
+            <p className="text-xs text-textMuted mb-4">Links to documentation and related files</p>
+            <div className="space-y-3 mb-4">
+              {config.additionalResources.map((res) => (
+                <div key={res.id} className="flex gap-2 items-start bg-surfaceHighlight p-3 rounded-lg border border-border group">
+                  <div className="flex-1 space-y-2">
+                    <Input 
+                      value={res.title} 
+                      onChange={(e) => updateAdditionalResource(res.id, 'title', e.target.value)} 
+                      placeholder="Title (e.g. Development Workflow)"
+                    />
+                    <Input 
+                      value={res.path} 
+                      onChange={(e) => updateAdditionalResource(res.id, 'path', e.target.value)} 
+                      placeholder="Path (e.g. docs/DEVELOPMENT.md)"
+                      className="font-mono text-xs"
+                    />
+                    <Input 
+                      value={res.description} 
+                      onChange={(e) => updateAdditionalResource(res.id, 'description', e.target.value)} 
+                      placeholder="Description"
+                    />
+                  </div>
+                  <button onClick={() => removeAdditionalResource(res.id)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity mt-2">
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1 space-y-2">
+                <Input 
+                  value={newResource.title} 
+                  onChange={(e) => setNewResource(prev => ({...prev, title: e.target.value}))} 
+                  placeholder="Title"
+                />
+                <Input 
+                  value={newResource.path} 
+                  onChange={(e) => setNewResource(prev => ({...prev, path: e.target.value}))} 
+                  placeholder="Path"
+                  className="font-mono text-xs"
+                />
+                <Input 
+                  value={newResource.description} 
+                  onChange={(e) => setNewResource(prev => ({...prev, description: e.target.value}))} 
+                  placeholder="Description"
+                />
+              </div>
+              <Button onClick={() => {
+                addAdditionalResource(newResource.title, newResource.path, newResource.description);
+                setNewResource({ title: '', path: '', description: '' });
+              }} variant="secondary" className="self-end">Add</Button>
+            </div>
+          </Card>
+
+          {/* Mistakes to Avoid */}
+          <Card title="11. Common AI Mistakes to Avoid">
+            <p className="text-xs text-textMuted mb-4">Pitfalls AI assistants should watch out for</p>
+            <div className="space-y-2 mb-4">
+              {config.mistakesToAvoid.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
+                  <span className="text-yellow-400 text-xs font-bold px-2 py-0.5 bg-yellow-900/20 rounded">⚠️</span>
+                  <input
+                    type="text"
+                    value={item.text}
+                    onChange={(e) => updateListItem('mistakesToAvoid', item.id, e.target.value)}
+                    className="flex-1 text-sm bg-transparent border-none focus:outline-none text-textMain"
+                  />
+                  <button onClick={() => removeListItem('mistakesToAvoid', item.id)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity">
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input 
+                value={newInputs['mistake'] || ''} 
+                onChange={(e) => setNewInputs(prev => ({...prev, mistake: e.target.value}))} 
+                placeholder="e.g. Don't implement without understanding" 
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addListItem('mistakesToAvoid', newInputs['mistake'] || '');
+                    setNewInputs(prev => ({...prev, mistake: ''}));
+                  }
+                }}
+              />
+              <Button onClick={() => {
+                addListItem('mistakesToAvoid', newInputs['mistake'] || '');
+                setNewInputs(prev => ({...prev, mistake: ''}));
+              }} variant="secondary">Add</Button>
+            </div>
+          </Card>
+
+          {/* Questions to Ask */}
+          <Card title="12. Questions AI Should Ask">
+            <p className="text-xs text-textMuted mb-4">Self-check questions before implementation</p>
+            <div className="space-y-2 mb-4">
+              {config.questionsToAsk.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
+                  <span className="text-purple-400 text-xs font-bold px-2 py-0.5 bg-purple-900/20 rounded">❓</span>
+                  <input
+                    type="text"
+                    value={item.text}
+                    onChange={(e) => updateListItem('questionsToAsk', item.id, e.target.value)}
+                    className="flex-1 text-sm bg-transparent border-none focus:outline-none text-textMain"
+                  />
+                  <button onClick={() => removeListItem('questionsToAsk', item.id)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity">
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input 
+                value={newInputs['question'] || ''} 
+                onChange={(e) => setNewInputs(prev => ({...prev, question: e.target.value}))} 
+                placeholder="e.g. What similar functionality already exists?" 
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addListItem('questionsToAsk', newInputs['question'] || '');
+                    setNewInputs(prev => ({...prev, question: ''}));
+                  }
+                }}
+              />
+              <Button onClick={() => {
+                addListItem('questionsToAsk', newInputs['question'] || '');
+                setNewInputs(prev => ({...prev, question: ''}));
+              }} variant="secondary">Add</Button>
+            </div>
+          </Card>
+
+          {/* Blind Spots */}
+          <Card title="13. AI Blind Spots & Mitigations">
+            <p className="text-xs text-textMuted mb-4">Known limitations and how to address them</p>
+            <div className="space-y-2 mb-4">
+              {config.blindSpots.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
+                  <span className="text-orange-400 text-xs font-bold px-2 py-0.5 bg-orange-900/20 rounded">👁️</span>
+                  <input
+                    type="text"
+                    value={item.text}
+                    onChange={(e) => updateListItem('blindSpots', item.id, e.target.value)}
+                    className="flex-1 text-sm bg-transparent border-none focus:outline-none text-textMain"
+                  />
+                  <button onClick={() => removeListItem('blindSpots', item.id)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity">
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input 
+                value={newInputs['blindspot'] || ''} 
+                onChange={(e) => setNewInputs(prev => ({...prev, blindspot: e.target.value}))} 
+                placeholder="e.g. Local environment unknown - confirm tool availability" 
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addListItem('blindSpots', newInputs['blindspot'] || '');
+                    setNewInputs(prev => ({...prev, blindspot: ''}));
+                  }
+                }}
+              />
+              <Button onClick={() => {
+                addListItem('blindSpots', newInputs['blindspot'] || '');
+                setNewInputs(prev => ({...prev, blindspot: ''}));
+              }} variant="secondary">Add</Button>
+            </div>
           </Card>
         </div>
       </div>
