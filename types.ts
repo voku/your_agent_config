@@ -55,6 +55,7 @@ export interface AgentConfig {
   preImplementationChecklist: ListItem[];
   aiWorkflowEnabled: boolean;
   llmOptimizedPatternsEnabled: boolean;
+  fixPreExistingIssuesEnabled: boolean;
   shellCommands: ShellCommand[];
   mistakesToAvoid: ListItem[];
   questionsToAsk: ListItem[];

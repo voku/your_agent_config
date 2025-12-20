@@ -24,6 +24,7 @@ const INITIAL_STATE: AgentConfig = {
   preImplementationChecklist: [],
   aiWorkflowEnabled: false,
   llmOptimizedPatternsEnabled: false,
+  fixPreExistingIssuesEnabled: false,
   shellCommands: [],
   mistakesToAvoid: [],
   questionsToAsk: [],
@@ -320,6 +321,57 @@ ${config.preImplementationChecklist.map(item => `- [ ] ${item.text}`).join('\n')
    - Shorter code isn't always better - clarity matters more
 ` : '';
 
+    const fixPreExistingIssuesSection = config.fixPreExistingIssuesEnabled ? `
+## Fix Pre-existing Issues When in Context
+
+**IMPORTANT**: When working in an area of the codebase, you should proactively identify and fix pre-existing issues.
+
+### Guidelines for Contextual Improvements
+
+1. **Identify Issues Within Your Working Area**
+   - Look for obvious bugs, code smells, or anti-patterns in files you're already modifying
+   - Notice flaky tests in the test suite you're running
+   - Spot performance issues in code paths you're executing
+   - Identify outdated patterns or deprecated API usage
+
+2. **Scope Appropriately**
+   - Only fix issues directly related to the area you're working in
+   - Don't expand scope to unrelated parts of the codebase
+   - Keep fixes small and focused to avoid introducing new issues
+   - If you find major issues outside your scope, document them instead of fixing
+
+3. **Quality Bar for Fixes**
+   - Fix must be low-risk and obvious (clear bugs, typos, dead code)
+   - Fix must not require significant refactoring
+   - Fix must not change public APIs or behavior users depend on
+   - Must have test coverage or add tests when fixing bugs
+
+4. **Document Your Improvements**
+   - Clearly separate scope-required changes from opportunistic fixes
+   - Explain why each fix is safe and beneficial
+   - Note any risks or assumptions in your fixes
+
+### Examples of Good Opportunistic Fixes
+
+✅ **DO FIX:**
+- Typos in comments or error messages
+- Unused imports or variables
+- Deprecated API usage with clear migration path
+- Missing error handling in code you're already touching
+- Flaky tests that are failing in your test runs
+- Performance issues in hot paths you're modifying
+- Inconsistent formatting in files you're editing
+
+❌ **DON'T FIX:**
+- Issues in completely unrelated files
+- Large-scale refactorings
+- Changes that require extensive testing
+- Modifications to stable, working code outside your task
+- Changes that could affect many users or systems
+
+**Remember**: The goal is to leave the code better than you found it, not perfect. Perfect is the enemy of done.
+` : '';
+
     const shellCommandsSection = config.shellCommands.length > 0 ? `
 ## Commands to Run
 
@@ -368,7 +420,7 @@ ${aiWorkflowSection ? '\n' + aiWorkflowSection : ''}
 - **Styling:** ${config.styling}
 - **State Management:** ${config.stateManagement}
 - **Backend/Services:** ${config.backend}
-${llmOptimizedPatternsSection ? '\n' + llmOptimizedPatternsSection : ''}
+${llmOptimizedPatternsSection ? '\n' + llmOptimizedPatternsSection : ''}${fixPreExistingIssuesSection ? '\n' + fixPreExistingIssuesSection : ''}
 ## 4. Project Structure
 **Key Directories:**
 \`\`\`
@@ -760,6 +812,19 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
                   type="checkbox"
                   checked={config.llmOptimizedPatternsEnabled}
                   onChange={(e) => setConfig(prev => ({ ...prev, llmOptimizedPatternsEnabled: e.target.checked }))}
+                  className="w-5 h-5 rounded border-border"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-surfaceHighlight rounded-lg border border-border">
+                <div>
+                  <Label>Fix Pre-existing Issues When in Context</Label>
+                  <p className="text-xs text-textMuted">Encourages AI to fix bugs, flaky tests, or performance issues when working in an area</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.fixPreExistingIssuesEnabled}
+                  onChange={(e) => setConfig(prev => ({ ...prev, fixPreExistingIssuesEnabled: e.target.checked }))}
                   className="w-5 h-5 rounded border-border"
                 />
               </div>
