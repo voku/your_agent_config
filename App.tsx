@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand } from './types';
+import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill } from './types';
 import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon } from './components/UIComponents';
 
 const INITIAL_STATE: AgentConfig = {
@@ -28,7 +28,8 @@ const INITIAL_STATE: AgentConfig = {
   shellCommands: [],
   mistakesToAvoid: [],
   questionsToAsk: [],
-  blindSpots: []
+  blindSpots: [],
+  skills: []
 };
 
 const App: React.FC = () => {
@@ -124,6 +125,57 @@ const App: React.FC = () => {
   const [newInputs, setNewInputs] = useState<{[key: string]: string}>({});
   const [newShellCmd, setNewShellCmd] = useState({ command: '', description: '' });
   const [newResource, setNewResource] = useState({ title: '', path: '', description: '' });
+  const [newSkill, setNewSkill] = useState({ name: '', description: '', path: '', license: '', compatibility: '', author: '', version: '' });
+
+  // Skills management
+  const addSkill = (name: string, description: string, path: string, license: string, compatibility: string, author: string, version: string) => {
+    if (!name.trim() || !description.trim()) return;
+    const newSkillItem: Skill = { 
+      id: Date.now().toString(), 
+      name: name.trim(), 
+      description: description.trim(),
+      path: path.trim() || `skills/${name.trim().toLowerCase().replace(/\s+/g, '-')}`,
+      license: license.trim() || undefined,
+      compatibility: compatibility.trim() || undefined,
+      metadata: (author.trim() || version.trim()) ? {
+        author: author.trim() || undefined,
+        version: version.trim() || undefined
+      } : undefined
+    };
+    setConfig(prev => ({ ...prev, skills: [...prev.skills, newSkillItem] }));
+  };
+
+  const removeSkill = (id: string) => {
+    setConfig(prev => ({ ...prev, skills: prev.skills.filter(skill => skill.id !== id) }));
+  };
+
+  const updateSkill = (id: string, field: keyof Skill, value: string) => {
+    setConfig(prev => ({
+      ...prev,
+      skills: prev.skills.map(skill => {
+        if (skill.id !== id) return skill;
+        if (field === 'metadata') return skill; // handled separately
+        return { ...skill, [field]: value };
+      })
+    }));
+  };
+
+  const updateSkillMetadata = (id: string, field: 'author' | 'version', value: string) => {
+    setConfig(prev => ({
+      ...prev,
+      skills: prev.skills.map(skill => {
+        if (skill.id !== id) return skill;
+        return {
+          ...skill,
+          metadata: {
+            ...skill.metadata,
+            [field]: value.trim() || undefined
+          }
+        };
+      })
+    }));
+  };
+
 
   // Logic to parse and merge pasted JSON
   const handleImportJson = (index: number) => {
@@ -224,6 +276,19 @@ const App: React.FC = () => {
                 description: res.description || ""
             }));
             next.additionalResources = [...next.additionalResources, ...newRes];
+        }
+
+        if (data.skills && Array.isArray(data.skills)) {
+            const newSkills = data.skills.map((skill: any, i: number) => ({
+                id: Date.now().toString() + "-skill-" + i,
+                name: skill.name || "",
+                description: skill.description || "",
+                path: skill.path || `skills/${(skill.name || 'skill').toLowerCase().replace(/\s+/g, '-')}`,
+                license: skill.license || undefined,
+                compatibility: skill.compatibility || undefined,
+                metadata: skill.metadata || undefined
+            }));
+            next.skills = [...next.skills, ...newSkills];
         }
 
         return next;
@@ -398,6 +463,30 @@ ${config.questionsToAsk.map(q => `- "${q.text}"`).join('\n')}
 
 ${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}
 ` : '';
+
+    const skillsSection = config.skills.length > 0 ? `
+## Available Skills
+
+This project has the following skills available for specialized tasks. Skills use progressive disclosure - only the name and description are loaded initially. When a task matches a skill's description, load the full SKILL.md from the skill's path.
+
+${config.skills.map(skill => {
+  let skillText = `### ${skill.name}\n**Description:** ${skill.description}\n**Path:** \`${skill.path}/SKILL.md\``;
+  if (skill.license) skillText += `\n**License:** ${skill.license}`;
+  if (skill.compatibility) skillText += `\n**Compatibility:** ${skill.compatibility}`;
+  if (skill.metadata) {
+    const metaEntries = Object.entries(skill.metadata).filter(([_, v]) => v);
+    if (metaEntries.length > 0) {
+      skillText += `\n**Metadata:** ${metaEntries.map(([k, v]) => `${k}=${v}`).join(', ')}`;
+    }
+  }
+  return skillText;
+}).join('\n\n')}
+
+**How to use skills:**
+1. **Discovery**: Review the skill name and description to determine relevance
+2. **Activation**: If the task matches, read the full SKILL.md file from the path above
+3. **Execution**: Follow the instructions in SKILL.md, loading any referenced files or scripts as needed
+` : '';
     
     return `# ${config.projectName} - AGENTS.md
 
@@ -438,7 +527,7 @@ ${!isProto ? '- **NEVER** Change database schemas without migrations\n- **NEVER*
 ### Testing & Quality
 - **Strategy:** ${config.testingStrategy}
 - **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".
-${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}
+${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}${skillsSection ? '\n' + skillsSection : ''}
 ## 6. Interaction Style
 **Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}
 `;
@@ -588,6 +677,41 @@ Please suggest 5-7 potential blind spots an AI assistant might have when working
 CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
 {
   "blindSpots": ["Local environment unknown – confirm tool availability before relying on them", "Hidden dependencies – request explicit dependency lists", ...]
+}`
+    },
+    {
+      title: "🔧 Skills Generator",
+      description: "Generate agent skills for specialized tasks. Returns JSON to add to skills list.",
+      prompt: `I am building "${config.projectName}" using:
+- Languages: ${config.languages}
+- Frameworks: ${config.frameworks}
+- Backend: ${config.backend}
+
+Mission: ${config.mission}
+
+Please suggest 3-5 agent skills that would be useful for this project. Each skill should handle a specific, repeatable task with specialized knowledge and workflows.
+
+Examples of good skills:
+- PDF processing (extract text, fill forms, merge documents)
+- Database migration management
+- API integration patterns
+- Security audit workflows
+
+CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+{
+  "skills": [
+    {
+      "name": "pdf-processing",
+      "description": "Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDF documents.",
+      "path": "skills/pdf-processing",
+      "license": "MIT",
+      "compatibility": "Requires Python 3.8+, pdfplumber",
+      "metadata": {
+        "author": "your-org",
+        "version": "1.0"
+      }
+    }
+  ]
 }`
     }
   ], [config]);
@@ -1120,6 +1244,129 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
                 addListItem('blindSpots', newInputs['blindspot'] || '');
                 setNewInputs(prev => ({...prev, blindspot: ''}));
               }} variant="secondary">Add</Button>
+            </div>
+          </Card>
+
+          {/* Skills */}
+          <Card title="14. Agent Skills">
+            <p className="text-xs text-textMuted mb-4">Specialized knowledge and workflows for specific tasks. Each skill is a folder with a SKILL.md file containing instructions.</p>
+            <div className="space-y-3 mb-4">
+              {config.skills.map((skill) => (
+                <div key={skill.id} className="flex gap-2 items-start bg-surfaceHighlight p-3 rounded-lg border border-border group">
+                  <div className="flex-1 space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input 
+                        value={skill.name} 
+                        onChange={(e) => updateSkill(skill.id, 'name', e.target.value)} 
+                        placeholder="Skill name (e.g. pdf-processing)"
+                        className="font-mono text-xs"
+                      />
+                      <Input 
+                        value={skill.path} 
+                        onChange={(e) => updateSkill(skill.id, 'path', e.target.value)} 
+                        placeholder="Path (e.g. skills/pdf-processing)"
+                        className="font-mono text-xs"
+                      />
+                    </div>
+                    <TextArea 
+                      value={skill.description} 
+                      onChange={(e) => updateSkill(skill.id, 'description', e.target.value)} 
+                      placeholder="Description: what the skill does and when to use it"
+                      className="text-xs h-16"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input 
+                        value={skill.license || ''} 
+                        onChange={(e) => updateSkill(skill.id, 'license', e.target.value)} 
+                        placeholder="License (optional)"
+                        className="text-xs"
+                      />
+                      <Input 
+                        value={skill.compatibility || ''} 
+                        onChange={(e) => updateSkill(skill.id, 'compatibility', e.target.value)} 
+                        placeholder="Compatibility (optional)"
+                        className="text-xs"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input 
+                        value={skill.metadata?.author || ''} 
+                        onChange={(e) => updateSkillMetadata(skill.id, 'author', e.target.value)} 
+                        placeholder="Author (optional)"
+                        className="text-xs"
+                      />
+                      <Input 
+                        value={skill.metadata?.version || ''} 
+                        onChange={(e) => updateSkillMetadata(skill.id, 'version', e.target.value)} 
+                        placeholder="Version (optional)"
+                        className="text-xs"
+                      />
+                    </div>
+                  </div>
+                  <button onClick={() => removeSkill(skill.id)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity mt-2">
+                    <TrashIcon />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1 space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <Input 
+                    value={newSkill.name} 
+                    onChange={(e) => setNewSkill(prev => ({...prev, name: e.target.value}))} 
+                    placeholder="Skill name"
+                    className="font-mono text-xs"
+                  />
+                  <Input 
+                    value={newSkill.path} 
+                    onChange={(e) => setNewSkill(prev => ({...prev, path: e.target.value}))} 
+                    placeholder="Path (auto-generated if empty)"
+                    className="font-mono text-xs"
+                  />
+                </div>
+                <TextArea 
+                  value={newSkill.description} 
+                  onChange={(e) => setNewSkill(prev => ({...prev, description: e.target.value}))} 
+                  placeholder="Description"
+                  className="text-xs h-16"
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <Input 
+                    value={newSkill.license} 
+                    onChange={(e) => setNewSkill(prev => ({...prev, license: e.target.value}))} 
+                    placeholder="License (optional)"
+                    className="text-xs"
+                  />
+                  <Input 
+                    value={newSkill.compatibility} 
+                    onChange={(e) => setNewSkill(prev => ({...prev, compatibility: e.target.value}))} 
+                    placeholder="Compatibility (optional)"
+                    className="text-xs"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input 
+                    value={newSkill.author} 
+                    onChange={(e) => setNewSkill(prev => ({...prev, author: e.target.value}))} 
+                    placeholder="Author (optional)"
+                    className="text-xs"
+                  />
+                  <Input 
+                    value={newSkill.version} 
+                    onChange={(e) => setNewSkill(prev => ({...prev, version: e.target.value}))} 
+                    placeholder="Version (optional)"
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+              <Button onClick={() => {
+                addSkill(newSkill.name, newSkill.description, newSkill.path, newSkill.license, newSkill.compatibility, newSkill.author, newSkill.version);
+                setNewSkill({ name: '', description: '', path: '', license: '', compatibility: '', author: '', version: '' });
+              }} variant="secondary" className="self-end">Add</Button>
+            </div>
+            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-200">
+              <strong>💡 Tip:</strong> Use the "LLM Helpers" tab to generate skills suggestions using AI!
             </div>
           </Card>
         </div>

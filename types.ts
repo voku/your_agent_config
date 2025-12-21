@@ -33,6 +33,20 @@ export interface ShellCommand {
   description: string;
 }
 
+export interface Skill {
+  id: string;
+  name: string;
+  description: string;
+  path: string;
+  license?: string;
+  compatibility?: string;
+  metadata?: {
+    author?: string;
+    version?: string;
+    [key: string]: string | undefined;
+  };
+}
+
 export interface AgentConfig {
   projectName: string;
   mission: string;
@@ -60,4 +74,5 @@ export interface AgentConfig {
   mistakesToAvoid: ListItem[];
   questionsToAsk: ListItem[];
   blindSpots: ListItem[];
+  skills: Skill[];
 }
