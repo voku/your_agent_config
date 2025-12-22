@@ -45,6 +45,10 @@ export interface Skill {
     version?: string;
     [key: string]: string | undefined;
   };
+  allowedTools?: string;
+  hasReferences?: boolean;
+  hasScripts?: boolean;
+  hasAssets?: boolean;
 }
 
 export interface AgentConfig {
