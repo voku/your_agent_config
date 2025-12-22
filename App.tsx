@@ -40,6 +40,13 @@ const App: React.FC = () => {
   // State for the "Import JSON" textareas in the helper tab
   const [importInputs, setImportInputs] = useState<{[key: number]: string}>({});
 
+  // Helper to generate unique IDs
+  let idCounter = 0;
+  const generateUniqueId = (prefix: string = ''): string => {
+    idCounter++;
+    return `${prefix}${Date.now()}-${idCounter}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
   // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -70,7 +77,7 @@ const App: React.FC = () => {
   // Helper functions for list item management
   const addListItem = (field: 'developmentPrinciples' | 'preImplementationChecklist' | 'mistakesToAvoid' | 'questionsToAsk' | 'blindSpots', text: string) => {
     if (!text.trim()) return;
-    const newItem: ListItem = { id: Date.now().toString(), text: text.trim() };
+    const newItem: ListItem = { id: generateUniqueId(), text: text.trim() };
     setConfig(prev => ({ ...prev, [field]: [...prev[field], newItem] }));
   };
 
@@ -88,7 +95,7 @@ const App: React.FC = () => {
   // Shell commands management
   const addShellCommand = (command: string, description: string) => {
     if (!command.trim()) return;
-    const newCmd: ShellCommand = { id: Date.now().toString(), command: command.trim(), description: description.trim() };
+    const newCmd: ShellCommand = { id: generateUniqueId(), command: command.trim(), description: description.trim() };
     setConfig(prev => ({ ...prev, shellCommands: [...prev.shellCommands, newCmd] }));
   };
 
@@ -106,7 +113,7 @@ const App: React.FC = () => {
   // Additional resources management
   const addAdditionalResource = (title: string, path: string, description: string) => {
     if (!title.trim() || !path.trim()) return;
-    const newRes: AdditionalResource = { id: Date.now().toString(), title: title.trim(), path: path.trim(), description: description.trim() };
+    const newRes: AdditionalResource = { id: generateUniqueId(), title: title.trim(), path: path.trim(), description: description.trim() };
     setConfig(prev => ({ ...prev, additionalResources: [...prev.additionalResources, newRes] }));
   };
 
@@ -130,25 +137,26 @@ const App: React.FC = () => {
 
   // Skill name validation
   const validateSkillName = (name: string): string => {
-    if (!name.trim()) return "";
+    const trimmedName = name.trim();
+    if (!trimmedName) return "";
     
     // Check length first
-    if (name.length > 64) {
+    if (trimmedName.length > 64) {
       return "Name must be 64 characters or less";
     }
     
     // Check for consecutive hyphens
-    if (name.includes('--')) {
+    if (trimmedName.includes('--')) {
       return "Name cannot contain consecutive hyphens";
     }
     
     // Check if starts or ends with hyphen
-    if (name.startsWith('-') || name.endsWith('-')) {
+    if (trimmedName.startsWith('-') || trimmedName.endsWith('-')) {
       return "Name cannot start or end with a hyphen";
     }
     
     // Finally, check overall pattern (lowercase, numbers, hyphens only)
-    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(trimmedName)) {
       return "Name must be lowercase letters, numbers, and hyphens only";
     }
     
@@ -166,7 +174,7 @@ const App: React.FC = () => {
     }
     
     const newSkillItem: Skill = { 
-      id: Date.now().toString(), 
+      id: generateUniqueId('skill-'), 
       name: name.trim(), 
       description: description.trim(),
       path: path.trim() || `skills/${name.trim().toLowerCase().replace(/\s+/g, '-')}`,
@@ -250,8 +258,8 @@ const App: React.FC = () => {
         if (data.directoryStructure) next.directoryStructure = data.directoryStructure;
         
         if (data.docMap && Array.isArray(data.docMap)) {
-            const newDocs = data.docMap.map((d: any, i: number) => ({
-                id: Date.now().toString() + "-imported-" + i,
+            const newDocs = data.docMap.map((d: any) => ({
+                id: generateUniqueId('imported-doc-'),
                 path: d.path || "unknown/path",
                 description: d.description || "No description provided"
             }));
@@ -260,48 +268,48 @@ const App: React.FC = () => {
 
         // Handle new list item types
         if (data.developmentPrinciples && Array.isArray(data.developmentPrinciples)) {
-            const newItems = data.developmentPrinciples.map((text: string, i: number) => ({
-                id: Date.now().toString() + "-principle-" + i,
+            const newItems = data.developmentPrinciples.map((text: string) => ({
+                id: generateUniqueId('principle-'),
                 text: text
             }));
             next.developmentPrinciples = [...next.developmentPrinciples, ...newItems];
         }
 
         if (data.mistakesToAvoid && Array.isArray(data.mistakesToAvoid)) {
-            const newItems = data.mistakesToAvoid.map((text: string, i: number) => ({
-                id: Date.now().toString() + "-mistake-" + i,
+            const newItems = data.mistakesToAvoid.map((text: string) => ({
+                id: generateUniqueId('mistake-'),
                 text: text
             }));
             next.mistakesToAvoid = [...next.mistakesToAvoid, ...newItems];
         }
 
         if (data.questionsToAsk && Array.isArray(data.questionsToAsk)) {
-            const newItems = data.questionsToAsk.map((text: string, i: number) => ({
-                id: Date.now().toString() + "-question-" + i,
+            const newItems = data.questionsToAsk.map((text: string) => ({
+                id: generateUniqueId('question-'),
                 text: text
             }));
             next.questionsToAsk = [...next.questionsToAsk, ...newItems];
         }
 
         if (data.blindSpots && Array.isArray(data.blindSpots)) {
-            const newItems = data.blindSpots.map((text: string, i: number) => ({
-                id: Date.now().toString() + "-blindspot-" + i,
+            const newItems = data.blindSpots.map((text: string) => ({
+                id: generateUniqueId('blindspot-'),
                 text: text
             }));
             next.blindSpots = [...next.blindSpots, ...newItems];
         }
 
         if (data.preImplementationChecklist && Array.isArray(data.preImplementationChecklist)) {
-            const newItems = data.preImplementationChecklist.map((text: string, i: number) => ({
-                id: Date.now().toString() + "-checklist-" + i,
+            const newItems = data.preImplementationChecklist.map((text: string) => ({
+                id: generateUniqueId('checklist-'),
                 text: text
             }));
             next.preImplementationChecklist = [...next.preImplementationChecklist, ...newItems];
         }
 
         if (data.shellCommands && Array.isArray(data.shellCommands)) {
-            const newCmds = data.shellCommands.map((cmd: any, i: number) => ({
-                id: Date.now().toString() + "-cmd-" + i,
+            const newCmds = data.shellCommands.map((cmd: any) => ({
+                id: generateUniqueId('cmd-'),
                 command: cmd.command || "",
                 description: cmd.description || ""
             }));
@@ -309,8 +317,8 @@ const App: React.FC = () => {
         }
 
         if (data.additionalResources && Array.isArray(data.additionalResources)) {
-            const newRes = data.additionalResources.map((res: any, i: number) => ({
-                id: Date.now().toString() + "-resource-" + i,
+            const newRes = data.additionalResources.map((res: any) => ({
+                id: generateUniqueId('resource-'),
                 title: res.title || "",
                 path: res.path || "",
                 description: res.description || ""
@@ -319,8 +327,8 @@ const App: React.FC = () => {
         }
 
         if (data.skills && Array.isArray(data.skills)) {
-            const newSkills = data.skills.map((skill: any, i: number) => ({
-                id: Date.now().toString() + "-skill-" + i,
+            const newSkills = data.skills.map((skill: any) => ({
+                id: generateUniqueId('skill-'),
                 name: skill.name || "",
                 description: skill.description || "",
                 path: skill.path || `skills/${(skill.name || 'skill').toLowerCase().replace(/\s+/g, '-')}`,
@@ -935,7 +943,7 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
               ))}
               <Button 
                 variant="ghost" 
-                onClick={() => setConfig(prev => ({ ...prev, docMap: [...prev.docMap, { id: Date.now().toString(), path: '', description: '' }] }))}
+                onClick={() => setConfig(prev => ({ ...prev, docMap: [...prev.docMap, { id: generateUniqueId('doc-'), path: '', description: '' }] }))}
                 className="w-full border border-dashed border-border"
               >
                 + Add File Path
