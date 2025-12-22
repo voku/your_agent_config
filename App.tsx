@@ -131,18 +131,27 @@ const App: React.FC = () => {
   // Skill name validation
   const validateSkillName = (name: string): string => {
     if (!name.trim()) return "";
-    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
-      return "Name must be lowercase letters, numbers, and hyphens only";
-    }
-    if (name.startsWith('-') || name.endsWith('-')) {
-      return "Name cannot start or end with a hyphen";
-    }
-    if (name.includes('--')) {
-      return "Name cannot contain consecutive hyphens";
-    }
+    
+    // Check length first
     if (name.length > 64) {
       return "Name must be 64 characters or less";
     }
+    
+    // Check for consecutive hyphens
+    if (name.includes('--')) {
+      return "Name cannot contain consecutive hyphens";
+    }
+    
+    // Check if starts or ends with hyphen
+    if (name.startsWith('-') || name.endsWith('-')) {
+      return "Name cannot start or end with a hyphen";
+    }
+    
+    // Finally, check overall pattern (lowercase, numbers, hyphens only)
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(name)) {
+      return "Name must be lowercase letters, numbers, and hyphens only";
+    }
+    
     return "";
   };
 
