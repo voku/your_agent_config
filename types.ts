@@ -74,6 +74,7 @@ export interface AgentConfig {
   aiWorkflowEnabled: boolean;
   llmOptimizedPatternsEnabled: boolean;
   fixPreExistingIssuesEnabled: boolean;
+  globalRulesEnabled: boolean;
   shellCommands: ShellCommand[];
   mistakesToAvoid: ListItem[];
   questionsToAsk: ListItem[];
