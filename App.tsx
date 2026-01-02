@@ -25,6 +25,7 @@ const INITIAL_STATE: AgentConfig = {
   aiWorkflowEnabled: false,
   llmOptimizedPatternsEnabled: false,
   fixPreExistingIssuesEnabled: false,
+  globalRulesEnabled: false,
   shellCommands: [],
   mistakesToAvoid: [],
   questionsToAsk: [],
@@ -553,11 +554,33 @@ ${config.skills.map(skill => {
 2. **Move detailed content to references/** for on-demand loading
 3. **Structure for efficiency**: Metadata (~100 tokens) → Instructions (~5000 tokens) → Resources (as needed)
 ` : '';
+
+    const globalRulesSection = config.globalRulesEnabled ? `
+# Global Rules (Must Follow)
+
+You are a world-class software engineer and software architect.
+
+Your motto is:
+
+> **Every mission assigned is delivered with 100% quality and state-of-the-art execution — no hacks, no workarounds, no partial deliverables and no mock-driven confidence. Mocks/stubs may exist in unit tests for I/O boundaries, but final validation must rely on real integration and end-to-end tests.**
+
+You always:
+
+- Deliver end-to-end, production-like solutions with clean, modular, and maintainable architecture.
+- Take full ownership of the task: you do not abandon work because it is complex or tedious; you only pause when requirements are truly contradictory or when critical clarification is needed.
+- Are proactive and efficient: you avoid repeatedly asking for confirmation like "Can I proceed?" and instead move logically to next steps, asking focused questions only when they unblock progress.
+- Follow the full engineering cycle for significant tasks: **understand → design → implement → (conceptually) test → refine → document**, using all relevant tools and environment capabilities appropriately.
+- Respect both functional and non-functional requirements and, when the user's technical ideas are unclear or suboptimal, you propose better, modern, state-of-the-art alternatives that still satisfy their business goals.
+- Manage context efficiently and avoid abrupt, low-value interruptions; when you must stop due to platform limits, you clearly summarize what was done and what remains.
+
+---
+` : '';
     
     return `# ${config.projectName} - AGENTS.md
 
 > **⚠️ SYSTEM CONTEXT FILE**
 > This file governs the behavior of AI agents (Cursor, Copilot, Windsurf) within this repository.
+${globalRulesSection ? '\n' + globalRulesSection : ''}
 ${additionalResourcesSection ? '\n' + additionalResourcesSection : ''}${developmentPrinciplesSection ? '\n' + developmentPrinciplesSection : ''}
 ## 1. Project Identity & Mission
 **Goal:** ${config.mission}
@@ -1028,6 +1051,19 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
                   type="checkbox"
                   checked={config.fixPreExistingIssuesEnabled}
                   onChange={(e) => setConfig(prev => ({ ...prev, fixPreExistingIssuesEnabled: e.target.checked }))}
+                  className="w-5 h-5 rounded border-border"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-surfaceHighlight rounded-lg border border-border">
+                <div>
+                  <Label>Enable Global Rules (Must Follow)</Label>
+                  <p className="text-xs text-textMuted">Adds world-class engineering principles: 100% quality, no hacks, real tests, full ownership</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.globalRulesEnabled}
+                  onChange={(e) => setConfig(prev => ({ ...prev, globalRulesEnabled: e.target.checked }))}
                   className="w-5 h-5 rounded border-border"
                 />
               </div>
