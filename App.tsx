@@ -1041,7 +1041,7 @@ Return this exact JSON structure:
                 onClick={() => setConfig(prev => ({ ...prev, phase: ProjectPhase.PROTOTYPE }))}
                 className={`p-4 rounded-xl border text-center transition-all ${
                   config.phase === ProjectPhase.PROTOTYPE 
-                    ? 'bg-green-500/10 border-green-500 text-green-200' 
+                    ? 'bg-green-500/10 border-green-500 text-green-800' 
                     : 'bg-surfaceHighlight border-border text-textMuted hover:border-textMuted'
                 }`}
               >
@@ -1053,7 +1053,7 @@ Return this exact JSON structure:
                 onClick={() => setConfig(prev => ({ ...prev, phase: ProjectPhase.PRODUCTION }))}
                 className={`p-4 rounded-xl border text-center transition-all ${
                   config.phase === ProjectPhase.PRODUCTION 
-                    ? 'bg-red-500/10 border-red-500 text-red-200' 
+                    ? 'bg-red-500/10 border-red-500 text-red-800' 
                     : 'bg-surfaceHighlight border-border text-textMuted hover:border-textMuted'
                 }`}
               >
@@ -1826,7 +1826,7 @@ Return this exact JSON structure:
                 }
               }} variant="secondary" className="self-end">Add</Button>
             </div>
-            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-200">
+            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-800">
               <strong>💡 Tip:</strong> Use the "LLM Helpers" tab to generate skills suggestions using AI!
             </div>
           </Card>
@@ -1877,7 +1877,7 @@ Return this exact JSON structure:
 
           {activeTab === 'prompt' && (
              <div className="p-8 max-w-4xl mx-auto">
-               <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg mb-6 text-sm text-blue-200">
+               <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg mb-6 text-sm text-blue-800">
                  <strong>How to use:</strong> Paste this into Cursor's "Rules for AI" or as a System Prompt in your chat configuration.
                </div>
                <pre className="font-mono text-sm text-textMain dark:text-gray-300 whitespace-pre-wrap">{systemPrompt}</pre>
