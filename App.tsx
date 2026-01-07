@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill } from './types';
 import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon, SunIcon, MoonIcon, GithubIcon } from './components/UIComponents';
+import { ComboInput } from './components/ComboInput';
+import { PROJECT_PRESETS, FIELD_PRESETS } from './presets';
 
 const INITIAL_STATE: AgentConfig = {
   projectName: "My Awesome Project",
@@ -1082,33 +1084,99 @@ Return this exact JSON structure:
           {/* Tech Stack */}
           <Card title="3. Tech Stack">
             <div className="space-y-4">
+               {/* Project Type Preset Selector */}
+               <div>
+                 <Label>Quick Start Template</Label>
+                 <select 
+                   onChange={(e) => {
+                     const preset = PROJECT_PRESETS[e.target.value];
+                     if (preset) {
+                       setConfig(prev => ({
+                         ...prev,
+                         languages: preset.languages,
+                         frameworks: preset.frameworks,
+                         packageManager: preset.packageManager,
+                         styling: preset.styling,
+                         stateManagement: preset.stateManagement,
+                         backend: preset.backend,
+                       }));
+                     }
+                   }}
+                   className="w-full bg-surfaceHighlight border border-border rounded-lg px-3 py-2.5 text-sm text-textMain focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                 >
+                   <option value="">Select a template or customize below...</option>
+                   {Object.entries(PROJECT_PRESETS).map(([key, preset]) => (
+                     <option key={key} value={key}>
+                       {preset.name} - {preset.description}
+                     </option>
+                   ))}
+                 </select>
+                 <p className="text-xs text-textMuted mt-1">💡 Choose a template to auto-fill fields below, or customize manually</p>
+               </div>
+               
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="languages">Languages</Label>
-                    <Input name="languages" value={config.languages} onChange={handleInputChange} />
+                    <ComboInput 
+                      name="languages" 
+                      value={config.languages} 
+                      onChange={(val) => setConfig(prev => ({...prev, languages: val}))}
+                      presets={FIELD_PRESETS.languages}
+                      placeholder="e.g. TypeScript, Python"
+                    />
                   </div>
                   <div>
                     <Label htmlFor="frameworks">Frameworks</Label>
-                    <Input name="frameworks" value={config.frameworks} onChange={handleInputChange} />
+                    <ComboInput 
+                      name="frameworks" 
+                      value={config.frameworks} 
+                      onChange={(val) => setConfig(prev => ({...prev, frameworks: val}))}
+                      presets={FIELD_PRESETS.frameworks}
+                      placeholder="e.g. React, Next.js"
+                    />
                   </div>
                   <div>
                     <Label htmlFor="styling">Styling</Label>
-                    <Input name="styling" value={config.styling} onChange={handleInputChange} />
+                    <ComboInput 
+                      name="styling" 
+                      value={config.styling} 
+                      onChange={(val) => setConfig(prev => ({...prev, styling: val}))}
+                      presets={FIELD_PRESETS.styling}
+                      placeholder="e.g. Tailwind CSS"
+                    />
                   </div>
                    <div>
                     <Label htmlFor="stateManagement">State Management</Label>
-                    <Input name="stateManagement" value={config.stateManagement} onChange={handleInputChange} />
+                    <ComboInput 
+                      name="stateManagement" 
+                      value={config.stateManagement} 
+                      onChange={(val) => setConfig(prev => ({...prev, stateManagement: val}))}
+                      presets={FIELD_PRESETS.stateManagement}
+                      placeholder="e.g. Zustand, Redux"
+                    />
                   </div>
                   <div>
                     <Label htmlFor="backend">Backend</Label>
-                    <Input name="backend" value={config.backend} onChange={handleInputChange} />
+                    <ComboInput 
+                      name="backend" 
+                      value={config.backend} 
+                      onChange={(val) => setConfig(prev => ({...prev, backend: val}))}
+                      presets={FIELD_PRESETS.backend}
+                      placeholder="e.g. Supabase, Firebase"
+                    />
                   </div>
                   <div>
                     <Label htmlFor="packageManager">Package Manager</Label>
-                    <Input name="packageManager" value={config.packageManager} onChange={handleInputChange} />
+                    <ComboInput 
+                      name="packageManager" 
+                      value={config.packageManager} 
+                      onChange={(val) => setConfig(prev => ({...prev, packageManager: val}))}
+                      presets={FIELD_PRESETS.packageManagers}
+                      placeholder="e.g. npm, pnpm"
+                    />
                   </div>
                </div>
-               <p className="text-xs text-textMuted mt-2">💡 Use the "LLM Helpers" tab to get AI suggestions for your tech stack</p>
+               <p className="text-xs text-textMuted mt-2">💡 Type to filter options, or enter custom values. Use the "LLM Helpers" tab for AI suggestions.</p>
             </div>
           </Card>
 
