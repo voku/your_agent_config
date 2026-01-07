@@ -74,10 +74,10 @@ export const TextArea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement
 export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'icon' }> = ({ 
   children, variant = 'primary', className = '', ...props 
 }) => {
-  const base = "inline-flex items-center justify-center gap-2 font-semibold transition-all rounded-lg disabled:opacity-50 disabled:cursor-not-allowed";
+  const base = "inline-flex items-center justify-center gap-2 font-semibold transition-all rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm";
   const variants = {
     primary: "bg-primary hover:bg-primaryHover text-white px-4 py-2 shadow-lg shadow-primary/20",
-    secondary: "bg-surfaceHighlight hover:bg-border text-textMain border border-border px-4 py-2",
+    secondary: "bg-surfaceHighlight hover:bg-border text-textMain border border-border px-3 py-1.5",
     ghost: "bg-transparent hover:bg-white/5 text-textMuted hover:text-textMain px-3 py-1.5",
     icon: "p-2 hover:bg-white/10 text-textMuted hover:text-white rounded-md"
   };
