@@ -21,6 +21,18 @@
               primaryHover: '#7c3aed',
               textMain: '#212529',
               textMuted: '#6c757d',
+              // Dark theme semantic colors (used with dark: prefix)
+              darkBackground: '#09090b',
+              darkSurface: '#18181b',
+              darkSurfaceHighlight: '#27272a',
+              darkBorder: '#3f3f46',
+              darkTextMain: '#f4f4f5',
+              darkTextMuted: '#a1a1aa',
+              // Code preview panel colors for dark theme
+              darkCodeBg: '#1e1e1e',
+              darkCodeSurface: '#252526',
+              darkCodeBorder: '#333333',
+              darkCodeHover: '#2d2d2d',
             },
             fontFamily: {
               mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
@@ -37,19 +49,10 @@
         color: #212529;
       }
       
-      /* Dark theme overrides */
+      /* Dark theme body override */
       .dark body {
         background-color: #09090b;
         color: #f4f4f5;
-      }
-      
-      .dark {
-        --color-background: #09090b;
-        --color-surface: #18181b;
-        --color-surfaceHighlight: #27272a;
-        --color-border: #3f3f46;
-        --color-textMain: #f4f4f5;
-        --color-textMuted: #a1a1aa;
       }
     </style>
   <script type="importmap">

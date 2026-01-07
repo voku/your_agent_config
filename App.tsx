@@ -286,21 +286,8 @@ const App: React.FC = () => {
     try {
       const data = JSON.parse(cleanJson);
       
-      // Define expected fields for each helper
-      const helperExpectedFields = [
-        ['languages', 'frameworks', 'packageManager', 'styling', 'stateManagement', 'backend'], // Tech Stack
-        ['neverList'], // Safety Guardrails
-        ['mission'], // Mission Refinement
-        ['directoryStructure', 'docMap'], // Architecture Map
-        ['docMap'], // Key Files Detector
-        ['developmentPrinciples'], // Development Principles
-        ['mistakesToAvoid'], // AI Mistakes
-        ['questionsToAsk'], // Questions Generator
-        ['blindSpots'], // Blind Spots
-        ['skills'], // Skills Generator
-      ];
-      
-      const validation = validateJsonStructure(data, helperExpectedFields[index] || []);
+      // Get expected fields from the helper prompt object
+      const validation = validateJsonStructure(data, helperPrompts[index]?.expectedFields || []);
       if (!validation.valid) {
         alert(`Invalid JSON structure: ${validation.message}\n\nPlease ensure the LLM returned JSON in the expected format.`);
         return;
@@ -711,6 +698,7 @@ INSTRUCTIONS:
     {
       title: "🚀 Tech Stack Advisor",
       description: "Ask an LLM to suggest the best stack. Returns JSON to auto-fill stack fields.",
+      expectedFields: ['languages', 'frameworks', 'packageManager', 'styling', 'stateManagement', 'backend'],
       prompt: `I am starting a software project called "${config.projectName}".
 Mission: ${config.mission}
 Phase: ${config.phase}
@@ -737,6 +725,7 @@ Return this exact JSON structure:
     {
       title: "🛡️ Safety Guardrails",
       description: "Generate specific 'NEVER' rules. Returns JSON to merge into your list.",
+      expectedFields: ['neverList'],
       prompt: `I am using the following stack:
 - Languages: ${config.languages}
 - Frameworks: ${config.frameworks}
@@ -759,6 +748,7 @@ Return this exact JSON structure:
     {
       title: "✨ Mission Refinement",
       description: "Polishes your mission. Returns JSON to update the mission field.",
+      expectedFields: ['mission'],
       prompt: `My project's mission is: "${config.mission}".
 North Star: "${config.northStar}"
 
@@ -779,6 +769,7 @@ Return this exact JSON structure:
     {
       title: "🗺️ Architecture Map",
       description: "Suggests directory structure. Returns JSON to update structure and docs.",
+      expectedFields: ['directoryStructure', 'docMap'],
       prompt: `I am building a ${config.phase} project using ${config.frameworks} and ${config.backend}.
       
 Please suggest a robust, scalable directory structure.
@@ -802,6 +793,7 @@ Return this exact JSON structure:
     {
       title: "📂 Key Files Detector",
       description: "Identifies important files AI agents should read. Returns JSON to add to context map.",
+      expectedFields: ['docMap'],
       prompt: `I am using the following tech stack:
 - Languages: ${config.languages}
 - Frameworks: ${config.frameworks}
@@ -828,6 +820,7 @@ Return this exact JSON structure:
     {
       title: "🎯 Development Principles Generator",
       description: "Generate core development principles. Returns JSON to add to principles list.",
+      expectedFields: ['developmentPrinciples'],
       prompt: `I am building "${config.projectName}" with the following mission:
 ${config.mission}
 
@@ -851,6 +844,7 @@ Return this exact JSON structure:
     {
       title: "⚠️ AI Mistakes Generator",
       description: "Generate common mistakes AI should avoid. Returns JSON to add to mistakes list.",
+      expectedFields: ['mistakesToAvoid'],
       prompt: `I am using the following stack:
 - Languages: ${config.languages}
 - Frameworks: ${config.frameworks}
@@ -873,6 +867,7 @@ Return this exact JSON structure:
     {
       title: "❓ Questions Generator",
       description: "Generate self-check questions for AI. Returns JSON to add to questions list.",
+      expectedFields: ['questionsToAsk'],
       prompt: `I am building a ${config.phase} project called "${config.projectName}".
 
 Please suggest 5-7 questions an AI assistant should ask itself before starting any implementation.
@@ -892,6 +887,7 @@ Return this exact JSON structure:
     {
       title: "👁️ Blind Spots Generator",
       description: "Generate AI blind spots and mitigations. Returns JSON to add to blind spots list.",
+      expectedFields: ['blindSpots'],
       prompt: `I am using:
 - Languages: ${config.languages}
 - Frameworks: ${config.frameworks}
@@ -914,6 +910,7 @@ Return this exact JSON structure:
     {
       title: "🔧 Skills Generator",
       description: "Generate agent skills for specialized tasks. Returns JSON to add to skills list.",
+      expectedFields: ['skills'],
       prompt: `I am building "${config.projectName}" using:
 - Languages: ${config.languages}
 - Frameworks: ${config.frameworks}
@@ -1837,24 +1834,24 @@ Return this exact JSON structure:
       </div>
 
       {/* RIGHT PANEL: PREVIEW & TOOLS */}
-      <div className="w-full md:w-1/2 lg:w-full bg-surfaceHighlight dark:bg-[#1e1e1e] flex flex-col h-full overflow-hidden">
+      <div className="w-full md:w-1/2 lg:w-full bg-surfaceHighlight dark:bg-darkCodeBg flex flex-col h-full overflow-hidden">
         {/* Tabs */}
-        <div className="flex items-center border-b border-border dark:border-[#333] bg-surface dark:bg-[#252526]">
+        <div className="flex items-center border-b border-border dark:border-darkCodeBorder bg-surface dark:bg-darkCodeSurface">
            <button 
              onClick={() => setActiveTab('markdown')}
-             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-[#333] transition-colors ${activeTab === 'markdown' ? 'bg-surfaceHighlight dark:bg-[#1e1e1e] text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-[#2d2d2d]'}`}
+             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-darkCodeBorder transition-colors ${activeTab === 'markdown' ? 'bg-surfaceHighlight dark:bg-darkCodeBg text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-darkCodeHover'}`}
            >
              📄 AGENTS.md
            </button>
            <button 
              onClick={() => setActiveTab('prompt')}
-             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-[#333] transition-colors ${activeTab === 'prompt' ? 'bg-surfaceHighlight dark:bg-[#1e1e1e] text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-[#2d2d2d]'}`}
+             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-darkCodeBorder transition-colors ${activeTab === 'prompt' ? 'bg-surfaceHighlight dark:bg-darkCodeBg text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-darkCodeHover'}`}
            >
              🤖 System Prompt
            </button>
            <button 
              onClick={() => setActiveTab('helpers')}
-             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-[#333] transition-colors ${activeTab === 'helpers' ? 'bg-surfaceHighlight dark:bg-[#1e1e1e] text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-[#2d2d2d]'}`}
+             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-darkCodeBorder transition-colors ${activeTab === 'helpers' ? 'bg-surfaceHighlight dark:bg-darkCodeBg text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-darkCodeHover'}`}
            >
              🛠️ LLM Helpers
            </button>
@@ -1871,7 +1868,7 @@ Return this exact JSON structure:
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto bg-surfaceHighlight dark:bg-[#1e1e1e] p-0 relative">
+        <div className="flex-1 overflow-auto bg-surfaceHighlight dark:bg-darkCodeBg p-0 relative">
           {activeTab === 'markdown' && (
              <div className="p-8 max-w-4xl mx-auto">
                <pre className="font-mono text-sm text-textMain dark:text-gray-300 whitespace-pre-wrap">{generatedMarkdown}</pre>
@@ -1890,7 +1887,7 @@ Return this exact JSON structure:
           {activeTab === 'helpers' && (
             <div className="p-8 grid grid-cols-1 xl:grid-cols-2 gap-6">
               {helperPrompts.map((helper, idx) => (
-                <div key={idx} className="bg-surface dark:bg-[#252526] border border-border dark:border-[#333] rounded-xl p-6 flex flex-col">
+                <div key={idx} className="bg-surface dark:bg-darkCodeSurface border border-border dark:border-darkCodeBorder rounded-xl p-6 flex flex-col">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-textMain dark:text-white flex items-center gap-2">
