@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill } from './types';
-import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon } from './components/UIComponents';
+import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon, SunIcon, MoonIcon, GithubIcon } from './components/UIComponents';
 
 const INITIAL_STATE: AgentConfig = {
   projectName: "My Awesome Project",
@@ -37,9 +37,19 @@ const App: React.FC = () => {
   const [config, setConfig] = useState<AgentConfig>(INITIAL_STATE);
   const [activeTab, setActiveTab] = useState<'markdown' | 'prompt' | 'helpers'>('markdown');
   const [newNeverItem, setNewNeverItem] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   // State for the "Import JSON" textareas in the helper tab
   const [importInputs, setImportInputs] = useState<{[key: number]: string}>({});
+
+  // Theme toggle effect
+  React.useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   // Helper to generate unique IDs
   let idCounter = 0;
@@ -226,16 +236,74 @@ const App: React.FC = () => {
   };
 
 
+  // Helper to validate JSON structure
+  const validateJsonStructure = (data: any, expectedFields: string[]): { valid: boolean; message: string } => {
+    if (typeof data !== 'object' || data === null) {
+      return { valid: false, message: 'Response must be a JSON object' };
+    }
+    
+    const dataKeys = Object.keys(data);
+    const hasExpectedFields = expectedFields.some(field => dataKeys.includes(field));
+    
+    if (!hasExpectedFields) {
+      return { 
+        valid: false, 
+        message: `JSON missing expected fields. Expected one of: ${expectedFields.join(', ')}. Found: ${dataKeys.join(', ')}` 
+      };
+    }
+    
+    return { valid: true, message: 'Valid' };
+  };
+
   // Logic to parse and merge pasted JSON
   const handleImportJson = (index: number) => {
     const rawInput = importInputs[index];
-    if (!rawInput) return;
+    if (!rawInput) {
+      alert("Please paste JSON response first");
+      return;
+    }
 
     // Clean markdown code blocks if present
-    const cleanJson = rawInput.replace(/```json/g, '').replace(/```/g, '').trim();
+    let cleanJson = rawInput.trim();
+    
+    // Remove markdown code blocks
+    cleanJson = cleanJson.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+    
+    // Try to find JSON object if there's extra text
+    const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      cleanJson = jsonMatch[0];
+    }
+
+    // Validate it's not empty
+    if (!cleanJson) {
+      alert("No JSON content found. Please paste the LLM's JSON response.");
+      return;
+    }
 
     try {
       const data = JSON.parse(cleanJson);
+      
+      // Define expected fields for each helper
+      const helperExpectedFields = [
+        ['languages', 'frameworks', 'packageManager', 'styling', 'stateManagement', 'backend'], // Tech Stack
+        ['neverList'], // Safety Guardrails
+        ['mission'], // Mission Refinement
+        ['directoryStructure', 'docMap'], // Architecture Map
+        ['docMap'], // Key Files Detector
+        ['developmentPrinciples'], // Development Principles
+        ['mistakesToAvoid'], // AI Mistakes
+        ['questionsToAsk'], // Questions Generator
+        ['blindSpots'], // Blind Spots
+        ['skills'], // Skills Generator
+      ];
+      
+      const validation = validateJsonStructure(data, helperExpectedFields[index] || []);
+      if (!validation.valid) {
+        alert(`Invalid JSON structure: ${validation.message}\n\nPlease ensure the LLM returned JSON in the expected format.`);
+        return;
+      }
+      
       setConfig(prev => {
         const next = { ...prev };
         
@@ -349,10 +417,11 @@ const App: React.FC = () => {
       
       // Clear input after success
       setImportInputs(prev => ({ ...prev, [index]: '' }));
-      alert("Successfully merged external LLM data!");
+      alert("✅ Successfully merged external LLM data!");
     } catch (e) {
-      console.error(e);
-      alert("Failed to parse JSON. Please ensure the response is valid JSON format.");
+      const errorMsg = e instanceof Error ? e.message : 'Unknown error';
+      console.error('JSON Parse Error:', e);
+      alert(`❌ Failed to parse JSON: ${errorMsg}\n\nPlease ensure:\n1. The LLM returned ONLY JSON (no markdown, no explanations)\n2. The JSON is properly formatted\n3. Remove any code blocks or extra text`);
     }
   };
 
@@ -645,7 +714,15 @@ Mission: ${config.mission}
 Phase: ${config.phase}
 
 Please recommend a complete technical stack best suited for this mission.
-CRITICAL: Return ONLY a raw JSON object (no markdown, no explanations) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "languages": "...",
   "frameworks": "...",
@@ -664,7 +741,15 @@ CRITICAL: Return ONLY a raw JSON object (no markdown, no explanations) with this
 - State Mgmt: ${config.stateManagement}
 
 Please suggest 5-7 critical "NEVER" rules for an AI coding agent.
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "neverList": ["Never use 'any'", "Never mutate state directly", ...]
 }`
@@ -676,7 +761,15 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
 North Star: "${config.northStar}"
 
 Please refine this mission statement to be concise yet inspiring for a developer team.
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "mission": "The single best refined mission statement here"
 }`
@@ -687,7 +780,15 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
       prompt: `I am building a ${config.phase} project using ${config.frameworks} and ${config.backend}.
       
 Please suggest a robust, scalable directory structure.
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "directoryStructure": "src/components\\nsrc/hooks\\n...",
   "docMap": [
@@ -706,7 +807,15 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
 - Backend: ${config.backend}
 
 Based on this stack, suggest 3-5 key file paths that an AI coding agent should read to understand the architecture and conventions of this project.
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "docMap": [
     { "path": "src/types.ts", "description": "Type definitions and interfaces" },
@@ -724,7 +833,15 @@ North Star: ${config.northStar}
 Phase: ${config.phase}
 
 Please suggest 5-7 core development principles that should guide all development decisions.
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "developmentPrinciples": ["Zero downtime deployments", "Security first", "User experience over features", ...]
 }`
@@ -738,7 +855,15 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
 - Backend: ${config.backend}
 
 Please suggest 5-7 common mistakes AI assistants make when working with this tech stack.
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "mistakesToAvoid": ["Don't implement without understanding existing patterns", "Don't skip the discovery phase", ...]
 }`
@@ -749,7 +874,15 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
       prompt: `I am building a ${config.phase} project called "${config.projectName}".
 
 Please suggest 5-7 questions an AI assistant should ask itself before starting any implementation.
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "questionsToAsk": ["What similar functionality already exists?", "What existing tests can guide my understanding?", ...]
 }`
@@ -763,7 +896,15 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
 - Backend: ${config.backend}
 
 Please suggest 5-7 potential blind spots an AI assistant might have when working on this project, along with mitigation strategies.
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "blindSpots": ["Local environment unknown – confirm tool availability before relying on them", "Hidden dependencies – request explicit dependency lists", ...]
 }`
@@ -795,7 +936,14 @@ Generate 3-5 focused Agent Skills following the Agent Skills specification:
 - code-review: "Perform systematic code reviews following project standards. Use when user asks to review code, check quality, or mentions code review."
 - api-documentation: "Generate OpenAPI/Swagger documentation from code. Use when documenting APIs or when user mentions API docs, Swagger, or OpenAPI."
 
-CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
+⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
+- Your response must be ONLY valid JSON
+- NO markdown code blocks (no \`\`\`json)
+- NO explanations before or after
+- NO additional text
+- Start with { and end with }
+
+Return this exact JSON structure:
 {
   "skills": [
     {
@@ -838,10 +986,32 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
       {/* LEFT PANEL: CONFIGURATION */}
       <div className="w-full md:w-1/2 lg:w-[600px] xl:w-[700px] bg-background flex flex-col border-r border-border h-full">
         <div className="p-6 border-b border-border bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-pink-500">
-            Agent Context Architect
-          </h1>
-          <p className="text-textMuted text-sm mt-1">Build the brain for your AI coding assistants.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-pink-500">
+                Agent Context Architect
+              </h1>
+              <p className="text-textMuted text-sm mt-1">Build the brain for your AI coding assistants.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <a 
+                href="https://github.com/voku/your_agent_config" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2 hover:bg-surfaceHighlight rounded-lg transition-colors text-textMuted hover:text-primary"
+                title="Contribute on GitHub"
+              >
+                <GithubIcon />
+              </a>
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 hover:bg-surfaceHighlight rounded-lg transition-colors text-textMuted hover:text-primary"
+                title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {isDarkMode ? <SunIcon /> : <MoonIcon />}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
@@ -1599,24 +1769,24 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
       </div>
 
       {/* RIGHT PANEL: PREVIEW & TOOLS */}
-      <div className="w-full md:w-1/2 lg:w-full bg-[#1e1e1e] flex flex-col h-full overflow-hidden">
+      <div className="w-full md:w-1/2 lg:w-full bg-surfaceHighlight dark:bg-[#1e1e1e] flex flex-col h-full overflow-hidden">
         {/* Tabs */}
-        <div className="flex items-center border-b border-[#333] bg-[#252526]">
+        <div className="flex items-center border-b border-border dark:border-[#333] bg-surface dark:bg-[#252526]">
            <button 
              onClick={() => setActiveTab('markdown')}
-             className={`px-6 py-3 text-sm font-medium border-r border-[#333] transition-colors ${activeTab === 'markdown' ? 'bg-[#1e1e1e] text-white border-t-2 border-t-primary' : 'text-gray-400 hover:bg-[#2d2d2d]'}`}
+             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-[#333] transition-colors ${activeTab === 'markdown' ? 'bg-surfaceHighlight dark:bg-[#1e1e1e] text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-[#2d2d2d]'}`}
            >
              📄 AGENTS.md
            </button>
            <button 
              onClick={() => setActiveTab('prompt')}
-             className={`px-6 py-3 text-sm font-medium border-r border-[#333] transition-colors ${activeTab === 'prompt' ? 'bg-[#1e1e1e] text-white border-t-2 border-t-primary' : 'text-gray-400 hover:bg-[#2d2d2d]'}`}
+             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-[#333] transition-colors ${activeTab === 'prompt' ? 'bg-surfaceHighlight dark:bg-[#1e1e1e] text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-[#2d2d2d]'}`}
            >
              🤖 System Prompt
            </button>
            <button 
              onClick={() => setActiveTab('helpers')}
-             className={`px-6 py-3 text-sm font-medium border-r border-[#333] transition-colors ${activeTab === 'helpers' ? 'bg-[#1e1e1e] text-white border-t-2 border-t-primary' : 'text-gray-400 hover:bg-[#2d2d2d]'}`}
+             className={`px-6 py-3 text-sm font-medium border-r border-border dark:border-[#333] transition-colors ${activeTab === 'helpers' ? 'bg-surfaceHighlight dark:bg-[#1e1e1e] text-textMain dark:text-white border-t-2 border-t-primary' : 'text-textMuted dark:text-gray-400 hover:bg-background dark:hover:bg-[#2d2d2d]'}`}
            >
              🛠️ LLM Helpers
            </button>
@@ -1633,48 +1803,48 @@ CRITICAL: Return ONLY a raw JSON object (no markdown) with this exact structure:
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto bg-[#1e1e1e] p-0 relative">
+        <div className="flex-1 overflow-auto bg-surfaceHighlight dark:bg-[#1e1e1e] p-0 relative">
           {activeTab === 'markdown' && (
              <div className="p-8 max-w-4xl mx-auto">
-               <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap">{generatedMarkdown}</pre>
+               <pre className="font-mono text-sm text-textMain dark:text-gray-300 whitespace-pre-wrap">{generatedMarkdown}</pre>
              </div>
           )}
 
           {activeTab === 'prompt' && (
              <div className="p-8 max-w-4xl mx-auto">
-               <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg mb-6 text-sm text-blue-200">
+               <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg mb-6 text-sm text-blue-600 dark:text-blue-200">
                  <strong>How to use:</strong> Paste this into Cursor's "Rules for AI" or as a System Prompt in your chat configuration.
                </div>
-               <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap">{systemPrompt}</pre>
+               <pre className="font-mono text-sm text-textMain dark:text-gray-300 whitespace-pre-wrap">{systemPrompt}</pre>
              </div>
           )}
 
           {activeTab === 'helpers' && (
             <div className="p-8 grid grid-cols-1 xl:grid-cols-2 gap-6">
               {helperPrompts.map((helper, idx) => (
-                <div key={idx} className="bg-[#252526] border border-[#333] rounded-xl p-6 flex flex-col">
+                <div key={idx} className="bg-surface dark:bg-[#252526] border border-border dark:border-[#333] rounded-xl p-6 flex flex-col">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-textMain dark:text-white flex items-center gap-2">
                         {helper.title}
                       </h3>
-                      <p className="text-sm text-gray-400 mt-1">{helper.description}</p>
+                      <p className="text-sm text-textMuted dark:text-gray-400 mt-1">{helper.description}</p>
                     </div>
                     <Button variant="ghost" onClick={() => copyToClipboard(helper.prompt)}>
                       <CopyIcon /> Copy
                     </Button>
                   </div>
                   
-                  <div className="bg-black/30 rounded-lg p-3 mb-4 border border-white/5 flex-1 max-h-40 overflow-y-auto">
-                    <pre className="text-xs text-gray-500 whitespace-pre-wrap font-mono">{helper.prompt}</pre>
+                  <div className="bg-surfaceHighlight dark:bg-black/30 rounded-lg p-3 mb-4 border border-border dark:border-white/5 flex-1 max-h-40 overflow-y-auto">
+                    <pre className="text-xs text-textMuted dark:text-gray-500 whitespace-pre-wrap font-mono">{helper.prompt}</pre>
                   </div>
 
-                  <div className="mt-auto pt-4 border-t border-white/5">
+                  <div className="mt-auto pt-4 border-t border-border dark:border-white/5">
                     <Label>Import LLM Response (JSON)</Label>
                     <div className="flex gap-2">
                       <TextArea 
                         placeholder="Paste the JSON response here..." 
-                        className="bg-black/20 border-white/10 h-20 font-mono text-xs"
+                        className="bg-surfaceHighlight dark:bg-black/20 border-border dark:border-white/10 h-20 font-mono text-xs"
                         value={importInputs[idx] || ''}
                         onChange={(e) => setImportInputs(prev => ({...prev, [idx]: e.target.value}))}
                       />
