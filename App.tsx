@@ -1224,7 +1224,7 @@ Return this exact JSON structure:
              <div className="space-y-2 mb-4">
                {config.neverList.map((item, idx) => (
                  <div key={idx} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
-                   <span className="text-red-400 text-xs font-bold px-2 py-0.5 bg-red-900/20 rounded">NEVER</span>
+                   <span className="text-red-300 text-xs font-bold px-2 py-0.5 bg-red-950 rounded border border-red-800">NEVER</span>
                    <span className="flex-1 text-sm">{item}</span>
                    <button onClick={() => removeNeverItem(idx)} className="opacity-0 group-hover:opacity-100 text-textMuted hover:text-red-400 transition-opacity">
                      <TrashIcon />
@@ -1260,7 +1260,7 @@ Return this exact JSON structure:
                   type="checkbox"
                   checked={config.aiWorkflowEnabled}
                   onChange={(e) => setConfig(prev => ({ ...prev, aiWorkflowEnabled: e.target.checked }))}
-                  className="w-5 h-5 rounded border-border"
+                  className="w-4 h-4 rounded border-border"
                 />
               </div>
               
@@ -1273,7 +1273,7 @@ Return this exact JSON structure:
                   type="checkbox"
                   checked={config.llmOptimizedPatternsEnabled}
                   onChange={(e) => setConfig(prev => ({ ...prev, llmOptimizedPatternsEnabled: e.target.checked }))}
-                  className="w-5 h-5 rounded border-border"
+                  className="w-4 h-4 rounded border-border"
                 />
               </div>
               
@@ -1286,7 +1286,7 @@ Return this exact JSON structure:
                   type="checkbox"
                   checked={config.fixPreExistingIssuesEnabled}
                   onChange={(e) => setConfig(prev => ({ ...prev, fixPreExistingIssuesEnabled: e.target.checked }))}
-                  className="w-5 h-5 rounded border-border"
+                  className="w-4 h-4 rounded border-border"
                 />
               </div>
               
@@ -1299,7 +1299,7 @@ Return this exact JSON structure:
                   type="checkbox"
                   checked={config.globalRulesEnabled}
                   onChange={(e) => setConfig(prev => ({ ...prev, globalRulesEnabled: e.target.checked }))}
-                  className="w-5 h-5 rounded border-border"
+                  className="w-4 h-4 rounded border-border"
                 />
               </div>
             </div>
@@ -1311,7 +1311,7 @@ Return this exact JSON structure:
             <div className="space-y-2 mb-4">
               {config.developmentPrinciples.map((item) => (
                 <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
-                  <span className="text-green-400 text-xs font-bold px-2 py-0.5 bg-green-900/20 rounded">✅</span>
+                  <span className="text-green-300 text-xs font-bold px-2 py-0.5 bg-green-950 rounded border border-green-800">✅</span>
                   <input
                     type="text"
                     value={item.text}
@@ -1349,7 +1349,7 @@ Return this exact JSON structure:
             <div className="space-y-2 mb-4">
               {config.preImplementationChecklist.map((item) => (
                 <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
-                  <span className="text-blue-400 text-xs font-bold px-2 py-0.5 bg-blue-900/20 rounded">☐</span>
+                  <span className="text-blue-300 text-xs font-bold px-2 py-0.5 bg-blue-950 rounded border border-blue-800">☐</span>
                   <input
                     type="text"
                     value={item.text}
@@ -1489,7 +1489,7 @@ Return this exact JSON structure:
             <div className="space-y-2 mb-4">
               {config.mistakesToAvoid.map((item) => (
                 <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
-                  <span className="text-yellow-400 text-xs font-bold px-2 py-0.5 bg-yellow-900/20 rounded">⚠️</span>
+                  <span className="text-yellow-300 text-xs font-bold px-2 py-0.5 bg-yellow-950 rounded border border-yellow-800">⚠️</span>
                   <input
                     type="text"
                     value={item.text}
@@ -1527,7 +1527,7 @@ Return this exact JSON structure:
             <div className="space-y-2 mb-4">
               {config.questionsToAsk.map((item) => (
                 <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
-                  <span className="text-purple-400 text-xs font-bold px-2 py-0.5 bg-purple-900/20 rounded">❓</span>
+                  <span className="text-purple-300 text-xs font-bold px-2 py-0.5 bg-purple-950 rounded border border-purple-800">❓</span>
                   <input
                     type="text"
                     value={item.text}
@@ -1565,7 +1565,7 @@ Return this exact JSON structure:
             <div className="space-y-2 mb-4">
               {config.blindSpots.map((item) => (
                 <div key={item.id} className="flex items-center gap-2 bg-surfaceHighlight p-2 rounded-lg border border-border group">
-                  <span className="text-orange-400 text-xs font-bold px-2 py-0.5 bg-orange-900/20 rounded">👁️</span>
+                  <span className="text-orange-300 text-xs font-bold px-2 py-0.5 bg-orange-950 rounded border border-orange-800">👁️</span>
                   <input
                     type="text"
                     value={item.text}
@@ -1696,7 +1696,7 @@ Return this exact JSON structure:
                           type="checkbox" 
                           checked={skill.hasReferences || false}
                           onChange={(e) => updateSkill(skill.id, 'hasReferences', e.target.checked)}
-                          className="rounded"
+                          className="w-4 h-4 rounded border-border"
                         />
                         <span>📚 Has references/</span>
                       </label>
@@ -1705,7 +1705,7 @@ Return this exact JSON structure:
                           type="checkbox" 
                           checked={skill.hasScripts || false}
                           onChange={(e) => updateSkill(skill.id, 'hasScripts', e.target.checked)}
-                          className="rounded"
+                          className="w-4 h-4 rounded border-border"
                         />
                         <span>🔧 Has scripts/</span>
                       </label>
@@ -1714,7 +1714,7 @@ Return this exact JSON structure:
                           type="checkbox" 
                           checked={skill.hasAssets || false}
                           onChange={(e) => updateSkill(skill.id, 'hasAssets', e.target.checked)}
-                          className="rounded"
+                          className="w-4 h-4 rounded border-border"
                         />
                         <span>📦 Has assets/</span>
                       </label>
@@ -1795,7 +1795,7 @@ Return this exact JSON structure:
                       type="checkbox" 
                       checked={newSkill.hasReferences}
                       onChange={(e) => setNewSkill(prev => ({...prev, hasReferences: e.target.checked}))}
-                      className="rounded"
+                      className="w-4 h-4 rounded border-border"
                     />
                     <span>📚 Has references/</span>
                   </label>
@@ -1804,7 +1804,7 @@ Return this exact JSON structure:
                       type="checkbox" 
                       checked={newSkill.hasScripts}
                       onChange={(e) => setNewSkill(prev => ({...prev, hasScripts: e.target.checked}))}
-                      className="rounded"
+                      className="w-4 h-4 rounded border-border"
                     />
                     <span>🔧 Has scripts/</span>
                   </label>
@@ -1813,7 +1813,7 @@ Return this exact JSON structure:
                       type="checkbox" 
                       checked={newSkill.hasAssets}
                       onChange={(e) => setNewSkill(prev => ({...prev, hasAssets: e.target.checked}))}
-                      className="rounded"
+                      className="w-4 h-4 rounded border-border"
                     />
                     <span>📦 Has assets/</span>
                   </label>
