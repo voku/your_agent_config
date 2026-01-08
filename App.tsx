@@ -256,18 +256,14 @@ const App: React.FC = () => {
       } else {
         // Enable module - check for implied modules to suggest
         const implied = getImpliedModules(moduleKey);
-        const newEnabled = [...prev.enabledModules, moduleKey];
+        const enabledSet = new Set([...prev.enabledModules, moduleKey]);
         
         // Automatically add implied modules that aren't already enabled
-        implied.forEach(imp => {
-          if (!newEnabled.includes(imp)) {
-            newEnabled.push(imp);
-          }
-        });
+        implied.forEach(imp => enabledSet.add(imp));
         
         return {
           ...prev,
-          enabledModules: newEnabled
+          enabledModules: Array.from(enabledSet)
         };
       }
     });

@@ -58,14 +58,12 @@ export function getConflictingModules(moduleKey: string): string[] {
   // Get modules that this module conflicts with
   const directConflicts = [...module.conflicts];
   
-  // Also get modules that conflict with this module
-  MODULES.forEach(m => {
-    if (m.conflicts.includes(moduleKey) && !directConflicts.includes(m.key)) {
-      directConflicts.push(m.key);
-    }
-  });
+  // Also get modules that conflict with this module (using filter for better performance)
+  const reverseConflicts = MODULES
+    .filter(m => m.conflicts.includes(moduleKey) && !directConflicts.includes(m.key))
+    .map(m => m.key);
   
-  return directConflicts;
+  return [...directConflicts, ...reverseConflicts];
 }
 
 /**
