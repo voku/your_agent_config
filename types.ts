@@ -8,7 +8,6 @@ export type ModuleCategoryType = 'engineering' | 'security' | 'operations' | 'pr
 export type ModuleSeverity = 'gate' | 'critical' | 'standard' | 'mode';
 
 export interface AgentModule {
-  schemaVersion: number;
   key: string;
   title: string;
   enabled: boolean;
@@ -25,10 +24,33 @@ export interface AgentModule {
   implies: string[];
 }
 
+export interface ModuleCategoryDefinition {
+  key: string;
+  name: string;
+  description: string;
+  displayOrder: number;
+}
+
+export interface ModulePreset {
+  key: string;
+  name: string;
+  description: string;
+  modules: string[];
+  advisory: string[];
+}
+
 export interface ModuleCategory {
   name: string;
   modules: AgentModule[];
   description: string;
+}
+
+// Root schema for agents-modules.json - single source of truth
+export interface AgentsModulesSchema {
+  schemaVersion: number;
+  categories: ModuleCategoryDefinition[];
+  presets: ModulePreset[];
+  modules: AgentModule[];
 }
 
 export enum AIStyle {

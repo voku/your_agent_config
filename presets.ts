@@ -10,41 +10,8 @@ export interface ProjectPreset {
   backend: string;
 }
 
-// Module-based presets for quick configuration
-export interface ModulePreset {
-  name: string;
-  description: string;
-  modules: string[];
-  advisory: string[]; // Modules that should be warn-only
-}
-
-export const MODULE_PRESETS: Record<string, ModulePreset> = {
-  'startup-mvp': {
-    name: 'Startup MVP',
-    description: 'Fast iteration with essential safety',
-    modules: ['exploratory-spike', 'security', 'documentation'],
-    advisory: ['security', 'documentation']
-  },
-  'enterprise-api': {
-    name: 'Enterprise API',
-    description: 'Full safety for production systems',
-    modules: ['security', 'ops-production-safety', 'database-data-integrity', 
-              'tdd', 'code-review', 'api-design', 'documentation', 'performance'],
-    advisory: []
-  },
-  'open-source-library': {
-    name: 'Open Source Library',
-    description: 'Quality code, no ops overhead',
-    modules: ['tdd', 'code-review', 'documentation', 'api-design'],
-    advisory: []
-  },
-  'legacy-modernization': {
-    name: 'Legacy Modernization',
-    description: 'Safe incremental refactoring',
-    modules: ['legacy-migration', 'tdd', 'documentation'],
-    advisory: []
-  }
-};
+// Re-export MODULE_PRESETS from modules.ts (single source of truth in agents-modules.json)
+export { MODULE_PRESETS } from './modules';
 
 export const PROJECT_PRESETS: Record<string, ProjectPreset> = {
   'modern-web-app': {

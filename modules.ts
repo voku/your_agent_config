@@ -1,9 +1,18 @@
-import { AgentModule, ModuleCategory } from './types';
+import { AgentModule, ModuleCategory, AgentsModulesSchema, ModulePreset } from './types';
 import modulesData from './agents-modules.json';
 
-// Cast JSON data to properly typed modules
-export const MODULES: AgentModule[] = modulesData as AgentModule[];
+// Cast JSON data to properly typed schema
+const schema = modulesData as AgentsModulesSchema;
 
+// Export modules from the single source of truth
+export const MODULES: AgentModule[] = schema.modules;
+
+// Export presets from the single source of truth
+export const MODULE_PRESETS: Record<string, ModulePreset> = Object.fromEntries(
+  schema.presets.map(preset => [preset.key, preset])
+);
+
+// Build categories dynamically from the schema
 export const CATEGORIES: ModuleCategory[] = [
   {
     name: 'Security & Operations',
