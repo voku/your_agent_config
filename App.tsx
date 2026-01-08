@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill } from './types';
+import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill, AgentModule } from './types';
 import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon, SunIcon, MoonIcon, GithubIcon } from './components/UIComponents';
 import { ComboInput } from './components/ComboInput';
-import { PROJECT_PRESETS, FIELD_PRESETS } from './presets';
+import { PROJECT_PRESETS, FIELD_PRESETS, MODULE_PRESETS } from './presets';
+import { CATEGORIES, MODULES, hasConflict, getConflictingModules, getImpliedModules, getSeverityInfo } from './modules';
 
 const INITIAL_STATE: AgentConfig = {
   projectName: "My Awesome Project",
@@ -32,7 +33,10 @@ const INITIAL_STATE: AgentConfig = {
   mistakesToAvoid: [],
   questionsToAsk: [],
   blindSpots: [],
-  skills: []
+  skills: [],
+  // Enforcement modules
+  enabledModules: [],
+  advisoryModules: []
 };
 
 const App: React.FC = () => {
@@ -234,6 +238,63 @@ const App: React.FC = () => {
           }
         };
       })
+    }));
+  };
+
+  // Module toggle handler
+  const handleModuleToggle = (moduleKey: string) => {
+    setConfig(prev => {
+      const isCurrentlyEnabled = prev.enabledModules.includes(moduleKey);
+      
+      if (isCurrentlyEnabled) {
+        // Disable module
+        return {
+          ...prev,
+          enabledModules: prev.enabledModules.filter(k => k !== moduleKey),
+          advisoryModules: prev.advisoryModules.filter(k => k !== moduleKey)
+        };
+      } else {
+        // Enable module - check for implied modules to suggest
+        const implied = getImpliedModules(moduleKey);
+        const newEnabled = [...prev.enabledModules, moduleKey];
+        
+        // Automatically add implied modules that aren't already enabled
+        implied.forEach(imp => {
+          if (!newEnabled.includes(imp)) {
+            newEnabled.push(imp);
+          }
+        });
+        
+        return {
+          ...prev,
+          enabledModules: newEnabled
+        };
+      }
+    });
+  };
+
+  // Toggle advisory mode for a module
+  const handleAdvisoryToggle = (moduleKey: string) => {
+    setConfig(prev => {
+      const isAdvisory = prev.advisoryModules.includes(moduleKey);
+      return {
+        ...prev,
+        advisoryModules: isAdvisory 
+          ? prev.advisoryModules.filter(k => k !== moduleKey)
+          : [...prev.advisoryModules, moduleKey]
+      };
+    });
+  };
+
+  // Apply module preset
+  const applyModulePreset = (presetKey: string) => {
+    const preset = MODULE_PRESETS[presetKey];
+    if (!preset) return;
+    
+    setConfig(prev => ({
+      ...prev,
+      enabledModules: [...preset.modules],
+      advisoryModules: [...preset.advisory]
     }));
   };
 
@@ -633,6 +694,31 @@ You always:
 
 ---
 ` : '';
+
+    // Generate enforcement modules section
+    const enabledModulesData = config.enabledModules
+      .map(key => MODULES.find(m => m.key === key))
+      .filter((m): m is AgentModule => m !== undefined);
+    
+    const enforcementModulesSection = enabledModulesData.length > 0 ? `
+## Enforcement Modules
+
+${enabledModulesData.map(module => {
+  const isAdvisory = config.advisoryModules.includes(module.key);
+  const severityLabel = isAdvisory ? 'ADVISORY' : module.severity.toUpperCase();
+  return `### ${module.title} [${severityLabel}]
+
+**Purpose**: ${module.description}
+
+**Hard Rules**:
+${module.rules.hard.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
+
+**Soft Rules**:
+${module.rules.soft.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
+${module.conflicts.length > 0 ? `
+**Conflicts with**: ${module.conflicts.join(', ')}` : ''}`;
+}).join('\n\n---\n\n')}
+` : '';
     
     return `# ${config.projectName} - AGENTS.md
 
@@ -674,7 +760,7 @@ ${!isProto ? '- **NEVER** Change database schemas without migrations\n- **NEVER*
 ### Testing & Quality
 - **Strategy:** ${config.testingStrategy}
 - **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".
-${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}${skillsSection ? '\n' + skillsSection : ''}
+${enforcementModulesSection ? '\n' + enforcementModulesSection : ''}${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}${skillsSection ? '\n' + skillsSection : ''}
 ## 6. Interaction Style
 **Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}
 `;
@@ -1303,6 +1389,124 @@ Return this exact JSON structure:
                 />
               </div>
             </div>
+          </Card>
+
+          {/* Enforcement Modules */}
+          <Card title="6b. Enforcement Modules">
+            <p className="text-xs text-textMuted mb-4">Select modules to enforce specific development practices. Modules with conflicts will be grayed out.</p>
+            
+            {/* Module Preset Selector */}
+            <div className="mb-6">
+              <Label>Quick Start Preset</Label>
+              <select 
+                onChange={(e) => {
+                  if (e.target.value) {
+                    applyModulePreset(e.target.value);
+                  }
+                }}
+                className="w-full bg-surfaceHighlight border border-border rounded-lg px-3 py-2.5 text-sm text-textMain focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+              >
+                <option value="">Select a module preset...</option>
+                {Object.entries(MODULE_PRESETS).map(([key, preset]) => (
+                  <option key={key} value={key}>
+                    {preset.name} - {preset.description}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Module Categories */}
+            {CATEGORIES.map(category => (
+              <details key={category.name} className="mb-4 border border-border rounded-lg overflow-hidden" open>
+                <summary className="px-4 py-3 bg-surfaceHighlight cursor-pointer hover:bg-border transition-colors">
+                  <span className="font-semibold text-sm">{category.name}</span>
+                  <span className="text-xs text-textMuted ml-2">({category.modules.length} modules)</span>
+                  <p className="text-xs text-textMuted mt-1">{category.description}</p>
+                </summary>
+                <div className="p-4 space-y-3">
+                  {category.modules.map(module => {
+                    const isEnabled = config.enabledModules.includes(module.key);
+                    const isConflicting = !isEnabled && hasConflict(config.enabledModules, module.key);
+                    const conflictingWith = getConflictingModules(module.key).filter(k => config.enabledModules.includes(k));
+                    const impliedBy = getImpliedModules(module.key);
+                    const isAdvisory = config.advisoryModules.includes(module.key);
+                    const severityInfo = getSeverityInfo(module.severity);
+                    
+                    return (
+                      <div 
+                        key={module.key}
+                        className={`p-3 rounded-lg border transition-all ${
+                          isEnabled 
+                            ? 'bg-primary/10 border-primary/30' 
+                            : isConflicting 
+                              ? 'bg-red-500/5 border-red-500/20 opacity-60' 
+                              : 'bg-surfaceHighlight border-border hover:border-textMuted'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            checked={isEnabled}
+                            disabled={isConflicting}
+                            onChange={() => handleModuleToggle(module.key)}
+                            className="mt-1 w-4 h-4 rounded border-border cursor-pointer disabled:cursor-not-allowed"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium text-sm">{module.title}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded border ${severityInfo.className}`}>
+                                {isAdvisory ? 'ADVISORY' : severityInfo.label}
+                              </span>
+                              {isConflicting && (
+                                <span className="text-xs px-2 py-0.5 rounded border bg-red-500/10 text-red-600 border-red-500/30">
+                                  ⚠️ Conflicts with: {conflictingWith.join(', ')}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-textMuted mt-1">{module.description}</p>
+                            
+                            {/* Show implied modules */}
+                            {impliedBy.length > 0 && isEnabled && (
+                              <p className="text-xs text-primary mt-1">
+                                → Implies: {impliedBy.join(', ')}
+                              </p>
+                            )}
+                            
+                            {/* Advisory toggle when enabled */}
+                            {isEnabled && (
+                              <div className="mt-2 flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  id={`advisory-${module.key}`}
+                                  checked={isAdvisory}
+                                  onChange={() => handleAdvisoryToggle(module.key)}
+                                  className="w-3 h-3 rounded border-border"
+                                />
+                                <label htmlFor={`advisory-${module.key}`} className="text-xs text-textMuted cursor-pointer">
+                                  Advisory only (warn but don't block)
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </details>
+            ))}
+            
+            {/* Summary of enabled modules */}
+            {config.enabledModules.length > 0 && (
+              <div className="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+                <p className="text-sm font-medium">
+                  {config.enabledModules.length} module{config.enabledModules.length > 1 ? 's' : ''} enabled
+                </p>
+                <p className="text-xs text-textMuted mt-1">
+                  {config.enabledModules.join(', ')}
+                </p>
+              </div>
+            )}
           </Card>
 
           {/* Development Principles */}

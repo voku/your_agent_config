@@ -3,6 +3,30 @@ export enum ProjectPhase {
   PRODUCTION = 'production',
 }
 
+// Agent Module Types
+export type ModuleCategoryType = 'engineering' | 'security' | 'operations' | 'process' | 'architecture';
+export type ModuleSeverity = 'gate' | 'critical' | 'standard' | 'mode';
+
+export interface AgentModule {
+  key: string;
+  title: string;
+  category: ModuleCategoryType;
+  severity: ModuleSeverity;
+  description: string;
+  rules: {
+    hard: string[];
+    soft: string[];
+  };
+  conflicts: string[];
+  implies: string[];
+}
+
+export interface ModuleCategory {
+  name: string;
+  modules: AgentModule[];
+  description: string;
+}
+
 export enum AIStyle {
   TERSE = 'terse',
   EXPLANATORY = 'explanatory',
@@ -80,4 +104,7 @@ export interface AgentConfig {
   questionsToAsk: ListItem[];
   blindSpots: ListItem[];
   skills: Skill[];
+  // Enforcement modules
+  enabledModules: string[];
+  advisoryModules: string[];
 }
