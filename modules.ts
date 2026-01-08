@@ -1,4 +1,15 @@
-import { AgentModule, ModuleCategory, AgentsModulesSchema, ModulePreset } from './types';
+import { 
+  AgentModule, 
+  ModuleCategory, 
+  AgentsModulesSchema, 
+  ModulePreset, 
+  ProjectPreset, 
+  FieldPresets,
+  SeverityConfig,
+  WorkflowTemplates,
+  LLMHelper,
+  ModuleSeverity
+} from './types';
 import modulesData from './agents-modules.json';
 
 // Cast JSON data to properly typed schema
@@ -7,10 +18,27 @@ const schema = modulesData as AgentsModulesSchema;
 // Export modules from the single source of truth
 export const MODULES: AgentModule[] = schema.modules;
 
-// Export presets from the single source of truth
+// Export module presets from the single source of truth
 export const MODULE_PRESETS: Record<string, ModulePreset> = Object.fromEntries(
-  schema.presets.map(preset => [preset.key, preset])
+  schema.modulePresets.map(preset => [preset.key, preset])
 );
+
+// Export project presets from the single source of truth
+export const PROJECT_PRESETS: Record<string, ProjectPreset> = Object.fromEntries(
+  schema.projectPresets.map(preset => [preset.key, preset])
+);
+
+// Export field presets from the single source of truth
+export const FIELD_PRESETS: FieldPresets = schema.fieldPresets;
+
+// Export severity configurations from the single source of truth
+export const SEVERITIES: Record<ModuleSeverity, SeverityConfig> = schema.severities;
+
+// Export workflow templates from the single source of truth
+export const WORKFLOW_TEMPLATES: WorkflowTemplates = schema.workflowTemplates;
+
+// Export LLM helpers from the single source of truth
+export const LLM_HELPERS: LLMHelper[] = schema.llmHelpers;
 
 // Build categories dynamically from the schema's displayGroups
 export const CATEGORIES: ModuleCategory[] = schema.displayGroups
@@ -76,33 +104,15 @@ export function getModuleByKey(key: string): AgentModule | undefined {
 }
 
 /**
- * Get severity badge styling info
+ * Get severity badge styling info from the single source of truth
  */
-export function getSeverityInfo(severity: AgentModule['severity']): { label: string; className: string; description: string } {
-  switch (severity) {
-    case 'gate':
-      return { 
-        label: 'ENFORCED', 
-        className: 'bg-orange-500/10 text-orange-600 border-orange-500/30',
-        description: 'Mandatory enforcement - blocks merge if violated'
-      };
-    case 'critical':
-      return { 
-        label: 'BLOCKS MERGE', 
-        className: 'bg-red-500/10 text-red-600 border-red-500/30',
-        description: 'Critical rule - will block merge on violation'
-      };
-    case 'standard':
-      return { 
-        label: 'ADVISORY', 
-        className: 'bg-blue-500/10 text-blue-600 border-blue-500/30',
-        description: 'Standard advisory - warns but does not block'
-      };
-    case 'mode':
-      return { 
-        label: 'MODE', 
-        className: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
-        description: 'Operating mode - changes overall behavior'
-      };
-  }
+export function getSeverityInfo(severity: ModuleSeverity): SeverityConfig {
+  return SEVERITIES[severity];
+}
+
+/**
+ * Interpolate template variables in a string
+ */
+export function interpolateTemplate(template: string, variables: Record<string, string>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (_, key) => variables[key] || '');
 }

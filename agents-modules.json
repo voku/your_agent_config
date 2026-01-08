@@ -67,7 +67,29 @@
       "displayOrder": 4
     }
   ],
-  "presets": [
+  "severities": {
+    "gate": {
+      "label": "ENFORCED",
+      "className": "bg-orange-500/10 text-orange-600 border-orange-500/30",
+      "description": "Mandatory enforcement - blocks merge if violated"
+    },
+    "critical": {
+      "label": "BLOCKS MERGE",
+      "className": "bg-red-500/10 text-red-600 border-red-500/30",
+      "description": "Critical rule - will block merge on violation"
+    },
+    "standard": {
+      "label": "ADVISORY",
+      "className": "bg-blue-500/10 text-blue-600 border-blue-500/30",
+      "description": "Standard advisory - warns but does not block"
+    },
+    "mode": {
+      "label": "MODE",
+      "className": "bg-purple-500/10 text-purple-600 border-purple-500/30",
+      "description": "Operating mode - changes overall behavior"
+    }
+  },
+  "modulePresets": [
     {
       "key": "startup-mvp",
       "name": "Startup MVP",
@@ -95,6 +117,425 @@
       "description": "Safe incremental refactoring",
       "modules": ["legacy-migration", "tdd", "documentation"],
       "advisory": []
+    }
+  ],
+  "projectPresets": [
+    {
+      "key": "modern-web-app",
+      "name": "Modern Web App (Greenfield)",
+      "description": "Latest tech stack for new projects",
+      "languages": "TypeScript",
+      "frameworks": "React (Vite), Tailwind CSS",
+      "packageManager": "pnpm",
+      "styling": "Tailwind CSS",
+      "stateManagement": "Zustand",
+      "backend": "Supabase / Firebase"
+    },
+    {
+      "key": "enterprise-web",
+      "name": "Enterprise Web App",
+      "description": "Stable, well-supported stack for large organizations",
+      "languages": "TypeScript",
+      "frameworks": "React, Next.js, Material-UI",
+      "packageManager": "npm",
+      "styling": "Material-UI, CSS Modules",
+      "stateManagement": "Redux Toolkit",
+      "backend": "Node.js (Express), PostgreSQL"
+    },
+    {
+      "key": "legacy-modernization",
+      "name": "Legacy Project (Cash Cow)",
+      "description": "Modernizing existing legacy applications",
+      "languages": "JavaScript, TypeScript (gradual migration)",
+      "frameworks": "jQuery → React (incremental), Bootstrap",
+      "packageManager": "npm",
+      "styling": "Bootstrap, SASS",
+      "stateManagement": "Context API",
+      "backend": "Existing backend (REST APIs)"
+    },
+    {
+      "key": "fullstack-node",
+      "name": "Full-Stack Node.js",
+      "description": "Complete JavaScript/TypeScript stack",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "React, Express, Node.js",
+      "packageManager": "npm",
+      "styling": "Tailwind CSS",
+      "stateManagement": "React Query, Zustand",
+      "backend": "Express, PostgreSQL, Prisma"
+    },
+    {
+      "key": "jamstack",
+      "name": "JAMstack / Static Site",
+      "description": "Fast, secure, scalable static sites",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "Next.js, Gatsby, Astro",
+      "packageManager": "pnpm",
+      "styling": "Tailwind CSS, CSS Modules",
+      "stateManagement": "React Context",
+      "backend": "Headless CMS (Strapi, Contentful), Serverless Functions"
+    },
+    {
+      "key": "mobile-hybrid",
+      "name": "Mobile Hybrid App",
+      "description": "Cross-platform mobile applications",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "React Native, Expo",
+      "packageManager": "npm",
+      "styling": "React Native StyleSheet, NativeBase",
+      "stateManagement": "Redux Toolkit, React Query",
+      "backend": "Firebase, REST APIs"
+    },
+    {
+      "key": "vue-ecosystem",
+      "name": "Vue.js Ecosystem",
+      "description": "Vue-based web applications",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "Vue 3, Nuxt, Vite",
+      "packageManager": "pnpm",
+      "styling": "Tailwind CSS, Vuetify",
+      "stateManagement": "Pinia",
+      "backend": "Node.js, Express"
+    },
+    {
+      "key": "python-fullstack",
+      "name": "Python Full-Stack",
+      "description": "Python backend with modern frontend",
+      "languages": "Python, TypeScript",
+      "frameworks": "Django/FastAPI, React",
+      "packageManager": "pip (backend), npm (frontend)",
+      "styling": "Tailwind CSS",
+      "stateManagement": "Zustand, React Query",
+      "backend": "Django, FastAPI, PostgreSQL"
+    },
+    {
+      "key": "microservices",
+      "name": "Microservices Architecture",
+      "description": "Distributed system with multiple services",
+      "languages": "TypeScript, Go, Python",
+      "frameworks": "Node.js, Express, gRPC",
+      "packageManager": "npm, go modules",
+      "styling": "Tailwind CSS (frontend)",
+      "stateManagement": "Redux Toolkit",
+      "backend": "Docker, Kubernetes, PostgreSQL, Redis, RabbitMQ"
+    },
+    {
+      "key": "serverless",
+      "name": "Serverless Application",
+      "description": "Cloud-native serverless architecture",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "Next.js, AWS Lambda, API Gateway",
+      "packageManager": "npm",
+      "styling": "Tailwind CSS",
+      "stateManagement": "React Query, Zustand",
+      "backend": "AWS Lambda, DynamoDB, S3, CloudFront"
+    }
+  ],
+  "fieldPresets": {
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "TypeScript, JavaScript",
+      "Python",
+      "Python, TypeScript",
+      "Go",
+      "Rust",
+      "Java",
+      "C#, .NET",
+      "PHP",
+      "Ruby"
+    ],
+    "frameworks": [
+      "React (Vite)",
+      "React, Next.js",
+      "Vue 3, Vite",
+      "Angular",
+      "Svelte, SvelteKit",
+      "Astro",
+      "Express, Node.js",
+      "Django",
+      "FastAPI",
+      "Flask",
+      "Spring Boot",
+      "ASP.NET Core",
+      "Laravel",
+      "Ruby on Rails"
+    ],
+    "packageManagers": [
+      "npm",
+      "pnpm",
+      "yarn",
+      "bun"
+    ],
+    "styling": [
+      "Tailwind CSS",
+      "CSS Modules",
+      "Styled Components",
+      "Emotion",
+      "SASS/SCSS",
+      "Material-UI",
+      "Chakra UI",
+      "Bootstrap",
+      "Ant Design",
+      "Mantine"
+    ],
+    "stateManagement": [
+      "Zustand",
+      "Redux Toolkit",
+      "React Query",
+      "Context API",
+      "Pinia (Vue)",
+      "Vuex (Vue)",
+      "MobX",
+      "Jotai",
+      "Recoil",
+      "XState"
+    ],
+    "backend": [
+      "Supabase",
+      "Firebase",
+      "Node.js, Express",
+      "PostgreSQL",
+      "MongoDB",
+      "MySQL",
+      "Redis",
+      "AWS (Lambda, DynamoDB, S3)",
+      "Google Cloud",
+      "Azure",
+      "REST APIs",
+      "GraphQL",
+      "tRPC"
+    ]
+  },
+  "workflowTemplates": {
+    "aiWorkflow": {
+      "title": "AI Assistant Workflow",
+      "description": "Step-by-step approach for AI assistants",
+      "phases": [
+        {
+          "name": "Discovery Phase",
+          "subtitle": "ALWAYS do this first",
+          "items": [
+            "Read documentation completely to understand the current priorities",
+            "Examine the existing codebase structure using exploration commands",
+            "Study similar existing files - look for patterns, naming conventions, and architectural decisions",
+            "Run the test suite to understand current functionality",
+            "Check dependencies and configuration files"
+          ]
+        },
+        {
+          "name": "Planning Phase",
+          "subtitle": "Before any implementation",
+          "items": [
+            "Create a detailed implementation plan that explains which files need to be created/modified",
+            "Document what existing patterns you'll follow",
+            "Explain how your changes integrate with current architecture",
+            "Identify what tests need to be added/updated",
+            "Identify potential breaking changes and mitigation strategies",
+            "Plan your testing approach"
+          ]
+        },
+        {
+          "name": "Implementation Phase",
+          "subtitle": null,
+          "items": [
+            "Start with tests when adding new functionality (TDD approach)",
+            "Make small, incremental changes - don't implement everything at once",
+            "Follow existing code patterns exactly",
+            "Test continuously - run relevant tests after each significant change"
+          ]
+        },
+        {
+          "name": "Verification Phase",
+          "subtitle": "MANDATORY",
+          "items": [
+            "Run the full test suite - all tests must pass",
+            "Verify type checking - no TypeScript errors",
+            "Test the actual functionality - don't assume it works because tests pass",
+            "Check for integration issues - ensure your changes work with existing features"
+          ]
+        }
+      ]
+    },
+    "llmOptimizedPatterns": {
+      "title": "LLM-Optimized Code Patterns",
+      "description": "Guidelines for writing code optimized for LLM understanding",
+      "principles": [
+        {
+          "name": "Prefer Standard Library APIs Over Custom Abstractions",
+          "items": [
+            "Use standard APIs like Date.now(), .filter(), .map() instead of custom wrappers",
+            "Standard APIs are trained knowledge - LLMs understand them instantly",
+            "Avoid custom abstractions that require 'mental mapping'"
+          ]
+        },
+        {
+          "name": "When to Extract Functions (LLM-Optimized)",
+          "items": [
+            "Extract when logic is complex AND used multiple times",
+            "Extract when the function name clearly describes what it does",
+            "Don't extract simple one-liners",
+            "Don't create wrapper functions around standard APIs"
+          ]
+        },
+        {
+          "name": "Duplication Guidelines",
+          "items": [
+            "Small duplications are OK for standard patterns",
+            "Large duplications should be extracted",
+            "Business logic should be centralized with named constants"
+          ]
+        },
+        {
+          "name": "Token Efficiency",
+          "items": [
+            "Standard patterns require less cognitive load than custom abstractions",
+            "Shorter code isn't always better - clarity matters more"
+          ]
+        }
+      ]
+    },
+    "fixPreExistingIssues": {
+      "title": "Fix Pre-existing Issues When in Context",
+      "description": "Guidelines for proactively fixing issues when working in an area",
+      "guidelines": [
+        {
+          "name": "Identify Issues Within Your Working Area",
+          "items": [
+            "Look for obvious bugs, code smells, or anti-patterns in files you're already modifying",
+            "Notice flaky tests in the test suite you're running",
+            "Spot performance issues in code paths you're executing",
+            "Identify outdated patterns or deprecated API usage"
+          ]
+        },
+        {
+          "name": "Scope Appropriately",
+          "items": [
+            "Only fix issues directly related to the area you're working in",
+            "Don't expand scope to unrelated parts of the codebase",
+            "Keep fixes small and focused to avoid introducing new issues",
+            "If you find major issues outside your scope, document them instead of fixing"
+          ]
+        },
+        {
+          "name": "Quality Bar for Fixes",
+          "items": [
+            "Fix must be low-risk and obvious (clear bugs, typos, dead code)",
+            "Fix must not require significant refactoring",
+            "Fix must not change public APIs or behavior users depend on",
+            "Must have test coverage or add tests when fixing bugs"
+          ]
+        },
+        {
+          "name": "Document Your Improvements",
+          "items": [
+            "Clearly separate scope-required changes from opportunistic fixes",
+            "Explain why each fix is safe and beneficial",
+            "Note any risks or assumptions in your fixes"
+          ]
+        }
+      ],
+      "doFix": [
+        "Typos in comments or error messages",
+        "Unused imports or variables",
+        "Deprecated API usage with clear migration path",
+        "Missing error handling in code you're already touching",
+        "Flaky tests that are failing in your test runs",
+        "Performance issues in hot paths you're modifying",
+        "Inconsistent formatting in files you're editing"
+      ],
+      "dontFix": [
+        "Issues in completely unrelated files",
+        "Large-scale refactorings",
+        "Changes that require extensive testing",
+        "Modifications to stable, working code outside your task",
+        "Changes that could affect many users or systems"
+      ]
+    },
+    "globalRules": {
+      "title": "Global Rules (Must Follow)",
+      "description": "World-class engineering principles",
+      "motto": "Every mission assigned is delivered with 100% quality and state-of-the-art execution — no hacks, no workarounds, no partial deliverables and no mock-driven confidence. Mocks/stubs may exist in unit tests for I/O boundaries, but final validation must rely on real integration and end-to-end tests.",
+      "principles": [
+        "Deliver end-to-end, production-like solutions with clean, modular, and maintainable architecture.",
+        "Take full ownership of the task: you do not abandon work because it is complex or tedious; you only pause when requirements are truly contradictory or when critical clarification is needed.",
+        "Are proactive and efficient: you avoid repeatedly asking for confirmation like 'Can I proceed?' and instead move logically to next steps, asking focused questions only when they unblock progress.",
+        "Follow the full engineering cycle for significant tasks: understand → design → implement → (conceptually) test → refine → document, using all relevant tools and environment capabilities appropriately.",
+        "Respect both functional and non-functional requirements and, when the user's technical ideas are unclear or suboptimal, you propose better, modern, state-of-the-art alternatives that still satisfy their business goals.",
+        "Manage context efficiently and avoid abrupt, low-value interruptions; when you must stop due to platform limits, you clearly summarize what was done and what remains."
+      ]
+    }
+  },
+  "llmHelpers": [
+    {
+      "key": "tech-stack-advisor",
+      "title": "🚀 Tech Stack Advisor",
+      "description": "Ask an LLM to suggest the best stack. Returns JSON to auto-fill stack fields.",
+      "expectedFields": ["languages", "frameworks", "packageManager", "styling", "stateManagement", "backend"],
+      "promptTemplate": "I am starting a software project called \"{{projectName}}\".\nMission: {{mission}}\nPhase: {{phase}}\n\nPlease recommend a complete technical stack best suited for this mission.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"languages\": \"...\",\n  \"frameworks\": \"...\",\n  \"packageManager\": \"...\",\n  \"styling\": \"...\",\n  \"stateManagement\": \"...\",\n  \"backend\": \"...\"\n}"
+    },
+    {
+      "key": "safety-guardrails",
+      "title": "🛡️ Safety Guardrails",
+      "description": "Generate specific 'NEVER' rules. Returns JSON to merge into your list.",
+      "expectedFields": ["neverList"],
+      "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Mgmt: {{stateManagement}}\n\nPlease suggest 5-7 critical \"NEVER\" rules for an AI coding agent.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"neverList\": [\"Never use 'any'\", \"Never mutate state directly\", ...]\n}"
+    },
+    {
+      "key": "mission-refinement",
+      "title": "✨ Mission Refinement",
+      "description": "Polishes your mission. Returns JSON to update the mission field.",
+      "expectedFields": ["mission"],
+      "promptTemplate": "My project's mission is: \"{{mission}}\".\nNorth Star: \"{{northStar}}\"\n\nPlease refine this mission statement to be concise yet inspiring for a developer team.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mission\": \"The single best refined mission statement here\"\n}"
+    },
+    {
+      "key": "architecture-map",
+      "title": "🗺️ Architecture Map",
+      "description": "Suggests directory structure. Returns JSON to update structure and docs.",
+      "expectedFields": ["directoryStructure", "docMap"],
+      "promptTemplate": "I am building a {{phase}} project using {{frameworks}} and {{backend}}.\n\nPlease suggest a robust, scalable directory structure.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"directoryStructure\": \"src/components\\nsrc/hooks\\n...\",\n  \"docMap\": [\n    { \"path\": \"docs/architecture.md\", \"description\": \"High level overview\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
+    },
+    {
+      "key": "key-files-detector",
+      "title": "📂 Key Files Detector",
+      "description": "Identifies important files AI agents should read. Returns JSON to add to context map.",
+      "expectedFields": ["docMap"],
+      "promptTemplate": "I am using the following tech stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Management: {{stateManagement}}\n- Backend: {{backend}}\n\nBased on this stack, suggest 3-5 key file paths that an AI coding agent should read to understand the architecture and conventions of this project.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"docMap\": [\n    { \"path\": \"src/types.ts\", \"description\": \"Type definitions and interfaces\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
+    },
+    {
+      "key": "development-principles",
+      "title": "🎯 Development Principles Generator",
+      "description": "Generate core development principles. Returns JSON to add to principles list.",
+      "expectedFields": ["developmentPrinciples"],
+      "promptTemplate": "I am building \"{{projectName}}\" with the following mission:\n{{mission}}\n\nNorth Star: {{northStar}}\nPhase: {{phase}}\n\nPlease suggest 5-7 core development principles that should guide all development decisions.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"developmentPrinciples\": [\"Zero downtime deployments\", \"Security first\", \"User experience over features\", ...]\n}"
+    },
+    {
+      "key": "ai-mistakes",
+      "title": "⚠️ AI Mistakes Generator",
+      "description": "Generate common mistakes AI should avoid. Returns JSON to add to mistakes list.",
+      "expectedFields": ["mistakesToAvoid"],
+      "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 common mistakes AI assistants make when working with this tech stack.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mistakesToAvoid\": [\"Don't implement without understanding existing patterns\", \"Don't skip the discovery phase\", ...]\n}"
+    },
+    {
+      "key": "questions-generator",
+      "title": "❓ Questions Generator",
+      "description": "Generate self-check questions for AI. Returns JSON to add to questions list.",
+      "expectedFields": ["questionsToAsk"],
+      "promptTemplate": "I am building a {{phase}} project called \"{{projectName}}\".\n\nPlease suggest 5-7 questions an AI assistant should ask itself before starting any implementation.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"questionsToAsk\": [\"What similar functionality already exists?\", \"What existing tests can guide my understanding?\", ...]\n}"
+    },
+    {
+      "key": "blind-spots",
+      "title": "👁️ Blind Spots Generator",
+      "description": "Generate AI blind spots and mitigations. Returns JSON to add to blind spots list.",
+      "expectedFields": ["blindSpots"],
+      "promptTemplate": "I am using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 potential blind spots an AI assistant might have when working on this project, along with mitigation strategies.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"blindSpots\": [\"Local environment unknown – confirm tool availability before relying on them\", \"Hidden dependencies – request explicit dependency lists\", ...]\n}"
+    },
+    {
+      "key": "skills-generator",
+      "title": "🔧 Skills Generator",
+      "description": "Generate agent skills for specialized tasks. Returns JSON to add to skills list.",
+      "expectedFields": ["skills"],
+      "promptTemplate": "I am building \"{{projectName}}\" using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nMission: {{mission}}\n\nGenerate 3-5 focused Agent Skills following the Agent Skills specification:\n\n**Requirements**:\n1. Each skill must be focused on ONE specific, repeatable task\n2. Name: lowercase-with-hyphens (max 64 chars)\n3. Description: Include BOTH what it does AND when to use it (specific keywords/triggers)\n4. Consider these best practices:\n   - Skills compose better when focused rather than trying to do everything\n   - Include \"when to use\" keywords (e.g., \"when user mentions X\", \"for Y tasks\")\n   - Specify if references/, scripts/, or assets/ directories are needed\n   - Keep SKILL.md under 500 lines, move details to references/\n\n**Examples of good skills**:\n- pdf-processing: \"Extract text and tables from PDFs, fill forms, merge documents. Use when working with PDF documents or when user mentions PDFs, forms, or document extraction.\"\n- code-review: \"Perform systematic code reviews following project standards. Use when user asks to review code, check quality, or mentions code review.\"\n- api-documentation: \"Generate OpenAPI/Swagger documentation from code. Use when documenting APIs or when user mentions API docs, Swagger, or OpenAPI.\"\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"skills\": [\n    {\n      \"name\": \"skill-name\",\n      \"description\": \"What it does and when to use it with specific keywords\",\n      \"path\": \"skills/skill-name\",\n      \"license\": \"MIT\",\n      \"compatibility\": \"Any environment requirements\",\n      \"allowedTools\": \"optional space-delimited list\",\n      \"hasReferences\": false,\n      \"hasScripts\": false,\n      \"hasAssets\": false,\n      \"metadata\": {\n        \"author\": \"your-org\",\n        \"version\": \"1.0\"\n      }\n    }\n  ]\n}"
     }
   ],
   "modules": [
