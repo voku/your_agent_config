@@ -1,0 +1,991 @@
+{
+  "schemaVersion": 1,
+  "categories": [
+    {
+      "key": "security",
+      "name": "Security",
+      "description": "Security hygiene and vulnerability prevention",
+      "displayGroup": "Security & Operations",
+      "displayOrder": 1
+    },
+    {
+      "key": "operations",
+      "name": "Operations",
+      "description": "Production safety and deployment practices",
+      "displayGroup": "Security & Operations",
+      "displayOrder": 1
+    },
+    {
+      "key": "engineering",
+      "name": "Engineering Discipline",
+      "description": "Code quality and testing practices",
+      "displayGroup": "Engineering Discipline",
+      "displayOrder": 2
+    },
+    {
+      "key": "process",
+      "name": "Process & Workflow",
+      "description": "Team collaboration and development modes",
+      "displayGroup": "Process & Workflow",
+      "displayOrder": 3
+    },
+    {
+      "key": "architecture",
+      "name": "Architecture & Design",
+      "description": "System structure and API contracts",
+      "displayGroup": "Architecture & Design",
+      "displayOrder": 4
+    }
+  ],
+  "displayGroups": [
+    {
+      "key": "security-operations",
+      "name": "Security & Operations",
+      "description": "Critical safety nets for production systems",
+      "categories": ["security", "operations"],
+      "displayOrder": 1
+    },
+    {
+      "key": "engineering",
+      "name": "Engineering Discipline",
+      "description": "Code quality and testing practices",
+      "categories": ["engineering"],
+      "displayOrder": 2
+    },
+    {
+      "key": "process",
+      "name": "Process & Workflow",
+      "description": "Team collaboration and development modes",
+      "categories": ["process"],
+      "displayOrder": 3
+    },
+    {
+      "key": "architecture",
+      "name": "Architecture & Design",
+      "description": "System structure and API contracts",
+      "categories": ["architecture"],
+      "displayOrder": 4
+    }
+  ],
+  "severities": {
+    "gate": {
+      "label": "ENFORCED",
+      "className": "bg-orange-500/10 text-orange-600 border-orange-500/30",
+      "description": "Mandatory enforcement - blocks merge if violated"
+    },
+    "critical": {
+      "label": "BLOCKS MERGE",
+      "className": "bg-red-500/10 text-red-600 border-red-500/30",
+      "description": "Critical rule - will block merge on violation"
+    },
+    "standard": {
+      "label": "ADVISORY",
+      "className": "bg-blue-500/10 text-blue-600 border-blue-500/30",
+      "description": "Standard advisory - warns but does not block"
+    },
+    "mode": {
+      "label": "MODE",
+      "className": "bg-purple-500/10 text-purple-600 border-purple-500/30",
+      "description": "Operating mode - changes overall behavior"
+    }
+  },
+  "modulePresets": [
+    {
+      "key": "startup-mvp",
+      "name": "Startup MVP",
+      "description": "Fast iteration with essential safety",
+      "modules": ["security", "documentation"],
+      "advisory": ["security", "documentation"]
+    },
+    {
+      "key": "enterprise-api",
+      "name": "Enterprise API",
+      "description": "Full safety for production systems",
+      "modules": ["security", "ops-production-safety", "database-data-integrity", "tdd", "code-review", "api-design", "documentation", "performance"],
+      "advisory": []
+    },
+    {
+      "key": "open-source-library",
+      "name": "Open Source Library",
+      "description": "Quality code, no ops overhead",
+      "modules": ["tdd", "code-review", "documentation", "api-design"],
+      "advisory": []
+    },
+    {
+      "key": "legacy-modernization",
+      "name": "Legacy Modernization",
+      "description": "Safe incremental refactoring",
+      "modules": ["legacy-migration", "tdd", "documentation"],
+      "advisory": []
+    }
+  ],
+  "projectPresets": [
+    {
+      "key": "modern-web-app",
+      "name": "Modern Web App (Greenfield)",
+      "description": "Latest tech stack for new projects",
+      "languages": "TypeScript",
+      "frameworks": "React (Vite), Tailwind CSS",
+      "packageManager": "pnpm",
+      "styling": "Tailwind CSS",
+      "stateManagement": "Zustand",
+      "backend": "Supabase / Firebase"
+    },
+    {
+      "key": "enterprise-web",
+      "name": "Enterprise Web App",
+      "description": "Stable, well-supported stack for large organizations",
+      "languages": "TypeScript",
+      "frameworks": "React, Next.js, Material-UI",
+      "packageManager": "npm",
+      "styling": "Material-UI, CSS Modules",
+      "stateManagement": "Redux Toolkit",
+      "backend": "Node.js (Express), PostgreSQL"
+    },
+    {
+      "key": "legacy-modernization",
+      "name": "Legacy Project (Cash Cow)",
+      "description": "Modernizing existing legacy applications",
+      "languages": "JavaScript, TypeScript (gradual migration)",
+      "frameworks": "jQuery → React (incremental), Bootstrap",
+      "packageManager": "npm",
+      "styling": "Bootstrap, SASS",
+      "stateManagement": "Context API",
+      "backend": "Existing backend (REST APIs)"
+    },
+    {
+      "key": "fullstack-node",
+      "name": "Full-Stack Node.js",
+      "description": "Complete JavaScript/TypeScript stack",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "React, Express, Node.js",
+      "packageManager": "npm",
+      "styling": "Tailwind CSS",
+      "stateManagement": "React Query, Zustand",
+      "backend": "Express, PostgreSQL, Prisma"
+    },
+    {
+      "key": "jamstack",
+      "name": "JAMstack / Static Site",
+      "description": "Fast, secure, scalable static sites",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "Next.js, Gatsby, Astro",
+      "packageManager": "pnpm",
+      "styling": "Tailwind CSS, CSS Modules",
+      "stateManagement": "React Context",
+      "backend": "Headless CMS (Strapi, Contentful), Serverless Functions"
+    },
+    {
+      "key": "mobile-hybrid",
+      "name": "Mobile Hybrid App",
+      "description": "Cross-platform mobile applications",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "React Native, Expo",
+      "packageManager": "npm",
+      "styling": "React Native StyleSheet, NativeBase",
+      "stateManagement": "Redux Toolkit, React Query",
+      "backend": "Firebase, REST APIs"
+    },
+    {
+      "key": "vue-ecosystem",
+      "name": "Vue.js Ecosystem",
+      "description": "Vue-based web applications",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "Vue 3, Nuxt, Vite",
+      "packageManager": "pnpm",
+      "styling": "Tailwind CSS, Vuetify",
+      "stateManagement": "Pinia",
+      "backend": "Node.js, Express"
+    },
+    {
+      "key": "python-fullstack",
+      "name": "Python Full-Stack",
+      "description": "Python backend with modern frontend",
+      "languages": "Python, TypeScript",
+      "frameworks": "Django/FastAPI, React",
+      "packageManager": "pip (backend), npm (frontend)",
+      "styling": "Tailwind CSS",
+      "stateManagement": "Zustand, React Query",
+      "backend": "Django, FastAPI, PostgreSQL"
+    },
+    {
+      "key": "microservices",
+      "name": "Microservices Architecture",
+      "description": "Distributed system with multiple services",
+      "languages": "TypeScript, Go, Python",
+      "frameworks": "Node.js, Express, gRPC",
+      "packageManager": "npm, go modules",
+      "styling": "Tailwind CSS (frontend)",
+      "stateManagement": "Redux Toolkit",
+      "backend": "Docker, Kubernetes, PostgreSQL, Redis, RabbitMQ"
+    },
+    {
+      "key": "serverless",
+      "name": "Serverless Application",
+      "description": "Cloud-native serverless architecture",
+      "languages": "TypeScript, JavaScript",
+      "frameworks": "Next.js, AWS Lambda, API Gateway",
+      "packageManager": "npm",
+      "styling": "Tailwind CSS",
+      "stateManagement": "React Query, Zustand",
+      "backend": "AWS Lambda, DynamoDB, S3, CloudFront"
+    }
+  ],
+  "fieldPresets": {
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "TypeScript, JavaScript",
+      "Python",
+      "Python, TypeScript",
+      "Go",
+      "Rust",
+      "Java",
+      "C#, .NET",
+      "PHP",
+      "Ruby"
+    ],
+    "frameworks": [
+      "React (Vite)",
+      "React, Next.js",
+      "Vue 3, Vite",
+      "Angular",
+      "Svelte, SvelteKit",
+      "Astro",
+      "Express, Node.js",
+      "Django",
+      "FastAPI",
+      "Flask",
+      "Spring Boot",
+      "ASP.NET Core",
+      "Laravel",
+      "Ruby on Rails"
+    ],
+    "packageManagers": [
+      "npm",
+      "pnpm",
+      "yarn",
+      "bun"
+    ],
+    "styling": [
+      "Tailwind CSS",
+      "CSS Modules",
+      "Styled Components",
+      "Emotion",
+      "SASS/SCSS",
+      "Material-UI",
+      "Chakra UI",
+      "Bootstrap",
+      "Ant Design",
+      "Mantine"
+    ],
+    "stateManagement": [
+      "Zustand",
+      "Redux Toolkit",
+      "React Query",
+      "Context API",
+      "Pinia (Vue)",
+      "Vuex (Vue)",
+      "MobX",
+      "Jotai",
+      "Recoil",
+      "XState"
+    ],
+    "backend": [
+      "Supabase",
+      "Firebase",
+      "Node.js, Express",
+      "PostgreSQL",
+      "MongoDB",
+      "MySQL",
+      "Redis",
+      "AWS (Lambda, DynamoDB, S3)",
+      "Google Cloud",
+      "Azure",
+      "REST APIs",
+      "GraphQL",
+      "tRPC"
+    ]
+  },
+  "workflowTemplates": {
+    "aiWorkflow": {
+      "title": "AI Assistant Workflow",
+      "description": "Step-by-step approach for AI assistants",
+      "phases": [
+        {
+          "name": "Discovery Phase",
+          "subtitle": "ALWAYS do this first",
+          "items": [
+            "Read documentation completely to understand the current priorities",
+            "Examine the existing codebase structure using exploration commands",
+            "Study similar existing files - look for patterns, naming conventions, and architectural decisions",
+            "Run the test suite to understand current functionality",
+            "Check dependencies and configuration files"
+          ]
+        },
+        {
+          "name": "Planning Phase",
+          "subtitle": "Before any implementation",
+          "items": [
+            "Create a detailed implementation plan that explains which files need to be created/modified",
+            "Document what existing patterns you'll follow",
+            "Explain how your changes integrate with current architecture",
+            "Identify what tests need to be added/updated",
+            "Identify potential breaking changes and mitigation strategies",
+            "Plan your testing approach"
+          ]
+        },
+        {
+          "name": "Implementation Phase",
+          "subtitle": null,
+          "items": [
+            "Start with tests when adding new functionality (TDD approach)",
+            "Make small, incremental changes - don't implement everything at once",
+            "Follow existing code patterns exactly",
+            "Test continuously - run relevant tests after each significant change"
+          ]
+        },
+        {
+          "name": "Verification Phase",
+          "subtitle": "MANDATORY",
+          "items": [
+            "Run the full test suite - all tests must pass",
+            "Verify type checking - no TypeScript errors",
+            "Test the actual functionality - don't assume it works because tests pass",
+            "Check for integration issues - ensure your changes work with existing features"
+          ]
+        }
+      ]
+    },
+    "llmOptimizedPatterns": {
+      "title": "LLM-Optimized Code Patterns",
+      "description": "Guidelines for writing code optimized for LLM understanding",
+      "principles": [
+        {
+          "name": "Prefer Standard Library APIs Over Custom Abstractions",
+          "items": [
+            "Use standard APIs like Date.now(), .filter(), .map() instead of custom wrappers",
+            "Standard APIs are trained knowledge - LLMs understand them instantly",
+            "Avoid custom abstractions that require 'mental mapping'"
+          ]
+        },
+        {
+          "name": "When to Extract Functions (LLM-Optimized)",
+          "items": [
+            "Extract when logic is complex AND used multiple times",
+            "Extract when the function name clearly describes what it does",
+            "Don't extract simple one-liners",
+            "Don't create wrapper functions around standard APIs"
+          ]
+        },
+        {
+          "name": "Duplication Guidelines",
+          "items": [
+            "Small duplications are OK for standard patterns",
+            "Large duplications should be extracted",
+            "Business logic should be centralized with named constants"
+          ]
+        },
+        {
+          "name": "Token Efficiency",
+          "items": [
+            "Standard patterns require less cognitive load than custom abstractions",
+            "Shorter code isn't always better - clarity matters more"
+          ]
+        }
+      ]
+    },
+    "fixPreExistingIssues": {
+      "title": "Fix Pre-existing Issues When in Context",
+      "description": "Guidelines for proactively fixing issues when working in an area",
+      "guidelines": [
+        {
+          "name": "Identify Issues Within Your Working Area",
+          "items": [
+            "Look for obvious bugs, code smells, or anti-patterns in files you're already modifying",
+            "Notice flaky tests in the test suite you're running",
+            "Spot performance issues in code paths you're executing",
+            "Identify outdated patterns or deprecated API usage"
+          ]
+        },
+        {
+          "name": "Scope Appropriately",
+          "items": [
+            "Only fix issues directly related to the area you're working in",
+            "Don't expand scope to unrelated parts of the codebase",
+            "Keep fixes small and focused to avoid introducing new issues",
+            "If you find major issues outside your scope, document them instead of fixing"
+          ]
+        },
+        {
+          "name": "Quality Bar for Fixes",
+          "items": [
+            "Fix must be low-risk and obvious (clear bugs, typos, dead code)",
+            "Fix must not require significant refactoring",
+            "Fix must not change public APIs or behavior users depend on",
+            "Must have test coverage or add tests when fixing bugs"
+          ]
+        },
+        {
+          "name": "Document Your Improvements",
+          "items": [
+            "Clearly separate scope-required changes from opportunistic fixes",
+            "Explain why each fix is safe and beneficial",
+            "Note any risks or assumptions in your fixes"
+          ]
+        }
+      ],
+      "doFix": [
+        "Typos in comments or error messages",
+        "Unused imports or variables",
+        "Deprecated API usage with clear migration path",
+        "Missing error handling in code you're already touching",
+        "Flaky tests that are failing in your test runs",
+        "Performance issues in hot paths you're modifying",
+        "Inconsistent formatting in files you're editing"
+      ],
+      "dontFix": [
+        "Issues in completely unrelated files",
+        "Large-scale refactorings",
+        "Changes that require extensive testing",
+        "Modifications to stable, working code outside your task",
+        "Changes that could affect many users or systems"
+      ]
+    },
+    "globalRules": {
+      "title": "Global Rules (Must Follow)",
+      "description": "World-class engineering principles",
+      "motto": "Every mission assigned is delivered with 100% quality and state-of-the-art execution — no hacks, no workarounds, no partial deliverables and no mock-driven confidence. Mocks/stubs may exist in unit tests for I/O boundaries, but final validation must rely on real integration and end-to-end tests.",
+      "principles": [
+        "Deliver end-to-end, production-like solutions with clean, modular, and maintainable architecture.",
+        "Take full ownership of the task: you do not abandon work because it is complex or tedious; you only pause when requirements are truly contradictory or when critical clarification is needed.",
+        "Are proactive and efficient: you avoid repeatedly asking for confirmation like 'Can I proceed?' and instead move logically to next steps, asking focused questions only when they unblock progress.",
+        "Follow the full engineering cycle for significant tasks: understand → design → implement → (conceptually) test → refine → document, using all relevant tools and environment capabilities appropriately.",
+        "Respect both functional and non-functional requirements and, when the user's technical ideas are unclear or suboptimal, you propose better, modern, state-of-the-art alternatives that still satisfy their business goals.",
+        "Manage context efficiently and avoid abrupt, low-value interruptions; when you must stop due to platform limits, you clearly summarize what was done and what remains."
+      ]
+    }
+  },
+  "llmHelpers": [
+    {
+      "key": "tech-stack-advisor",
+      "title": "🚀 Tech Stack Advisor",
+      "description": "Ask an LLM to suggest the best stack. Returns JSON to auto-fill stack fields.",
+      "expectedFields": ["languages", "frameworks", "packageManager", "styling", "stateManagement", "backend"],
+      "promptTemplate": "I am starting a software project called \"{{projectName}}\".\nMission: {{mission}}\nPhase: {{phase}}\n\nPlease recommend a complete technical stack best suited for this mission.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"languages\": \"...\",\n  \"frameworks\": \"...\",\n  \"packageManager\": \"...\",\n  \"styling\": \"...\",\n  \"stateManagement\": \"...\",\n  \"backend\": \"...\"\n}"
+    },
+    {
+      "key": "safety-guardrails",
+      "title": "🛡️ Safety Guardrails",
+      "description": "Generate specific 'NEVER' rules. Returns JSON to merge into your list.",
+      "expectedFields": ["neverList"],
+      "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Mgmt: {{stateManagement}}\n\nPlease suggest 5-7 critical \"NEVER\" rules for an AI coding agent.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"neverList\": [\"Never use 'any'\", \"Never mutate state directly\", ...]\n}"
+    },
+    {
+      "key": "mission-refinement",
+      "title": "✨ Mission Refinement",
+      "description": "Polishes your mission. Returns JSON to update the mission field.",
+      "expectedFields": ["mission"],
+      "promptTemplate": "My project's mission is: \"{{mission}}\".\nNorth Star: \"{{northStar}}\"\n\nPlease refine this mission statement to be concise yet inspiring for a developer team.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mission\": \"The single best refined mission statement here\"\n}"
+    },
+    {
+      "key": "architecture-map",
+      "title": "🗺️ Architecture Map",
+      "description": "Suggests directory structure. Returns JSON to update structure and docs.",
+      "expectedFields": ["directoryStructure", "docMap"],
+      "promptTemplate": "I am building a {{phase}} project using {{frameworks}} and {{backend}}.\n\nPlease suggest a robust, scalable directory structure.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"directoryStructure\": \"src/components\\nsrc/hooks\\n...\",\n  \"docMap\": [\n    { \"path\": \"docs/architecture.md\", \"description\": \"High level overview\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
+    },
+    {
+      "key": "key-files-detector",
+      "title": "📂 Key Files Detector",
+      "description": "Identifies important files AI agents should read. Returns JSON to add to context map.",
+      "expectedFields": ["docMap"],
+      "promptTemplate": "I am using the following tech stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Management: {{stateManagement}}\n- Backend: {{backend}}\n\nBased on this stack, suggest 3-5 key file paths that an AI coding agent should read to understand the architecture and conventions of this project.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"docMap\": [\n    { \"path\": \"src/types.ts\", \"description\": \"Type definitions and interfaces\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
+    },
+    {
+      "key": "development-principles",
+      "title": "🎯 Development Principles Generator",
+      "description": "Generate core development principles. Returns JSON to add to principles list.",
+      "expectedFields": ["developmentPrinciples"],
+      "promptTemplate": "I am building \"{{projectName}}\" with the following mission:\n{{mission}}\n\nNorth Star: {{northStar}}\nPhase: {{phase}}\n\nPlease suggest 5-7 core development principles that should guide all development decisions.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"developmentPrinciples\": [\"Zero downtime deployments\", \"Security first\", \"User experience over features\", ...]\n}"
+    },
+    {
+      "key": "ai-mistakes",
+      "title": "⚠️ AI Mistakes Generator",
+      "description": "Generate common mistakes AI should avoid. Returns JSON to add to mistakes list.",
+      "expectedFields": ["mistakesToAvoid"],
+      "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 common mistakes AI assistants make when working with this tech stack.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mistakesToAvoid\": [\"Don't implement without understanding existing patterns\", \"Don't skip the discovery phase\", ...]\n}"
+    },
+    {
+      "key": "questions-generator",
+      "title": "❓ Questions Generator",
+      "description": "Generate self-check questions for AI. Returns JSON to add to questions list.",
+      "expectedFields": ["questionsToAsk"],
+      "promptTemplate": "I am building a {{phase}} project called \"{{projectName}}\".\n\nPlease suggest 5-7 questions an AI assistant should ask itself before starting any implementation.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"questionsToAsk\": [\"What similar functionality already exists?\", \"What existing tests can guide my understanding?\", ...]\n}"
+    },
+    {
+      "key": "blind-spots",
+      "title": "👁️ Blind Spots Generator",
+      "description": "Generate AI blind spots and mitigations. Returns JSON to add to blind spots list.",
+      "expectedFields": ["blindSpots"],
+      "promptTemplate": "I am using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 potential blind spots an AI assistant might have when working on this project, along with mitigation strategies.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"blindSpots\": [\"Local environment unknown – confirm tool availability before relying on them\", \"Hidden dependencies – request explicit dependency lists\", ...]\n}"
+    },
+    {
+      "key": "skills-generator",
+      "title": "🔧 Skills Generator",
+      "description": "Generate agent skills for specialized tasks. Returns JSON to add to skills list.",
+      "expectedFields": ["skills"],
+      "promptTemplate": "I am building \"{{projectName}}\" using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nMission: {{mission}}\n\nGenerate 3-5 focused Agent Skills following the Agent Skills specification:\n\n**Requirements**:\n1. Each skill must be focused on ONE specific, repeatable task\n2. Name: lowercase-with-hyphens (max 64 chars)\n3. Description: Include BOTH what it does AND when to use it (specific keywords/triggers)\n4. Consider these best practices:\n   - Skills compose better when focused rather than trying to do everything\n   - Include \"when to use\" keywords (e.g., \"when user mentions X\", \"for Y tasks\")\n   - Specify if references/, scripts/, or assets/ directories are needed\n   - Keep SKILL.md under 500 lines, move details to references/\n\n**Examples of good skills**:\n- pdf-processing: \"Extract text and tables from PDFs, fill forms, merge documents. Use when working with PDF documents or when user mentions PDFs, forms, or document extraction.\"\n- code-review: \"Perform systematic code reviews following project standards. Use when user asks to review code, check quality, or mentions code review.\"\n- api-documentation: \"Generate OpenAPI/Swagger documentation from code. Use when documenting APIs or when user mentions API docs, Swagger, or OpenAPI.\"\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"skills\": [\n    {\n      \"name\": \"skill-name\",\n      \"description\": \"What it does and when to use it with specific keywords\",\n      \"path\": \"skills/skill-name\",\n      \"license\": \"MIT\",\n      \"compatibility\": \"Any environment requirements\",\n      \"allowedTools\": \"optional space-delimited list\",\n      \"hasReferences\": false,\n      \"hasScripts\": false,\n      \"hasAssets\": false,\n      \"metadata\": {\n        \"author\": \"your-org\",\n        \"version\": \"1.0\"\n      }\n    }\n  ]\n}"
+    }
+  ],
+  "modules": [
+    {
+      "key": "tdd",
+      "title": "Test-Driven Development (TDD)",
+      "enabled": false,
+      "category": "engineering",
+      "severity": "gate",
+      "description": "Write failing tests before implementation code.",
+      "purpose": "Enforce test-driven development so behavior changes are specified by failing tests before implementation, preventing untested code from entering the codebase and enabling safe refactoring.",
+      "failureModes": [
+        "Undetected regressions from modifications to existing code",
+        "Bugs in new features due to incomplete mental models",
+        "Design deficiencies discovered only after implementation",
+        "Legacy growth caused by untested changes",
+        "The Tautology Trap: writing tests that merely confirm implementation details rather than desired behavior",
+        "Hallucinated Success: assuming code works because it 'looks right' without runtime verification"
+      ],
+      "rules": {
+        "hard": [
+          "No behavior-changing code may be committed without a prior commit containing a failing test that passes after the change",
+          "Pure refactors must not break any existing tests",
+          "All new public functions/classes must have at least one example-based test",
+          "You must execute a test command that fails before you write any implementation code. The failure output must be analyzed",
+          "You must write the absolute minimum code required to make the test pass. No premature optimization",
+          "Every code generation step must end with a test execution and verification",
+          "If no tests exist for a file you need to edit, add characterization tests in a separate commit first"
+        ],
+        "soft": [
+          "Target ≥80% line coverage on new/changed code",
+          "Prefer fast unit tests over slow integration tests",
+          "Keep individual tests focused on a single behavior",
+          "Use descriptive test names that explain the expected behavior"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Adding a new function",
+          "bad": "// Step 1: Write the implementation\nfunction calculateDiscount(price, percent) {\n  return price * (percent / 100);\n}\n// Step 2: Write tests (or skip them)",
+          "good": "// Step 1: Write a failing test\ntest('calculates 20% discount on $100', () => {\n  expect(calculateDiscount(100, 20)).toBe(20);\n});\n// Run test - it fails (function doesn't exist)\n\n// Step 2: Write minimal implementation\nfunction calculateDiscount(price, percent) {\n  return price * (percent / 100);\n}\n// Run test - it passes",
+          "explanation": "Always write the test first, run it to see it fail, then write the minimum code to make it pass."
+        },
+        {
+          "title": "Refactoring safely",
+          "bad": "// Refactor without running tests\nfunction getUser(id) {\n  // Changed from callback to async\n  return await db.query(`SELECT * FROM users WHERE id = ${id}`);\n}",
+          "good": "// Step 1: Ensure all existing tests pass\nnpm test -- --watch\n\n// Step 2: Make small refactor\nfunction getUser(id) {\n  return db.query('SELECT * FROM users WHERE id = ?', [id]);\n}\n\n// Step 3: Run tests after each change\n// Tests still pass? Continue. Tests fail? Revert.",
+          "explanation": "Refactors must keep all existing tests green. Run tests after each small change."
+        },
+        {
+          "title": "Fixing a bug",
+          "bad": "// Just fix the bug directly\nfunction divide(a, b) {\n  if (b === 0) return 0; // Added fix\n  return a / b;\n}",
+          "good": "// Step 1: Write a test that exposes the bug\ntest('divide by zero returns Infinity or throws', () => {\n  expect(() => divide(10, 0)).toThrow('Division by zero');\n});\n// Run test - it fails (proves bug exists)\n\n// Step 2: Fix the bug\nfunction divide(a, b) {\n  if (b === 0) throw new Error('Division by zero');\n  return a / b;\n}\n// Run test - it passes",
+          "explanation": "Before fixing a bug, write a test that reproduces it. This proves the bug exists and prevents regression."
+        }
+      ],
+      "conflicts": ["exploratory-spike"],
+      "implies": ["code-review"]
+    },
+    {
+      "key": "security",
+      "title": "Security & Supply Chain",
+      "enabled": false,
+      "category": "security",
+      "severity": "gate",
+      "description": "Prevent vulnerabilities and secure defaults.",
+      "purpose": "Force systematic security hygiene to prevent common vulnerability classes and insecure defaults during development. Establish a zero-trust environment where all inputs are validated and all secrets are protected.",
+      "failureModes": [
+        "Hardcoded credentials exposed in version control",
+        "SQL injection, XSS, or command injection vulnerabilities",
+        "Vulnerable dependencies with known CVEs",
+        "Insufficient input validation leading to data breaches",
+        "Privilege escalation due to overly permissive access controls"
+      ],
+      "rules": {
+        "hard": [
+          "Never hardcode secrets, tokens, or credentials",
+          "All external inputs must be validated and escaped/parameterized before use in queries, commands, or HTML",
+          "Dependency updates must pass automated vulnerability scans before merge",
+          "All authentication must use established libraries, never roll your own crypto",
+          "Sensitive data must be encrypted at rest and in transit"
+        ],
+        "soft": [
+          "Apply principle of least privilege to all permissions and access controls",
+          "Enable and configure secure headers (CSP, HSTS, etc.) by default",
+          "Implement rate limiting on public endpoints",
+          "Log security-relevant events for audit trails"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Handling secrets",
+          "bad": "const API_KEY = 'sk-1234567890abcdef';\nconst dbPassword = 'admin123';",
+          "good": "const API_KEY = process.env.API_KEY;\nconst dbPassword = process.env.DB_PASSWORD;\n\n// Validate at startup\nif (!API_KEY) throw new Error('API_KEY not configured');",
+          "explanation": "Never commit secrets to code. Use environment variables and validate they exist at startup."
+        },
+        {
+          "title": "SQL queries",
+          "bad": "const query = `SELECT * FROM users WHERE id = ${userId}`;\ndb.query(query);",
+          "good": "const query = 'SELECT * FROM users WHERE id = ?';\ndb.query(query, [userId]);",
+          "explanation": "Always use parameterized queries to prevent SQL injection attacks."
+        },
+        {
+          "title": "User input in HTML",
+          "bad": "element.innerHTML = `<div>Welcome, ${userName}</div>`;",
+          "good": "element.textContent = `Welcome, ${userName}`;\n// Or use a sanitization library\nelement.innerHTML = DOMPurify.sanitize(`<div>Welcome, ${userName}</div>`);",
+          "explanation": "Never insert unsanitized user input into HTML. Use textContent or sanitize with DOMPurify."
+        }
+      ],
+      "conflicts": [],
+      "implies": ["code-review"]
+    },
+    {
+      "key": "refactoring",
+      "title": "Refactoring & Code Quality",
+      "enabled": false,
+      "category": "engineering",
+      "severity": "standard",
+      "description": "Improve structure without changing behavior.",
+      "purpose": "Govern safe refactoring to improve code structure without altering behavior, ensuring changes remain verifiable and low-risk through existing tests. Each refactor should be atomic and independently revertable.",
+      "failureModes": [
+        "Breaking existing functionality while 'improving' code",
+        "Massive refactors that are impossible to review",
+        "Refactoring without adequate test coverage",
+        "Mixing behavior changes with structural changes"
+      ],
+      "rules": {
+        "hard": [
+          "Refactoring commits must not add or change external behavior",
+          "All existing tests must remain green throughout the process",
+          "Refactors must be performed in small, atomic commits",
+          "Each refactor commit must be independently reviewable and revertable"
+        ],
+        "soft": [
+          "Reduce cyclomatic complexity where >10",
+          "Eliminate duplicated code blocks >20 lines",
+          "Extract methods when functions exceed 50 lines",
+          "Apply consistent naming conventions across the codebase"
+        ]
+      },
+      "conflicts": [],
+      "implies": []
+    },
+    {
+      "key": "performance",
+      "title": "Performance & Optimization",
+      "enabled": false,
+      "category": "engineering",
+      "severity": "standard",
+      "description": "Measure before optimizing, bound all operations.",
+      "purpose": "Prevent silent performance regressions and unmeasured optimization claims by requiring measurement and bounded work in performance-sensitive paths. Ensure all async operations have timeouts and hot paths have limits.",
+      "failureModes": [
+        "Silent performance degradation over time",
+        "Premature optimization of non-bottlenecks",
+        "Unbounded queries or loops causing timeouts",
+        "Cache invalidation bugs causing stale data",
+        "Memory leaks from improper resource cleanup"
+      ],
+      "rules": {
+        "hard": [
+          "No performance-sensitive change without before/after measurement",
+          "No unbounded loops or queries in hot paths without explicit limits",
+          "No caching without an invalidation strategy",
+          "All async operations must have timeouts"
+        ],
+        "soft": [
+          "Prefer simpler algorithms over clever micro-optimizations",
+          "Optimize only measured bottlenecks, not assumptions",
+          "Document performance characteristics in code comments",
+          "Include performance impact in PR descriptions"
+        ]
+      },
+      "conflicts": [],
+      "implies": []
+    },
+    {
+      "key": "documentation",
+      "title": "Documentation & Knowledge Management",
+      "enabled": false,
+      "category": "process",
+      "severity": "standard",
+      "description": "Document APIs, decisions, and architecture.",
+      "purpose": "Ensure knowledge survives beyond the current session by requiring accurate documentation for public behavior, architecture, and decisions. Prevent tribal knowledge and enable onboarding.",
+      "failureModes": [
+        "Tribal knowledge lost when team members leave",
+        "Outdated documentation misleading new developers",
+        "Undocumented APIs causing integration issues",
+        "Missing context for architectural decisions"
+      ],
+      "rules": {
+        "hard": [
+          "Public APIs must be documented (usage + edge cases)",
+          "Architecture decisions must be recorded (ADRs or equivalent)",
+          "Docs must be updated alongside behavior changes",
+          "README must contain setup and contribution guidelines"
+        ],
+        "soft": [
+          "Prefer examples over prose",
+          "Keep docs close to code (docs/ near relevant modules)",
+          "Use diagrams for complex system interactions",
+          "Include troubleshooting guides for common issues"
+        ]
+      },
+      "conflicts": [],
+      "implies": []
+    },
+    {
+      "key": "ops-production-safety",
+      "title": "Operations & Production Safety",
+      "enabled": false,
+      "category": "operations",
+      "severity": "gate",
+      "description": "Ensure rollback plans and observability.",
+      "purpose": "Prevent changes that work locally but fail in production by enforcing rollout, rollback, observability, and environment awareness. Every production change must be reversible.",
+      "failureModes": [
+        "Deployments that cannot be rolled back",
+        "Production issues invisible due to missing observability",
+        "Environment-specific bugs from config drift",
+        "Cascading failures from missing circuit breakers"
+      ],
+      "rules": {
+        "hard": [
+          "Every production change must have an explicit rollback plan",
+          "New production-impacting behavior must emit logs/metrics",
+          "Config changes must be explicit, reviewable, and environment-aware",
+          "Database migrations must be backward compatible"
+        ],
+        "soft": [
+          "Prefer feature flags for risky changes",
+          "Deploy incrementally (canary/gradual rollout) where possible",
+          "Implement health checks for all services",
+          "Set up alerting for critical error rates"
+        ]
+      },
+      "conflicts": [],
+      "implies": ["security"]
+    },
+    {
+      "key": "legacy-migration",
+      "title": "Legacy Migration & Modernization",
+      "enabled": false,
+      "category": "engineering",
+      "severity": "standard",
+      "description": "Incremental, reversible modernization steps.",
+      "purpose": "Enable controlled modernization of legacy systems while preventing accidental rewrites and containing risk through incremental, reversible steps. Use strangler patterns over big-bang rewrites.",
+      "failureModes": [
+        "Big bang rewrites that never ship",
+        "Breaking existing functionality during migration",
+        "Expanding legacy surface area instead of shrinking it",
+        "Missing exit criteria leading to never-ending migrations"
+      ],
+      "rules": {
+        "hard": [
+          "No migration work without an explicit exit plan",
+          "New code must not increase the legacy surface area",
+          "Migration must be incremental and reversible",
+          "Parallel operation period required before cutting over"
+        ],
+        "soft": [
+          "Prefer strangler patterns over rewrites",
+          "Wrap legacy boundaries before refactoring internals",
+          "Maintain feature parity tracking documents",
+          "Set time-boxed milestones with clear success criteria"
+        ]
+      },
+      "conflicts": ["refactoring"],
+      "implies": []
+    },
+    {
+      "key": "exploratory-spike",
+      "title": "Exploratory / Spike Mode",
+      "enabled": false,
+      "category": "process",
+      "severity": "mode",
+      "description": "Time-boxed experimentation with strict cleanup.",
+      "purpose": "Allow rapid learning and experimentation without polluting production code, by enforcing strict deletion and promotion rules. Spike code must be isolated and outcomes documented.",
+      "failureModes": [
+        "Spike code accidentally merged to production",
+        "Learnings lost when spike is deleted",
+        "Spike scope creep turning experiment into feature",
+        "Never-ending spikes without clear outcomes"
+      ],
+      "rules": {
+        "hard": [
+          "Spike code must be isolated and deletable",
+          "No spike merges without an explicit promotion decision",
+          "Spikes must be labeled and time-boxed",
+          "Spike outcomes must be documented before deletion"
+        ],
+        "soft": [
+          "Prefer throwaway branches or sandbox folders",
+          "Capture learnings in notes/docs before deleting",
+          "Share spike findings with the team",
+          "Keep spikes focused on answering specific questions"
+        ]
+      },
+      "conflicts": ["tdd", "security", "ops-production-safety"],
+      "implies": []
+    },
+    {
+      "key": "code-review",
+      "title": "Code Review & Quality Gates",
+      "enabled": false,
+      "category": "process",
+      "severity": "gate",
+      "description": "Require peer review before merge.",
+      "purpose": "Ensure consistent, high-quality code review practices that catch defects early and maintain architectural integrity. Focus reviews on logic, architecture, and maintainability.",
+      "failureModes": [
+        "Rubber-stamp approvals without meaningful review",
+        "Blocking reviews causing delivery delays",
+        "Style bikeshedding drowning out substantive feedback",
+        "Architectural violations slipping through"
+      ],
+      "rules": {
+        "hard": [
+          "All code must be reviewed by at least one other person before merge",
+          "PRs must pass all automated checks (tests, linting, security scans)",
+          "Breaking changes require explicit approval from tech lead or architect",
+          "Self-merges are prohibited except for critical hotfixes with post-merge review"
+        ],
+        "soft": [
+          "Reviewers should focus on logic, architecture, and maintainability, not just style",
+          "Provide constructive feedback with specific suggestions",
+          "Keep PRs small and focused (< 400 lines when possible)",
+          "Respond to review requests within one business day"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Review comment quality",
+          "bad": "// Bad review comment:\n'This is wrong.'",
+          "good": "// Good review comment:\n'This query could cause N+1 performance issues. Consider using `include` or a batch query:\n```\nconst users = await User.findAll({ include: [Profile] });\n```'",
+          "explanation": "Provide specific, actionable feedback with code suggestions, not vague criticism."
+        },
+        {
+          "title": "PR size",
+          "bad": "// PR with 2000+ lines touching 50 files\n// 'Refactored authentication, added new dashboard, fixed 12 bugs'",
+          "good": "// Separate PRs:\n// PR 1: 'Refactor auth service' (200 lines)\n// PR 2: 'Add dashboard component' (300 lines)\n// PR 3: 'Fix login redirect bug' (50 lines)",
+          "explanation": "Split large changes into focused, reviewable PRs. Each PR should do one thing well."
+        }
+      ],
+      "conflicts": [],
+      "implies": []
+    },
+    {
+      "key": "api-design",
+      "title": "API Design & Contracts",
+      "enabled": false,
+      "category": "architecture",
+      "severity": "gate",
+      "description": "Version APIs and maintain compatibility.",
+      "purpose": "Enforce consistent, well-designed APIs that are easy to use, hard to misuse, and maintain backward compatibility. Breaking changes must be versioned and deprecated gracefully.",
+      "failureModes": [
+        "Breaking changes without versioning",
+        "Inconsistent error formats across endpoints",
+        "Missing or outdated API documentation",
+        "Leaky abstractions exposing internal implementation"
+      ],
+      "rules": {
+        "hard": [
+          "Breaking API changes require a new version (v2, v3, etc.)",
+          "All public APIs must have OpenAPI/Swagger documentation",
+          "API responses must use consistent error format with clear messages",
+          "Deprecation notices must be communicated at least one version in advance"
+        ],
+        "soft": [
+          "Use RESTful conventions unless there's a compelling reason not to",
+          "Prefer POST for operations with side effects, GET for reads",
+          "Include pagination for list endpoints",
+          "Provide filtering and sorting capabilities where appropriate"
+        ]
+      },
+      "examples": [
+        {
+          "title": "Breaking changes",
+          "bad": "// v1 API - suddenly changed\nPOST /api/users\n{ \"name\": \"John\", \"email\": \"john@example.com\" }\n// Changed to require 'fullName' instead of 'name' - breaks all clients!",
+          "good": "// Keep v1 working\nPOST /api/v1/users { \"name\": \"John\" }\n\n// Add v2 with new field\nPOST /api/v2/users { \"fullName\": \"John Doe\" }\n\n// Deprecation header in v1 responses:\nDeprecation: true\nSunset: 2024-12-31",
+          "explanation": "Never break existing APIs. Create a new version and deprecate the old one with notice."
+        },
+        {
+          "title": "Error responses",
+          "bad": "// Inconsistent errors:\n{ \"error\": \"Not found\" }\n{ \"message\": \"Invalid input\", \"code\": 400 }\n{ \"err\": { \"msg\": \"Auth failed\" } }",
+          "good": "// Consistent error format:\n{\n  \"error\": {\n    \"code\": \"USER_NOT_FOUND\",\n    \"message\": \"User with ID 123 not found\",\n    \"details\": { \"userId\": 123 }\n  }\n}",
+          "explanation": "Use a consistent error format across all endpoints with code, message, and optional details."
+        }
+      ],
+      "conflicts": [],
+      "implies": ["documentation"]
+    },
+    {
+      "key": "database-data-integrity",
+      "title": "Database & Data Integrity",
+      "enabled": false,
+      "category": "operations",
+      "severity": "gate",
+      "description": "Use transactions and reversible migrations.",
+      "purpose": "Ensure data consistency, prevent data loss, and maintain database performance through disciplined schema and query practices. All schema changes must be reversible.",
+      "failureModes": [
+        "Data corruption from missing transactions",
+        "Irreversible schema changes causing data loss",
+        "N+1 queries causing performance degradation",
+        "Missing indexes causing slow queries at scale"
+      ],
+      "rules": {
+        "hard": [
+          "All schema changes must be reversible migrations with down scripts",
+          "No direct database modifications in production; use migrations only",
+          "All data-modifying operations must be wrapped in transactions",
+          "Foreign key constraints must be enforced at the database level"
+        ],
+        "soft": [
+          "Use database constraints (NOT NULL, CHECK, UNIQUE) to enforce business rules",
+          "Avoid SELECT * in production code; specify columns explicitly",
+          "Add indexes for frequently queried columns",
+          "Use query explain plans to verify performance before merging"
+        ]
+      },
+      "conflicts": [],
+      "implies": []
+    },
+    {
+      "key": "frontend-ux",
+      "title": "Frontend & User Experience",
+      "enabled": false,
+      "category": "engineering",
+      "severity": "standard",
+      "description": "Accessible, performant, responsive interfaces.",
+      "purpose": "Ensure consistent, accessible, and performant user interfaces that provide excellent user experience across devices and capabilities. Accessibility is non-negotiable.",
+      "failureModes": [
+        "Inaccessible UI excluding users with disabilities",
+        "Inconsistent styling across components",
+        "Poor performance on mobile devices",
+        "Broken layouts at certain viewport sizes"
+      ],
+      "rules": {
+        "hard": [
+          "All interactive elements must be keyboard accessible",
+          "All images must have alt text",
+          "Color cannot be the only means of conveying information",
+          "Forms must have proper labels and error messages"
+        ],
+        "soft": [
+          "Target Lighthouse score >90 for performance and accessibility",
+          "Implement loading states for async operations >300ms",
+          "Use semantic HTML elements appropriately",
+          "Test UI on multiple screen sizes before merging"
+        ]
+      },
+      "conflicts": [],
+      "implies": []
+    }
+  ]
+}

@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill } from './types';
+import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill, AgentModule } from './types';
 import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon, SunIcon, MoonIcon, GithubIcon } from './components/UIComponents';
 import { ComboInput } from './components/ComboInput';
-import { PROJECT_PRESETS, FIELD_PRESETS } from './presets';
+import { PROJECT_PRESETS, FIELD_PRESETS, MODULE_PRESETS } from './presets';
+import { CATEGORIES, MODULES, hasConflict, getConflictingModules, getImpliedModules, getSeverityInfo, WORKFLOW_TEMPLATES, LLM_HELPERS, interpolateTemplate } from './modules';
 
 const INITIAL_STATE: AgentConfig = {
   projectName: "My Awesome Project",
@@ -32,7 +33,10 @@ const INITIAL_STATE: AgentConfig = {
   mistakesToAvoid: [],
   questionsToAsk: [],
   blindSpots: [],
-  skills: []
+  skills: [],
+  // Enforcement modules
+  enabledModules: [],
+  advisoryModules: []
 };
 
 const App: React.FC = () => {
@@ -237,6 +241,59 @@ const App: React.FC = () => {
     }));
   };
 
+  // Module toggle handler
+  const handleModuleToggle = (moduleKey: string) => {
+    setConfig(prev => {
+      const isCurrentlyEnabled = prev.enabledModules.includes(moduleKey);
+      
+      if (isCurrentlyEnabled) {
+        // Disable module
+        return {
+          ...prev,
+          enabledModules: prev.enabledModules.filter(k => k !== moduleKey),
+          advisoryModules: prev.advisoryModules.filter(k => k !== moduleKey)
+        };
+      } else {
+        // Enable module - check for implied modules to suggest
+        const implied = getImpliedModules(moduleKey);
+        const enabledSet = new Set([...prev.enabledModules, moduleKey]);
+        
+        // Automatically add implied modules that aren't already enabled
+        implied.forEach(imp => enabledSet.add(imp));
+        
+        return {
+          ...prev,
+          enabledModules: Array.from(enabledSet)
+        };
+      }
+    });
+  };
+
+  // Toggle advisory mode for a module
+  const handleAdvisoryToggle = (moduleKey: string) => {
+    setConfig(prev => {
+      const isAdvisory = prev.advisoryModules.includes(moduleKey);
+      return {
+        ...prev,
+        advisoryModules: isAdvisory 
+          ? prev.advisoryModules.filter(k => k !== moduleKey)
+          : [...prev.advisoryModules, moduleKey]
+      };
+    });
+  };
+
+  // Apply module preset
+  const applyModulePreset = (presetKey: string) => {
+    const preset = MODULE_PRESETS[presetKey];
+    if (!preset) return;
+    
+    setConfig(prev => ({
+      ...prev,
+      enabledModules: [...preset.modules],
+      advisoryModules: [...preset.advisory]
+    }));
+  };
+
 
   // Helper to validate JSON structure
   const validateJsonStructure = (data: any, expectedFields: string[]): { valid: boolean; message: string } => {
@@ -435,115 +492,47 @@ ${config.developmentPrinciples.map(p => `- ✅ **${p.text}**`).join('\n')}
 ${config.preImplementationChecklist.map(item => `- [ ] ${item.text}`).join('\n')}
 ` : '';
 
+    // Generate workflow sections from single source of truth
+    const aiWorkflow = WORKFLOW_TEMPLATES.aiWorkflow;
     const aiWorkflowSection = config.aiWorkflowEnabled ? `
-## AI Assistant Workflow
+## ${aiWorkflow.title}
 
 **IMPORTANT**: AI assistants must follow this step-by-step approach:
 
-### 1. Discovery Phase (ALWAYS do this first)
-- **Read documentation completely** to understand the current priorities
-- **Examine the existing codebase structure** using exploration commands
-- **Study similar existing files** - look for patterns, naming conventions, and architectural decisions
-- **Run the test suite** to understand current functionality
-- **Check dependencies and configuration files**
-
-### 2. Planning Phase (Before any implementation)
-- **Create a detailed implementation plan** that explains:
-  - Which files need to be created/modified
-  - What existing patterns you'll follow
-  - How your changes integrate with current architecture
-  - What tests need to be added/updated
-- **Identify potential breaking changes** and mitigation strategies
-- **Plan your testing approach**
-
-### 3. Implementation Phase
-- **Start with tests** when adding new functionality (TDD approach)
-- **Make small, incremental changes** - don't implement everything at once
-- **Follow existing code patterns exactly**
-- **Test continuously** - run relevant tests after each significant change
-
-### 4. Verification Phase (MANDATORY)
-- **Run the full test suite** - all tests must pass
-- **Verify type checking** - no TypeScript errors
-- **Test the actual functionality** - don't assume it works because tests pass
-- **Check for integration issues** - ensure your changes work with existing features
+${aiWorkflow.phases.map((phase, i) => `### ${i + 1}. ${phase.name}${phase.subtitle ? ` (${phase.subtitle})` : ''}
+${phase.items.map(item => `- ${item}`).join('\n')}`).join('\n\n')}
 ` : '';
 
+    const llmPatterns = WORKFLOW_TEMPLATES.llmOptimizedPatterns;
     const llmOptimizedPatternsSection = config.llmOptimizedPatternsEnabled ? `
-## LLM-Optimized Code Patterns
+## ${llmPatterns.title}
 
 **IMPORTANT**: This codebase should be optimized for LLM understanding and modification.
 
 ### Code Optimization Principles for LLMs
 
-1. **Prefer Standard Library APIs Over Custom Abstractions**
-   - Use standard APIs like \`Date.now()\`, \`.filter()\`, \`.map()\` instead of custom wrappers
-   - Standard APIs are trained knowledge - LLMs understand them instantly
-   - Avoid custom abstractions that require "mental mapping"
-
-2. **When to Extract Functions (LLM-Optimized)**
-   - Extract when logic is complex AND used multiple times
-   - Extract when the function name clearly describes what it does
-   - Don't extract simple one-liners
-   - Don't create wrapper functions around standard APIs
-
-3. **Duplication Guidelines**
-   - Small duplications are OK for standard patterns
-   - Large duplications should be extracted
-   - Business logic should be centralized with named constants
-
-4. **Token Efficiency**
-   - Standard patterns require less cognitive load than custom abstractions
-   - Shorter code isn't always better - clarity matters more
+${llmPatterns.principles.map((principle, i) => `${i + 1}. **${principle.name}**
+${principle.items.map(item => `   - ${item}`).join('\n')}`).join('\n\n')}
 ` : '';
 
+    const fixIssues = WORKFLOW_TEMPLATES.fixPreExistingIssues;
     const fixPreExistingIssuesSection = config.fixPreExistingIssuesEnabled ? `
-## Fix Pre-existing Issues When in Context
+## ${fixIssues.title}
 
 **IMPORTANT**: When working in an area of the codebase, you should proactively identify and fix pre-existing issues.
 
 ### Guidelines for Contextual Improvements
 
-1. **Identify Issues Within Your Working Area**
-   - Look for obvious bugs, code smells, or anti-patterns in files you're already modifying
-   - Notice flaky tests in the test suite you're running
-   - Spot performance issues in code paths you're executing
-   - Identify outdated patterns or deprecated API usage
-
-2. **Scope Appropriately**
-   - Only fix issues directly related to the area you're working in
-   - Don't expand scope to unrelated parts of the codebase
-   - Keep fixes small and focused to avoid introducing new issues
-   - If you find major issues outside your scope, document them instead of fixing
-
-3. **Quality Bar for Fixes**
-   - Fix must be low-risk and obvious (clear bugs, typos, dead code)
-   - Fix must not require significant refactoring
-   - Fix must not change public APIs or behavior users depend on
-   - Must have test coverage or add tests when fixing bugs
-
-4. **Document Your Improvements**
-   - Clearly separate scope-required changes from opportunistic fixes
-   - Explain why each fix is safe and beneficial
-   - Note any risks or assumptions in your fixes
+${fixIssues.guidelines.map((guideline, i) => `${i + 1}. **${guideline.name}**
+${guideline.items.map(item => `   - ${item}`).join('\n')}`).join('\n\n')}
 
 ### Examples of Good Opportunistic Fixes
 
 ✅ **DO FIX:**
-- Typos in comments or error messages
-- Unused imports or variables
-- Deprecated API usage with clear migration path
-- Missing error handling in code you're already touching
-- Flaky tests that are failing in your test runs
-- Performance issues in hot paths you're modifying
-- Inconsistent formatting in files you're editing
+${fixIssues.doFix.map(item => `- ${item}`).join('\n')}
 
 ❌ **DON'T FIX:**
-- Issues in completely unrelated files
-- Large-scale refactorings
-- Changes that require extensive testing
-- Modifications to stable, working code outside your task
-- Changes that could affect many users or systems
+${fixIssues.dontFix.map(item => `- ${item}`).join('\n')}
 
 **Remember**: The goal is to leave the code better than you found it, not perfect. Perfect is the enemy of done.
 ` : '';
@@ -613,25 +602,65 @@ ${config.skills.map(skill => {
 3. **Structure for efficiency**: Metadata (~100 tokens) → Instructions (~5000 tokens) → Resources (as needed)
 ` : '';
 
+    const globalRulesTemplate = WORKFLOW_TEMPLATES.globalRules;
     const globalRulesSection = config.globalRulesEnabled ? `
-# Global Rules (Must Follow)
+# ${globalRulesTemplate.title}
 
 You are a world-class software engineer and software architect.
 
 Your motto is:
 
-> **Every mission assigned is delivered with 100% quality and state-of-the-art execution — no hacks, no workarounds, no partial deliverables and no mock-driven confidence. Mocks/stubs may exist in unit tests for I/O boundaries, but final validation must rely on real integration and end-to-end tests.**
+> **${globalRulesTemplate.motto}**
 
 You always:
 
-- Deliver end-to-end, production-like solutions with clean, modular, and maintainable architecture.
-- Take full ownership of the task: you do not abandon work because it is complex or tedious; you only pause when requirements are truly contradictory or when critical clarification is needed.
-- Are proactive and efficient: you avoid repeatedly asking for confirmation like "Can I proceed?" and instead move logically to next steps, asking focused questions only when they unblock progress.
-- Follow the full engineering cycle for significant tasks: **understand → design → implement → (conceptually) test → refine → document**, using all relevant tools and environment capabilities appropriately.
-- Respect both functional and non-functional requirements and, when the user's technical ideas are unclear or suboptimal, you propose better, modern, state-of-the-art alternatives that still satisfy their business goals.
-- Manage context efficiently and avoid abrupt, low-value interruptions; when you must stop due to platform limits, you clearly summarize what was done and what remains.
+${globalRulesTemplate.principles.map(p => `- ${p}`).join('\n')}
 
 ---
+` : '';
+
+    // Generate enforcement modules section
+    const enabledModulesData = config.enabledModules
+      .map(key => MODULES.find(m => m.key === key))
+      .filter((m): m is AgentModule => m !== undefined);
+    
+    const enforcementModulesSection = enabledModulesData.length > 0 ? `
+## Enforcement Modules
+
+${enabledModulesData.map(module => {
+  const isAdvisory = config.advisoryModules.includes(module.key);
+  const severityLabel = isAdvisory ? 'ADVISORY' : module.severity.toUpperCase();
+  const examplesSection = module.examples && module.examples.length > 0 
+    ? `
+
+**Examples**:
+${module.examples.map(ex => `
+#### ${ex.title}
+
+❌ **Bad**:
+\`\`\`
+${ex.bad}
+\`\`\`
+
+✅ **Good**:
+\`\`\`
+${ex.good}
+\`\`\`
+${ex.explanation ? `\n*${ex.explanation}*` : ''}`).join('\n')}`
+    : '';
+  
+  return `### ${module.title} [${severityLabel}]
+
+**Purpose**: ${module.description}
+
+**Hard Rules**:
+${module.rules.hard.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
+
+**Soft Rules**:
+${module.rules.soft.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
+${module.conflicts.length > 0 ? `
+**Conflicts with**: ${module.conflicts.join(', ')}` : ''}${examplesSection}`;
+}).join('\n\n---\n\n')}
 ` : '';
     
     return `# ${config.projectName} - AGENTS.md
@@ -674,7 +703,7 @@ ${!isProto ? '- **NEVER** Change database schemas without migrations\n- **NEVER*
 ### Testing & Quality
 - **Strategy:** ${config.testingStrategy}
 - **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".
-${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}${skillsSection ? '\n' + skillsSection : ''}
+${enforcementModulesSection ? '\n' + enforcementModulesSection : ''}${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}${skillsSection ? '\n' + skillsSection : ''}
 ## 6. Interaction Style
 **Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}
 `;
@@ -694,276 +723,28 @@ INSTRUCTIONS:
 `;
   }, [generatedMarkdown, config]);
 
-  const helperPrompts = useMemo(() => [
-    {
-      title: "🚀 Tech Stack Advisor",
-      description: "Ask an LLM to suggest the best stack. Returns JSON to auto-fill stack fields.",
-      expectedFields: ['languages', 'frameworks', 'packageManager', 'styling', 'stateManagement', 'backend'],
-      prompt: `I am starting a software project called "${config.projectName}".
-Mission: ${config.mission}
-Phase: ${config.phase}
-
-Please recommend a complete technical stack best suited for this mission.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "languages": "...",
-  "frameworks": "...",
-  "packageManager": "...",
-  "styling": "...",
-  "stateManagement": "...",
-  "backend": "..."
-}`
-    },
-    {
-      title: "🛡️ Safety Guardrails",
-      description: "Generate specific 'NEVER' rules. Returns JSON to merge into your list.",
-      expectedFields: ['neverList'],
-      prompt: `I am using the following stack:
-- Languages: ${config.languages}
-- Frameworks: ${config.frameworks}
-- State Mgmt: ${config.stateManagement}
-
-Please suggest 5-7 critical "NEVER" rules for an AI coding agent.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "neverList": ["Never use 'any'", "Never mutate state directly", ...]
-}`
-    },
-    {
-      title: "✨ Mission Refinement",
-      description: "Polishes your mission. Returns JSON to update the mission field.",
-      expectedFields: ['mission'],
-      prompt: `My project's mission is: "${config.mission}".
-North Star: "${config.northStar}"
-
-Please refine this mission statement to be concise yet inspiring for a developer team.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "mission": "The single best refined mission statement here"
-}`
-    },
-    {
-      title: "🗺️ Architecture Map",
-      description: "Suggests directory structure. Returns JSON to update structure and docs.",
-      expectedFields: ['directoryStructure', 'docMap'],
-      prompt: `I am building a ${config.phase} project using ${config.frameworks} and ${config.backend}.
-      
-Please suggest a robust, scalable directory structure.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "directoryStructure": "src/components\\nsrc/hooks\\n...",
-  "docMap": [
-    { "path": "docs/architecture.md", "description": "High level overview" },
-    { "path": "prisma/schema.prisma", "description": "Database schema" }
-  ]
-}`
-    },
-    {
-      title: "📂 Key Files Detector",
-      description: "Identifies important files AI agents should read. Returns JSON to add to context map.",
-      expectedFields: ['docMap'],
-      prompt: `I am using the following tech stack:
-- Languages: ${config.languages}
-- Frameworks: ${config.frameworks}
-- State Management: ${config.stateManagement}
-- Backend: ${config.backend}
-
-Based on this stack, suggest 3-5 key file paths that an AI coding agent should read to understand the architecture and conventions of this project.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "docMap": [
-    { "path": "src/types.ts", "description": "Type definitions and interfaces" },
-    { "path": "prisma/schema.prisma", "description": "Database schema" }
-  ]
-}`
-    },
-    {
-      title: "🎯 Development Principles Generator",
-      description: "Generate core development principles. Returns JSON to add to principles list.",
-      expectedFields: ['developmentPrinciples'],
-      prompt: `I am building "${config.projectName}" with the following mission:
-${config.mission}
-
-North Star: ${config.northStar}
-Phase: ${config.phase}
-
-Please suggest 5-7 core development principles that should guide all development decisions.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "developmentPrinciples": ["Zero downtime deployments", "Security first", "User experience over features", ...]
-}`
-    },
-    {
-      title: "⚠️ AI Mistakes Generator",
-      description: "Generate common mistakes AI should avoid. Returns JSON to add to mistakes list.",
-      expectedFields: ['mistakesToAvoid'],
-      prompt: `I am using the following stack:
-- Languages: ${config.languages}
-- Frameworks: ${config.frameworks}
-- Backend: ${config.backend}
-
-Please suggest 5-7 common mistakes AI assistants make when working with this tech stack.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "mistakesToAvoid": ["Don't implement without understanding existing patterns", "Don't skip the discovery phase", ...]
-}`
-    },
-    {
-      title: "❓ Questions Generator",
-      description: "Generate self-check questions for AI. Returns JSON to add to questions list.",
-      expectedFields: ['questionsToAsk'],
-      prompt: `I am building a ${config.phase} project called "${config.projectName}".
-
-Please suggest 5-7 questions an AI assistant should ask itself before starting any implementation.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "questionsToAsk": ["What similar functionality already exists?", "What existing tests can guide my understanding?", ...]
-}`
-    },
-    {
-      title: "👁️ Blind Spots Generator",
-      description: "Generate AI blind spots and mitigations. Returns JSON to add to blind spots list.",
-      expectedFields: ['blindSpots'],
-      prompt: `I am using:
-- Languages: ${config.languages}
-- Frameworks: ${config.frameworks}
-- Backend: ${config.backend}
-
-Please suggest 5-7 potential blind spots an AI assistant might have when working on this project, along with mitigation strategies.
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "blindSpots": ["Local environment unknown – confirm tool availability before relying on them", "Hidden dependencies – request explicit dependency lists", ...]
-}`
-    },
-    {
-      title: "🔧 Skills Generator",
-      description: "Generate agent skills for specialized tasks. Returns JSON to add to skills list.",
-      expectedFields: ['skills'],
-      prompt: `I am building "${config.projectName}" using:
-- Languages: ${config.languages}
-- Frameworks: ${config.frameworks}
-- Backend: ${config.backend}
-
-Mission: ${config.mission}
-
-Generate 3-5 focused Agent Skills following the Agent Skills specification:
-
-**Requirements**:
-1. Each skill must be focused on ONE specific, repeatable task
-2. Name: lowercase-with-hyphens (max 64 chars)
-3. Description: Include BOTH what it does AND when to use it (specific keywords/triggers)
-4. Consider these best practices:
-   - Skills compose better when focused rather than trying to do everything
-   - Include "when to use" keywords (e.g., "when user mentions X", "for Y tasks")
-   - Specify if references/, scripts/, or assets/ directories are needed
-   - Keep SKILL.md under 500 lines, move details to references/
-
-**Examples of good skills**:
-- pdf-processing: "Extract text and tables from PDFs, fill forms, merge documents. Use when working with PDF documents or when user mentions PDFs, forms, or document extraction."
-- code-review: "Perform systematic code reviews following project standards. Use when user asks to review code, check quality, or mentions code review."
-- api-documentation: "Generate OpenAPI/Swagger documentation from code. Use when documenting APIs or when user mentions API docs, Swagger, or OpenAPI."
-
-⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:
-- Your response must be ONLY valid JSON
-- NO markdown code blocks (no \`\`\`json)
-- NO explanations before or after
-- NO additional text
-- Start with { and end with }
-
-Return this exact JSON structure:
-{
-  "skills": [
-    {
-      "name": "skill-name",
-      "description": "What it does and when to use it with specific keywords",
-      "path": "skills/skill-name",
-      "license": "MIT",
-      "compatibility": "Any environment requirements",
-      "allowedTools": "optional space-delimited list",
-      "hasReferences": false,
-      "hasScripts": false,
-      "hasAssets": false,
-      "metadata": {
-        "author": "your-org",
-        "version": "1.0"
-      }
-    }
-  ]
-}`
-    }
-  ], [config]);
+  // Generate helper prompts from the single source of truth, interpolating config variables
+  const helperPrompts = useMemo(() => {
+    const variables: Record<string, string> = {
+      projectName: config.projectName,
+      mission: config.mission,
+      northStar: config.northStar,
+      phase: config.phase,
+      languages: config.languages,
+      frameworks: config.frameworks,
+      stateManagement: config.stateManagement,
+      backend: config.backend,
+      styling: config.styling,
+      packageManager: config.packageManager,
+    };
+    
+    return LLM_HELPERS.map(helper => ({
+      title: helper.title,
+      description: helper.description,
+      expectedFields: helper.expectedFields,
+      prompt: interpolateTemplate(helper.promptTemplate, variables)
+    }));
+  }, [config]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -1303,6 +1084,127 @@ Return this exact JSON structure:
                 />
               </div>
             </div>
+          </Card>
+
+          {/* Enforcement Modules */}
+          <Card title="6b. Enforcement Modules">
+            <p className="text-xs text-textMuted mb-4">Select modules to enforce specific development practices. Modules with conflicts will be grayed out.</p>
+            
+            {/* Module Preset Selector */}
+            <div className="mb-6">
+              <Label>Quick Start Preset</Label>
+              <select 
+                onChange={(e) => {
+                  if (e.target.value) {
+                    applyModulePreset(e.target.value);
+                  }
+                }}
+                className="w-full bg-surfaceHighlight border border-border rounded-lg px-3 py-2.5 text-sm text-textMain focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+              >
+                <option value="">Select a module preset...</option>
+                {Object.entries(MODULE_PRESETS).map(([key, preset]) => (
+                  <option key={key} value={key}>
+                    {preset.name} - {preset.description}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Module Categories */}
+            {CATEGORIES.map(category => (
+              <details key={category.name} className="mb-4 border border-border rounded-lg overflow-hidden" open>
+                <summary className="px-4 py-3 bg-surfaceHighlight cursor-pointer hover:bg-border transition-colors">
+                  <span className="font-semibold text-sm">{category.name}</span>
+                  <span className="text-xs text-textMuted ml-2">({category.modules.length} modules)</span>
+                  <p className="text-xs text-textMuted mt-1">{category.description}</p>
+                </summary>
+                <div className="p-4 space-y-3">
+                  {category.modules.map(module => {
+                    const isEnabled = config.enabledModules.includes(module.key);
+                    const conflictingWith = getConflictingModules(module.key).filter(k => config.enabledModules.includes(k));
+                    const hasActiveConflict = conflictingWith.length > 0;
+                    const isConflicting = !isEnabled && hasConflict(config.enabledModules, module.key);
+                    const impliedBy = getImpliedModules(module.key);
+                    const isAdvisory = config.advisoryModules.includes(module.key);
+                    const severityInfo = getSeverityInfo(module.severity);
+                    
+                    return (
+                      <div 
+                        key={module.key}
+                        className={`p-3 rounded-lg border transition-all ${
+                          isEnabled 
+                            ? hasActiveConflict
+                              ? 'bg-red-500/10 border-red-500/30'
+                              : 'bg-primary/10 border-primary/30' 
+                            : isConflicting 
+                              ? 'bg-red-500/5 border-red-500/20 opacity-60' 
+                              : 'bg-surfaceHighlight border-border hover:border-textMuted'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            checked={isEnabled}
+                            disabled={isConflicting}
+                            onChange={() => handleModuleToggle(module.key)}
+                            className="mt-1 w-4 h-4 rounded border-border cursor-pointer disabled:cursor-not-allowed"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium text-sm">{module.title}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded border ${severityInfo.className}`}>
+                                {isAdvisory ? 'ADVISORY' : severityInfo.label}
+                              </span>
+                              {(isConflicting || hasActiveConflict) && (
+                                <span className="text-xs px-2 py-0.5 rounded border bg-red-500/10 text-red-600 border-red-500/30">
+                                  ⚠️ Conflicts with: {conflictingWith.join(', ')}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-textMuted mt-1">{module.description}</p>
+                            
+                            {/* Show implied modules */}
+                            {impliedBy.length > 0 && isEnabled && (
+                              <p className="text-xs text-primary mt-1">
+                                → Implies: {impliedBy.join(', ')}
+                              </p>
+                            )}
+                            
+                            {/* Advisory toggle when enabled */}
+                            {isEnabled && (
+                              <div className="mt-2 flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  id={`advisory-${module.key}`}
+                                  checked={isAdvisory}
+                                  onChange={() => handleAdvisoryToggle(module.key)}
+                                  className="w-3 h-3 rounded border-border"
+                                />
+                                <label htmlFor={`advisory-${module.key}`} className="text-xs text-textMuted cursor-pointer">
+                                  Advisory only (warn but don't block)
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </details>
+            ))}
+            
+            {/* Summary of enabled modules */}
+            {config.enabledModules.length > 0 && (
+              <div className="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+                <p className="text-sm font-medium">
+                  {config.enabledModules.length} module{config.enabledModules.length > 1 ? 's' : ''} enabled
+                </p>
+                <p className="text-xs text-textMuted mt-1">
+                  {config.enabledModules.join(', ')}
+                </p>
+              </div>
+            )}
           </Card>
 
           {/* Development Principles */}
