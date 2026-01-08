@@ -630,6 +630,25 @@ ${globalRulesTemplate.principles.map(p => `- ${p}`).join('\n')}
 ${enabledModulesData.map(module => {
   const isAdvisory = config.advisoryModules.includes(module.key);
   const severityLabel = isAdvisory ? 'ADVISORY' : module.severity.toUpperCase();
+  const examplesSection = module.examples && module.examples.length > 0 
+    ? `
+
+**Examples**:
+${module.examples.map(ex => `
+#### ${ex.title}
+
+❌ **Bad**:
+\`\`\`
+${ex.bad}
+\`\`\`
+
+✅ **Good**:
+\`\`\`
+${ex.good}
+\`\`\`
+${ex.explanation ? `\n*${ex.explanation}*` : ''}`).join('\n')}`
+    : '';
+  
   return `### ${module.title} [${severityLabel}]
 
 **Purpose**: ${module.description}
@@ -640,7 +659,7 @@ ${module.rules.hard.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
 **Soft Rules**:
 ${module.rules.soft.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
 ${module.conflicts.length > 0 ? `
-**Conflicts with**: ${module.conflicts.join(', ')}` : ''}`;
+**Conflicts with**: ${module.conflicts.join(', ')}` : ''}${examplesSection}`;
 }).join('\n\n---\n\n')}
 ` : '';
     
@@ -1102,8 +1121,9 @@ INSTRUCTIONS:
                 <div className="p-4 space-y-3">
                   {category.modules.map(module => {
                     const isEnabled = config.enabledModules.includes(module.key);
-                    const isConflicting = !isEnabled && hasConflict(config.enabledModules, module.key);
                     const conflictingWith = getConflictingModules(module.key).filter(k => config.enabledModules.includes(k));
+                    const hasActiveConflict = conflictingWith.length > 0;
+                    const isConflicting = !isEnabled && hasConflict(config.enabledModules, module.key);
                     const impliedBy = getImpliedModules(module.key);
                     const isAdvisory = config.advisoryModules.includes(module.key);
                     const severityInfo = getSeverityInfo(module.severity);
@@ -1113,7 +1133,9 @@ INSTRUCTIONS:
                         key={module.key}
                         className={`p-3 rounded-lg border transition-all ${
                           isEnabled 
-                            ? 'bg-primary/10 border-primary/30' 
+                            ? hasActiveConflict
+                              ? 'bg-red-500/10 border-red-500/30'
+                              : 'bg-primary/10 border-primary/30' 
                             : isConflicting 
                               ? 'bg-red-500/5 border-red-500/20 opacity-60' 
                               : 'bg-surfaceHighlight border-border hover:border-textMuted'
@@ -1133,7 +1155,7 @@ INSTRUCTIONS:
                               <span className={`text-xs px-2 py-0.5 rounded border ${severityInfo.className}`}>
                                 {isAdvisory ? 'ADVISORY' : severityInfo.label}
                               </span>
-                              {isConflicting && (
+                              {(isConflicting || hasActiveConflict) && (
                                 <span className="text-xs px-2 py-0.5 rounded border bg-red-500/10 text-red-600 border-red-500/30">
                                   ⚠️ Conflicts with: {conflictingWith.join(', ')}
                                 </span>

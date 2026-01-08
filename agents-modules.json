@@ -572,6 +572,26 @@
           "Use descriptive test names that explain the expected behavior"
         ]
       },
+      "examples": [
+        {
+          "title": "Adding a new function",
+          "bad": "// Step 1: Write the implementation\nfunction calculateDiscount(price, percent) {\n  return price * (percent / 100);\n}\n// Step 2: Write tests (or skip them)",
+          "good": "// Step 1: Write a failing test\ntest('calculates 20% discount on $100', () => {\n  expect(calculateDiscount(100, 20)).toBe(20);\n});\n// Run test - it fails (function doesn't exist)\n\n// Step 2: Write minimal implementation\nfunction calculateDiscount(price, percent) {\n  return price * (percent / 100);\n}\n// Run test - it passes",
+          "explanation": "Always write the test first, run it to see it fail, then write the minimum code to make it pass."
+        },
+        {
+          "title": "Refactoring safely",
+          "bad": "// Refactor without running tests\nfunction getUser(id) {\n  // Changed from callback to async\n  return await db.query(`SELECT * FROM users WHERE id = ${id}`);\n}",
+          "good": "// Step 1: Ensure all existing tests pass\nnpm test -- --watch\n\n// Step 2: Make small refactor\nfunction getUser(id) {\n  return db.query('SELECT * FROM users WHERE id = ?', [id]);\n}\n\n// Step 3: Run tests after each change\n// Tests still pass? Continue. Tests fail? Revert.",
+          "explanation": "Refactors must keep all existing tests green. Run tests after each small change."
+        },
+        {
+          "title": "Fixing a bug",
+          "bad": "// Just fix the bug directly\nfunction divide(a, b) {\n  if (b === 0) return 0; // Added fix\n  return a / b;\n}",
+          "good": "// Step 1: Write a test that exposes the bug\ntest('divide by zero returns Infinity or throws', () => {\n  expect(() => divide(10, 0)).toThrow('Division by zero');\n});\n// Run test - it fails (proves bug exists)\n\n// Step 2: Fix the bug\nfunction divide(a, b) {\n  if (b === 0) throw new Error('Division by zero');\n  return a / b;\n}\n// Run test - it passes",
+          "explanation": "Before fixing a bug, write a test that reproduces it. This proves the bug exists and prevents regression."
+        }
+      ],
       "conflicts": ["exploratory-spike"],
       "implies": ["code-review"]
     },
@@ -605,6 +625,26 @@
           "Log security-relevant events for audit trails"
         ]
       },
+      "examples": [
+        {
+          "title": "Handling secrets",
+          "bad": "const API_KEY = 'sk-1234567890abcdef';\nconst dbPassword = 'admin123';",
+          "good": "const API_KEY = process.env.API_KEY;\nconst dbPassword = process.env.DB_PASSWORD;\n\n// Validate at startup\nif (!API_KEY) throw new Error('API_KEY not configured');",
+          "explanation": "Never commit secrets to code. Use environment variables and validate they exist at startup."
+        },
+        {
+          "title": "SQL queries",
+          "bad": "const query = `SELECT * FROM users WHERE id = ${userId}`;\ndb.query(query);",
+          "good": "const query = 'SELECT * FROM users WHERE id = ?';\ndb.query(query, [userId]);",
+          "explanation": "Always use parameterized queries to prevent SQL injection attacks."
+        },
+        {
+          "title": "User input in HTML",
+          "bad": "element.innerHTML = `<div>Welcome, ${userName}</div>`;",
+          "good": "element.textContent = `Welcome, ${userName}`;\n// Or use a sanitization library\nelement.innerHTML = DOMPurify.sanitize(`<div>Welcome, ${userName}</div>`);",
+          "explanation": "Never insert unsanitized user input into HTML. Use textContent or sanitize with DOMPurify."
+        }
+      ],
       "conflicts": [],
       "implies": ["code-review"]
     },
@@ -823,6 +863,20 @@
           "Respond to review requests within one business day"
         ]
       },
+      "examples": [
+        {
+          "title": "Review comment quality",
+          "bad": "// Bad review comment:\n'This is wrong.'",
+          "good": "// Good review comment:\n'This query could cause N+1 performance issues. Consider using `include` or a batch query:\n```\nconst users = await User.findAll({ include: [Profile] });\n```'",
+          "explanation": "Provide specific, actionable feedback with code suggestions, not vague criticism."
+        },
+        {
+          "title": "PR size",
+          "bad": "// PR with 2000+ lines touching 50 files\n// 'Refactored authentication, added new dashboard, fixed 12 bugs'",
+          "good": "// Separate PRs:\n// PR 1: 'Refactor auth service' (200 lines)\n// PR 2: 'Add dashboard component' (300 lines)\n// PR 3: 'Fix login redirect bug' (50 lines)",
+          "explanation": "Split large changes into focused, reviewable PRs. Each PR should do one thing well."
+        }
+      ],
       "conflicts": [],
       "implies": []
     },
@@ -854,6 +908,20 @@
           "Provide filtering and sorting capabilities where appropriate"
         ]
       },
+      "examples": [
+        {
+          "title": "Breaking changes",
+          "bad": "// v1 API - suddenly changed\nPOST /api/users\n{ \"name\": \"John\", \"email\": \"john@example.com\" }\n// Changed to require 'fullName' instead of 'name' - breaks all clients!",
+          "good": "// Keep v1 working\nPOST /api/v1/users { \"name\": \"John\" }\n\n// Add v2 with new field\nPOST /api/v2/users { \"fullName\": \"John Doe\" }\n\n// Deprecation header in v1 responses:\nDeprecation: true\nSunset: 2024-12-31",
+          "explanation": "Never break existing APIs. Create a new version and deprecate the old one with notice."
+        },
+        {
+          "title": "Error responses",
+          "bad": "// Inconsistent errors:\n{ \"error\": \"Not found\" }\n{ \"message\": \"Invalid input\", \"code\": 400 }\n{ \"err\": { \"msg\": \"Auth failed\" } }",
+          "good": "// Consistent error format:\n{\n  \"error\": {\n    \"code\": \"USER_NOT_FOUND\",\n    \"message\": \"User with ID 123 not found\",\n    \"details\": { \"userId\": 123 }\n  }\n}",
+          "explanation": "Use a consistent error format across all endpoints with code, message, and optional details."
+        }
+      ],
       "conflicts": [],
       "implies": ["documentation"]
     },

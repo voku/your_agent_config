@@ -7,6 +7,13 @@ export enum ProjectPhase {
 export type ModuleCategoryType = 'engineering' | 'security' | 'operations' | 'process' | 'architecture';
 export type ModuleSeverity = 'gate' | 'critical' | 'standard' | 'mode';
 
+export interface ModuleExample {
+  title: string;
+  bad: string;
+  good: string;
+  explanation?: string;
+}
+
 export interface AgentModule {
   key: string;
   title: string;
@@ -20,6 +27,7 @@ export interface AgentModule {
     hard: string[];
     soft: string[];
   };
+  examples?: ModuleExample[];
   conflicts: string[];
   implies: string[];
 }
