@@ -8,11 +8,15 @@ export type ModuleCategoryType = 'engineering' | 'security' | 'operations' | 'pr
 export type ModuleSeverity = 'gate' | 'critical' | 'standard' | 'mode';
 
 export interface AgentModule {
+  schemaVersion: number;
   key: string;
   title: string;
+  enabled: boolean;
   category: ModuleCategoryType;
   severity: ModuleSeverity;
   description: string;
+  purpose: string;
+  failureModes: string[];
   rules: {
     hard: string[];
     soft: string[];

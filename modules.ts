@@ -1,5 +1,5 @@
 import { AgentModule, ModuleCategory } from './types';
-import modulesData from './agents-modules-minimal.json';
+import modulesData from './agents-modules.json';
 
 // Cast JSON data to properly typed modules
 export const MODULES: AgentModule[] = modulesData as AgentModule[];

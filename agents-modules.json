@@ -1,0 +1,410 @@
+[
+  {
+    "schemaVersion": 1,
+    "key": "tdd",
+    "title": "Test-Driven Development (TDD)",
+    "enabled": false,
+    "category": "engineering",
+    "severity": "gate",
+    "description": "Enforce test-driven development so behavior changes are specified by failing tests before implementation, preventing untested code from entering the codebase.",
+    "purpose": "Enforce test-driven development so behavior changes are specified by failing tests before implementation, preventing untested code from entering the codebase and enabling safe refactoring.",
+    "failureModes": [
+      "Undetected regressions from modifications to existing code",
+      "Bugs in new features due to incomplete mental models",
+      "Design deficiencies discovered only after implementation",
+      "Legacy growth caused by untested changes",
+      "The Tautology Trap: writing tests that merely confirm implementation details rather than desired behavior",
+      "Hallucinated Success: assuming code works because it 'looks right' without runtime verification"
+    ],
+    "rules": {
+      "hard": [
+        "No behavior-changing code may be committed without a prior commit containing a failing test that passes after the change",
+        "Pure refactors must not break any existing tests",
+        "All new public functions/classes must have at least one example-based test",
+        "You must execute a test command that fails before you write any implementation code. The failure output must be analyzed",
+        "You must write the absolute minimum code required to make the test pass. No premature optimization",
+        "Every code generation step must end with a test execution and verification",
+        "If no tests exist for a file you need to edit, add characterization tests in a separate commit first"
+      ],
+      "soft": [
+        "Target ≥80% line coverage on new/changed code",
+        "Prefer fast unit tests over slow integration tests",
+        "Keep individual tests focused on a single behavior",
+        "Use descriptive test names that explain the expected behavior"
+      ]
+    },
+    "conflicts": [
+      "exploratory-spike"
+    ],
+    "implies": [
+      "code-review"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "key": "security",
+    "title": "Security & Supply Chain",
+    "enabled": false,
+    "category": "security",
+    "severity": "gate",
+    "description": "Force systematic security hygiene to prevent common vulnerability classes and insecure defaults during development.",
+    "purpose": "Force systematic security hygiene to prevent common vulnerability classes and insecure defaults during development. Establish a zero-trust environment.",
+    "failureModes": [
+      "Hardcoded credentials exposed in version control",
+      "SQL injection, XSS, or command injection vulnerabilities",
+      "Vulnerable dependencies with known CVEs",
+      "Insufficient input validation leading to data breaches",
+      "Privilege escalation due to overly permissive access controls"
+    ],
+    "rules": {
+      "hard": [
+        "Never hardcode secrets, tokens, or credentials",
+        "All external inputs must be validated and escaped/parameterized before use in queries, commands, or HTML",
+        "Dependency updates must pass automated vulnerability scans before merge",
+        "All authentication must use established libraries, never roll your own crypto",
+        "Sensitive data must be encrypted at rest and in transit"
+      ],
+      "soft": [
+        "Apply principle of least privilege to all permissions and access controls",
+        "Enable and configure secure headers (CSP, HSTS, etc.) by default",
+        "Implement rate limiting on public endpoints",
+        "Log security-relevant events for audit trails"
+      ]
+    },
+    "conflicts": [],
+    "implies": [
+      "code-review"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "key": "refactoring",
+    "title": "Refactoring & Code Quality",
+    "enabled": false,
+    "category": "engineering",
+    "severity": "standard",
+    "description": "Govern safe refactoring to improve code structure without altering behavior.",
+    "purpose": "Govern safe refactoring to improve code structure without altering behavior, ensuring changes remain verifiable and low-risk through existing tests.",
+    "failureModes": [
+      "Breaking existing functionality while 'improving' code",
+      "Massive refactors that are impossible to review",
+      "Refactoring without adequate test coverage",
+      "Mixing behavior changes with structural changes"
+    ],
+    "rules": {
+      "hard": [
+        "Refactoring commits must not add or change external behavior",
+        "All existing tests must remain green throughout the process",
+        "Refactors must be performed in small, atomic commits",
+        "Each refactor commit must be independently reviewable and revertable"
+      ],
+      "soft": [
+        "Reduce cyclomatic complexity where >10",
+        "Eliminate duplicated code blocks >20 lines",
+        "Extract methods when functions exceed 50 lines",
+        "Apply consistent naming conventions across the codebase"
+      ]
+    },
+    "conflicts": [],
+    "implies": []
+  },
+  {
+    "schemaVersion": 1,
+    "key": "performance",
+    "title": "Performance & Optimization",
+    "enabled": false,
+    "category": "engineering",
+    "severity": "standard",
+    "description": "Prevent silent performance regressions and unmeasured optimization claims.",
+    "purpose": "Prevent silent performance regressions and unmeasured optimization claims by requiring measurement and bounded work in performance-sensitive paths.",
+    "failureModes": [
+      "Silent performance degradation over time",
+      "Premature optimization of non-bottlenecks",
+      "Unbounded queries or loops causing timeouts",
+      "Cache invalidation bugs causing stale data",
+      "Memory leaks from improper resource cleanup"
+    ],
+    "rules": {
+      "hard": [
+        "No performance-sensitive change without before/after measurement",
+        "No unbounded loops or queries in hot paths without explicit limits",
+        "No caching without an invalidation strategy",
+        "All async operations must have timeouts"
+      ],
+      "soft": [
+        "Prefer simpler algorithms over clever micro-optimizations",
+        "Optimize only measured bottlenecks, not assumptions",
+        "Document performance characteristics in code comments",
+        "Include performance impact in PR descriptions"
+      ]
+    },
+    "conflicts": [],
+    "implies": []
+  },
+  {
+    "schemaVersion": 1,
+    "key": "documentation",
+    "title": "Documentation & Knowledge Management",
+    "enabled": false,
+    "category": "process",
+    "severity": "standard",
+    "description": "Ensure knowledge survives beyond the current session.",
+    "purpose": "Ensure knowledge survives beyond the current session by requiring accurate documentation for public behavior, architecture, and decisions.",
+    "failureModes": [
+      "Tribal knowledge lost when team members leave",
+      "Outdated documentation misleading new developers",
+      "Undocumented APIs causing integration issues",
+      "Missing context for architectural decisions"
+    ],
+    "rules": {
+      "hard": [
+        "Public APIs must be documented (usage + edge cases)",
+        "Architecture decisions must be recorded (ADRs or equivalent)",
+        "Docs must be updated alongside behavior changes",
+        "README must contain setup and contribution guidelines"
+      ],
+      "soft": [
+        "Prefer examples over prose",
+        "Keep docs close to code (docs/ near relevant modules)",
+        "Use diagrams for complex system interactions",
+        "Include troubleshooting guides for common issues"
+      ]
+    },
+    "conflicts": [],
+    "implies": []
+  },
+  {
+    "schemaVersion": 1,
+    "key": "ops-production-safety",
+    "title": "Operations & Production Safety",
+    "enabled": false,
+    "category": "operations",
+    "severity": "gate",
+    "description": "Prevent changes that work locally but fail in production.",
+    "purpose": "Prevent changes that work locally but fail in production by enforcing rollout, rollback, observability, and environment awareness.",
+    "failureModes": [
+      "Deployments that cannot be rolled back",
+      "Production issues invisible due to missing observability",
+      "Environment-specific bugs from config drift",
+      "Cascading failures from missing circuit breakers"
+    ],
+    "rules": {
+      "hard": [
+        "Every production change must have an explicit rollback plan",
+        "New production-impacting behavior must emit logs/metrics",
+        "Config changes must be explicit, reviewable, and environment-aware",
+        "Database migrations must be backward compatible"
+      ],
+      "soft": [
+        "Prefer feature flags for risky changes",
+        "Deploy incrementally (canary/gradual rollout) where possible",
+        "Implement health checks for all services",
+        "Set up alerting for critical error rates"
+      ]
+    },
+    "conflicts": [],
+    "implies": [
+      "security"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "key": "legacy-migration",
+    "title": "Legacy Migration & Modernization",
+    "enabled": false,
+    "category": "engineering",
+    "severity": "standard",
+    "description": "Enable controlled modernization of legacy systems.",
+    "purpose": "Enable controlled modernization of legacy systems while preventing accidental rewrites and containing risk through incremental, reversible steps.",
+    "failureModes": [
+      "Big bang rewrites that never ship",
+      "Breaking existing functionality during migration",
+      "Expanding legacy surface area instead of shrinking it",
+      "Missing exit criteria leading to never-ending migrations"
+    ],
+    "rules": {
+      "hard": [
+        "No migration work without an explicit exit plan",
+        "New code must not increase the legacy surface area",
+        "Migration must be incremental and reversible",
+        "Parallel operation period required before cutting over"
+      ],
+      "soft": [
+        "Prefer strangler patterns over rewrites",
+        "Wrap legacy boundaries before refactoring internals",
+        "Maintain feature parity tracking documents",
+        "Set time-boxed milestones with clear success criteria"
+      ]
+    },
+    "conflicts": [
+      "refactoring"
+    ],
+    "implies": []
+  },
+  {
+    "schemaVersion": 1,
+    "key": "exploratory-spike",
+    "title": "Exploratory / Spike Mode",
+    "enabled": false,
+    "category": "process",
+    "severity": "mode",
+    "description": "Allow rapid learning and experimentation without polluting production code.",
+    "purpose": "Allow rapid learning and experimentation without polluting production code, by enforcing strict deletion and promotion rules.",
+    "failureModes": [
+      "Spike code accidentally merged to production",
+      "Learnings lost when spike is deleted",
+      "Spike scope creep turning experiment into feature",
+      "Never-ending spikes without clear outcomes"
+    ],
+    "rules": {
+      "hard": [
+        "Spike code must be isolated and deletable",
+        "No spike merges without an explicit promotion decision",
+        "Spikes must be labeled and time-boxed",
+        "Spike outcomes must be documented before deletion"
+      ],
+      "soft": [
+        "Prefer throwaway branches or sandbox folders",
+        "Capture learnings in notes/docs before deleting",
+        "Share spike findings with the team",
+        "Keep spikes focused on answering specific questions"
+      ]
+    },
+    "conflicts": [
+      "tdd",
+      "security",
+      "ops-production-safety"
+    ],
+    "implies": []
+  },
+  {
+    "schemaVersion": 1,
+    "key": "code-review",
+    "title": "Code Review & Quality Gates",
+    "enabled": false,
+    "category": "process",
+    "severity": "gate",
+    "description": "Ensure consistent, high-quality code review practices.",
+    "purpose": "Ensure consistent, high-quality code review practices that catch defects early and maintain architectural integrity.",
+    "failureModes": [
+      "Rubber-stamp approvals without meaningful review",
+      "Blocking reviews causing delivery delays",
+      "Style bikeshedding drowning out substantive feedback",
+      "Architectural violations slipping through"
+    ],
+    "rules": {
+      "hard": [
+        "All code must be reviewed by at least one other person before merge",
+        "PRs must pass all automated checks (tests, linting, security scans)",
+        "Breaking changes require explicit approval from tech lead or architect",
+        "Self-merges are prohibited except for critical hotfixes with post-merge review"
+      ],
+      "soft": [
+        "Reviewers should focus on logic, architecture, and maintainability, not just style",
+        "Provide constructive feedback with specific suggestions",
+        "Keep PRs small and focused (< 400 lines when possible)",
+        "Respond to review requests within one business day"
+      ]
+    },
+    "conflicts": [],
+    "implies": []
+  },
+  {
+    "schemaVersion": 1,
+    "key": "api-design",
+    "title": "API Design & Contracts",
+    "enabled": false,
+    "category": "architecture",
+    "severity": "gate",
+    "description": "Enforce consistent, well-designed APIs.",
+    "purpose": "Enforce consistent, well-designed APIs that are easy to use, hard to misuse, and maintain backward compatibility.",
+    "failureModes": [
+      "Breaking changes without versioning",
+      "Inconsistent error formats across endpoints",
+      "Missing or outdated API documentation",
+      "Leaky abstractions exposing internal implementation"
+    ],
+    "rules": {
+      "hard": [
+        "Breaking API changes require a new version (v2, v3, etc.)",
+        "All public APIs must have OpenAPI/Swagger documentation",
+        "API responses must use consistent error format with clear messages",
+        "Deprecation notices must be communicated at least one version in advance"
+      ],
+      "soft": [
+        "Use RESTful conventions unless there's a compelling reason not to",
+        "Prefer POST for operations with side effects, GET for reads",
+        "Include pagination for list endpoints",
+        "Provide filtering and sorting capabilities where appropriate"
+      ]
+    },
+    "conflicts": [],
+    "implies": [
+      "documentation"
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "key": "database-data-integrity",
+    "title": "Database & Data Integrity",
+    "enabled": false,
+    "category": "operations",
+    "severity": "gate",
+    "description": "Ensure data consistency, prevent data loss, and maintain database performance.",
+    "purpose": "Ensure data consistency, prevent data loss, and maintain database performance through disciplined schema and query practices.",
+    "failureModes": [
+      "Data corruption from missing transactions",
+      "Irreversible schema changes causing data loss",
+      "N+1 queries causing performance degradation",
+      "Missing indexes causing slow queries at scale"
+    ],
+    "rules": {
+      "hard": [
+        "All schema changes must be reversible migrations with down scripts",
+        "No direct database modifications in production; use migrations only",
+        "All data-modifying operations must be wrapped in transactions",
+        "Foreign key constraints must be enforced at the database level"
+      ],
+      "soft": [
+        "Use database constraints (NOT NULL, CHECK, UNIQUE) to enforce business rules",
+        "Avoid SELECT * in production code; specify columns explicitly",
+        "Add indexes for frequently queried columns",
+        "Use query explain plans to verify performance before merging"
+      ]
+    },
+    "conflicts": [],
+    "implies": []
+  },
+  {
+    "schemaVersion": 1,
+    "key": "frontend-ux",
+    "title": "Frontend & User Experience",
+    "enabled": false,
+    "category": "engineering",
+    "severity": "standard",
+    "description": "Ensure consistent, accessible, and performant user interfaces.",
+    "purpose": "Ensure consistent, accessible, and performant user interfaces that provide excellent user experience across devices and capabilities.",
+    "failureModes": [
+      "Inaccessible UI excluding users with disabilities",
+      "Inconsistent styling across components",
+      "Poor performance on mobile devices",
+      "Broken layouts at certain viewport sizes"
+    ],
+    "rules": {
+      "hard": [
+        "All interactive elements must be keyboard accessible",
+        "All images must have alt text",
+        "Color cannot be the only means of conveying information",
+        "Forms must have proper labels and error messages"
+      ],
+      "soft": [
+        "Target Lighthouse score >90 for performance and accessibility",
+        "Implement loading states for async operations >300ms",
+        "Use semantic HTML elements appropriately",
+        "Test UI on multiple screen sizes before merging"
+      ]
+    },
+    "conflicts": [],
+    "implies": []
+  }
+]
