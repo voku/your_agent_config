@@ -94,7 +94,7 @@
       "key": "startup-mvp",
       "name": "Startup MVP",
       "description": "Fast iteration with essential safety",
-      "modules": ["exploratory-spike", "security", "documentation"],
+      "modules": ["security", "documentation"],
       "advisory": ["security", "documentation"]
     },
     {
