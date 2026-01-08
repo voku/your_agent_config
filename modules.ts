@@ -12,29 +12,14 @@ export const MODULE_PRESETS: Record<string, ModulePreset> = Object.fromEntries(
   schema.presets.map(preset => [preset.key, preset])
 );
 
-// Build categories dynamically from the schema
-export const CATEGORIES: ModuleCategory[] = [
-  {
-    name: 'Security & Operations',
-    description: 'Critical safety nets for production systems',
-    modules: MODULES.filter(m => m.category === 'security' || m.category === 'operations')
-  },
-  {
-    name: 'Engineering Discipline',
-    description: 'Code quality and testing practices',
-    modules: MODULES.filter(m => m.category === 'engineering')
-  },
-  {
-    name: 'Process & Workflow',
-    description: 'Team collaboration and development modes',
-    modules: MODULES.filter(m => m.category === 'process')
-  },
-  {
-    name: 'Architecture & Design',
-    description: 'System structure and API contracts',
-    modules: MODULES.filter(m => m.category === 'architecture')
-  }
-];
+// Build categories dynamically from the schema's displayGroups
+export const CATEGORIES: ModuleCategory[] = schema.displayGroups
+  .sort((a, b) => a.displayOrder - b.displayOrder)
+  .map(group => ({
+    name: group.name,
+    description: group.description,
+    modules: MODULES.filter(m => group.categories.includes(m.category))
+  }));
 
 /**
  * Check if enabling a new module would create a conflict with already enabled modules

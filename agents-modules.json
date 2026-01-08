@@ -3,32 +3,67 @@
   "categories": [
     {
       "key": "security",
-      "name": "Security & Operations",
-      "description": "Critical safety nets for production systems",
+      "name": "Security",
+      "description": "Security hygiene and vulnerability prevention",
+      "displayGroup": "Security & Operations",
       "displayOrder": 1
     },
     {
       "key": "operations",
-      "name": "Security & Operations",
-      "description": "Critical safety nets for production systems",
+      "name": "Operations",
+      "description": "Production safety and deployment practices",
+      "displayGroup": "Security & Operations",
       "displayOrder": 1
     },
     {
       "key": "engineering",
       "name": "Engineering Discipline",
       "description": "Code quality and testing practices",
+      "displayGroup": "Engineering Discipline",
       "displayOrder": 2
     },
     {
       "key": "process",
       "name": "Process & Workflow",
       "description": "Team collaboration and development modes",
+      "displayGroup": "Process & Workflow",
       "displayOrder": 3
     },
     {
       "key": "architecture",
       "name": "Architecture & Design",
       "description": "System structure and API contracts",
+      "displayGroup": "Architecture & Design",
+      "displayOrder": 4
+    }
+  ],
+  "displayGroups": [
+    {
+      "key": "security-operations",
+      "name": "Security & Operations",
+      "description": "Critical safety nets for production systems",
+      "categories": ["security", "operations"],
+      "displayOrder": 1
+    },
+    {
+      "key": "engineering",
+      "name": "Engineering Discipline",
+      "description": "Code quality and testing practices",
+      "categories": ["engineering"],
+      "displayOrder": 2
+    },
+    {
+      "key": "process",
+      "name": "Process & Workflow",
+      "description": "Team collaboration and development modes",
+      "categories": ["process"],
+      "displayOrder": 3
+    },
+    {
+      "key": "architecture",
+      "name": "Architecture & Design",
+      "description": "System structure and API contracts",
+      "categories": ["architecture"],
       "displayOrder": 4
     }
   ],

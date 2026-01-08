@@ -28,6 +28,15 @@ export interface ModuleCategoryDefinition {
   key: string;
   name: string;
   description: string;
+  displayGroup: string;
+  displayOrder: number;
+}
+
+export interface DisplayGroup {
+  key: string;
+  name: string;
+  description: string;
+  categories: string[];
   displayOrder: number;
 }
 
@@ -49,6 +58,7 @@ export interface ModuleCategory {
 export interface AgentsModulesSchema {
   schemaVersion: number;
   categories: ModuleCategoryDefinition[];
+  displayGroups: DisplayGroup[];
   presets: ModulePreset[];
   modules: AgentModule[];
 }
