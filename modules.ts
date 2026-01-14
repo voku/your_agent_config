@@ -40,6 +40,9 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplates = schema.workflowTemplates;
 // Export LLM helpers from the single source of truth
 export const LLM_HELPERS: LLMHelper[] = schema.llmHelpers;
 
+// Export SYNC framework from the single source of truth
+export const SYNC_FRAMEWORK = schema.syncFramework;
+
 // Build categories dynamically from the schema's displayGroups
 export const CATEGORIES: ModuleCategory[] = schema.displayGroups
   .sort((a, b) => a.displayOrder - b.displayOrder)

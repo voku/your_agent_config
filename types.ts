@@ -171,6 +171,7 @@ export interface AgentsModulesSchema {
   workflowTemplates: WorkflowTemplates;
   llmHelpers: LLMHelper[];
   modules: AgentModule[];
+  syncFramework?: SYNCFrameworkTemplate;
 }
 
 export enum AIStyle {
@@ -221,6 +222,67 @@ export interface Skill {
   hasAssets?: boolean;
 }
 
+// SYNC Framework Types
+export enum SYNCPhase {
+  ALIGN = 'align',
+  IDEATE = 'ideate',
+  PROTOTYPE = 'prototype',
+  REFLECT = 'reflect',
+  LEARN = 'learn'
+}
+
+export enum SYNCPersonaMode {
+  STRICT = 'strict',
+  ADAPTIVE = 'adaptive'
+}
+
+export interface SYNCPhaseDefinition {
+  key: SYNCPhase;
+  name: string;
+  emoji: string;
+  description: string;
+  purpose: string;
+  steps: string[];
+  outputs: string[];
+}
+
+export interface SYNCAgentDefinition {
+  key: string;
+  name: string;
+  role: string;
+  analogy: string;
+  responsibilities: string[];
+  enforcedMandates: string[];
+}
+
+export interface SYNCMandateDefinition {
+  key: string;
+  name: string;
+  description: string;
+  ensures: string;
+  basedOn?: string;
+  requirements: string[];
+}
+
+export interface SYNCPersonaModeDefinition {
+  key: SYNCPersonaMode;
+  name: string;
+  description: string;
+  behavior: string;
+}
+
+export interface SYNCFrameworkTemplate {
+  title: string;
+  description: string;
+  motto: string;
+  phases: SYNCPhaseDefinition[];
+  agents: SYNCAgentDefinition[];
+  mandates: SYNCMandateDefinition[];
+  personaModes: SYNCPersonaModeDefinition[];
+  howItWorksTogether: string;
+  keyTerms?: Record<string, string>;
+}
+
 export interface AgentConfig {
   projectName: string;
   mission: string;
@@ -253,4 +315,10 @@ export interface AgentConfig {
   // Enforcement modules
   enabledModules: string[];
   advisoryModules: string[];
+  // SYNC Framework
+  syncFrameworkEnabled: boolean;
+  syncPersonaMode: SYNCPersonaMode;
+  syncEnabledPhases: SYNCPhase[];
+  syncEnabledAgents: string[];
+  syncEnabledMandates: string[];
 }

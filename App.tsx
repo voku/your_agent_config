@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill, AgentModule } from './types';
+import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalResource, ShellCommand, Skill, AgentModule, SYNCPhase, SYNCPersonaMode } from './types';
 import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon, SunIcon, MoonIcon, GithubIcon } from './components/UIComponents';
 import { ComboInput } from './components/ComboInput';
 import { PROJECT_PRESETS, FIELD_PRESETS, MODULE_PRESETS } from './presets';
-import { CATEGORIES, MODULES, hasConflict, getConflictingModules, getImpliedModules, getSeverityInfo, WORKFLOW_TEMPLATES, LLM_HELPERS, interpolateTemplate } from './modules';
+import { CATEGORIES, MODULES, hasConflict, getConflictingModules, getImpliedModules, getSeverityInfo, WORKFLOW_TEMPLATES, LLM_HELPERS, interpolateTemplate, SYNC_FRAMEWORK } from './modules';
 
 const INITIAL_STATE: AgentConfig = {
   projectName: "My Awesome Project",
@@ -36,7 +36,13 @@ const INITIAL_STATE: AgentConfig = {
   skills: [],
   // Enforcement modules
   enabledModules: [],
-  advisoryModules: []
+  advisoryModules: [],
+  // SYNC Framework
+  syncFrameworkEnabled: false,
+  syncPersonaMode: SYNCPersonaMode.ADAPTIVE,
+  syncEnabledPhases: [],
+  syncEnabledAgents: [],
+  syncEnabledMandates: []
 };
 
 const App: React.FC = () => {
@@ -619,6 +625,76 @@ ${globalRulesTemplate.principles.map(p => `- ${p}`).join('\n')}
 ---
 ` : '';
 
+    // Generate SYNC Framework section
+    const syncFrameworkSection = config.syncFrameworkEnabled && SYNC_FRAMEWORK ? `
+## SYNC Framework for LLM-Driven Development
+
+> **${SYNC_FRAMEWORK.motto}**
+
+${SYNC_FRAMEWORK.description}
+
+### Operating Mode: ${config.syncPersonaMode === SYNCPersonaMode.STRICT ? '🔒 STRICT' : '🔄 ADAPTIVE'}
+
+${SYNC_FRAMEWORK.personaModes.find(m => m.key === config.syncPersonaMode)?.behavior}
+
+${config.syncEnabledPhases.length > 0 ? `
+### Phases
+
+This project follows these SYNC phases:
+
+${config.syncEnabledPhases.map(phaseKey => {
+  const phase = SYNC_FRAMEWORK.phases.find(p => p.key === phaseKey);
+  if (!phase) return '';
+  return `#### ${phase.emoji} ${phase.name} – ${phase.description}
+
+**Purpose**: ${phase.purpose}
+
+**Steps**:
+${phase.steps.map(s => `- ${s}`).join('\n')}
+
+**Outputs**:
+${phase.outputs.map(o => `- ${o}`).join('\n')}`;
+}).join('\n\n')}` : ''}
+
+${config.syncEnabledAgents.length > 0 ? `
+### Specialized Agents
+
+These agents represent clear, non-overlapping roles in the development process:
+
+| Agent | Role | Responsibilities |
+|-------|------|------------------|
+${config.syncEnabledAgents.map(agentKey => {
+  const agent = SYNC_FRAMEWORK.agents.find(a => a.key === agentKey);
+  if (!agent) return '';
+  return `| **${agent.name}** | ${agent.role} | ${agent.responsibilities.join('; ')} |`;
+}).join('\n')}
+
+**How Agents Work Together**: ${SYNC_FRAMEWORK.howItWorksTogether}` : ''}
+
+${config.syncEnabledMandates.length > 0 ? `
+### Mandates (Non-Negotiable Laws)
+
+These mandates are enforced constraints that every phase must comply with:
+
+${config.syncEnabledMandates.map(mandateKey => {
+  const mandate = SYNC_FRAMEWORK.mandates.find(m => m.key === mandateKey);
+  if (!mandate) return '';
+  return `#### ${mandate.name}
+
+**Ensures**: ${mandate.ensures}${mandate.basedOn ? `\n**Based On**: ${mandate.basedOn}` : ''}
+
+**Requirements**:
+${mandate.requirements.map(r => `- ${r}`).join('\n')}`;
+}).join('\n\n')}` : ''}
+
+${SYNC_FRAMEWORK.keyTerms && Object.keys(SYNC_FRAMEWORK.keyTerms).length > 0 ? `
+### Key Terms
+
+${Object.entries(SYNC_FRAMEWORK.keyTerms).map(([term, definition]) => `- **${term}**: ${definition}`).join('\n')}` : ''}
+
+---
+` : '';
+
     // Generate enforcement modules section
     const enabledModulesData = config.enabledModules
       .map(key => MODULES.find(m => m.key === key))
@@ -663,50 +739,127 @@ ${module.conflicts.length > 0 ? `
 }).join('\n\n---\n\n')}
 ` : '';
     
-    return `# ${config.projectName} - AGENTS.md
+    const sections = [
+      `# ${config.projectName} - AGENTS.md`,
+      '',
+      '> **⚠️ SYSTEM CONTEXT FILE**',
+      '> This file governs the behavior of AI agents (Cursor, Copilot, Windsurf) within this repository.',
+    ];
 
-> **⚠️ SYSTEM CONTEXT FILE**
-> This file governs the behavior of AI agents (Cursor, Copilot, Windsurf) within this repository.
-${globalRulesSection ? '\n' + globalRulesSection : ''}
-${additionalResourcesSection ? '\n' + additionalResourcesSection : ''}${developmentPrinciplesSection ? '\n' + developmentPrinciplesSection : ''}
-## 1. Project Identity & Mission
-**Goal:** ${config.mission}
-**North Star:** ${config.northStar}
-${preImplementationChecklistSection ? '\n' + preImplementationChecklistSection : ''}
-## 2. Status & Stability
-**Phase:** ${isProto ? '🌱 PROTOTYPE' : '🌳 PRODUCTION'}
-**Breaking Changes:** ${isProto ? '✅ ALLOWED (Improve architecture freely)' : '⛔ FORBIDDEN (Strict backward compatibility)'}
-**Refactoring Policy:** ${isProto ? 'Aggressive refactoring encouraged.' : 'Conservative. Discuss before large changes.'}
-${aiWorkflowSection ? '\n' + aiWorkflowSection : ''}
-## 3. Tech Stack & Architecture
-- **Languages:** ${config.languages}
-- **Frameworks:** ${config.frameworks}
-- **Package Manager:** ${config.packageManager}
-- **Styling:** ${config.styling}
-- **State Management:** ${config.stateManagement}
-- **Backend/Services:** ${config.backend}
-${llmOptimizedPatternsSection ? '\n' + llmOptimizedPatternsSection : ''}${fixPreExistingIssuesSection ? '\n' + fixPreExistingIssuesSection : ''}
-## 4. Project Structure
-**Key Directories:**
-\`\`\`
-${config.directoryStructure}
-\`\`\`
+    if (globalRulesSection) {
+      sections.push('', globalRulesSection);
+    }
 
-**Context Map:**
-${config.docMap.map(d => `- \`${d.path}\`: ${d.description}`).join('\n')}
-${shellCommandsSection ? '\n' + shellCommandsSection : ''}
-## 5. Rules of Engagement
-### ⛔ The NEVER List
-${config.neverList.map(item => `- **NEVER** ${item}`).join('\n')}
-${!isProto ? '- **NEVER** Change database schemas without migrations\n- **NEVER** Break public API contracts' : ''}
+    if (syncFrameworkSection) {
+      sections.push('', syncFrameworkSection);
+    }
 
-### Testing & Quality
-- **Strategy:** ${config.testingStrategy}
-- **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".
-${enforcementModulesSection ? '\n' + enforcementModulesSection : ''}${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}${skillsSection ? '\n' + skillsSection : ''}
-## 6. Interaction Style
-**Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}
-`;
+    if (additionalResourcesSection) {
+      sections.push('', additionalResourcesSection);
+    }
+
+    if (developmentPrinciplesSection) {
+      sections.push('', developmentPrinciplesSection);
+    }
+
+    sections.push(
+      '## 1. Project Identity & Mission',
+      `**Goal:** ${config.mission}`,
+      `**North Star:** ${config.northStar}`
+    );
+
+    if (preImplementationChecklistSection) {
+      sections.push('', preImplementationChecklistSection);
+    }
+
+    sections.push(
+      '## 2. Status & Stability',
+      `**Phase:** ${isProto ? '🌱 PROTOTYPE' : '🌳 PRODUCTION'}`,
+      `**Breaking Changes:** ${isProto ? '✅ ALLOWED (Improve architecture freely)' : '⛔ FORBIDDEN (Strict backward compatibility)'}`,
+      `**Refactoring Policy:** ${isProto ? 'Aggressive refactoring encouraged.' : 'Conservative. Discuss before large changes.'}`
+    );
+
+    if (aiWorkflowSection) {
+      sections.push('', aiWorkflowSection);
+    }
+
+    sections.push(
+      '## 3. Tech Stack & Architecture',
+      `- **Languages:** ${config.languages}`,
+      `- **Frameworks:** ${config.frameworks}`,
+      `- **Package Manager:** ${config.packageManager}`,
+      `- **Styling:** ${config.styling}`,
+      `- **State Management:** ${config.stateManagement}`,
+      `- **Backend/Services:** ${config.backend}`
+    );
+
+    if (llmOptimizedPatternsSection) {
+      sections.push('', llmOptimizedPatternsSection);
+    }
+
+    if (fixPreExistingIssuesSection) {
+      sections.push('', fixPreExistingIssuesSection);
+    }
+
+    sections.push(
+      '## 4. Project Structure',
+      '**Key Directories:**',
+      '```',
+      config.directoryStructure,
+      '```',
+      '',
+      '**Context Map:**',
+      config.docMap.map(d => `- \`${d.path}\`: ${d.description}`).join('\n')
+    );
+
+    if (shellCommandsSection) {
+      sections.push('', shellCommandsSection);
+    }
+
+    sections.push(
+      '## 5. Rules of Engagement',
+      '### ⛔ The NEVER List',
+      config.neverList.map(item => `- **NEVER** ${item}`).join('\n')
+    );
+
+    if (!isProto) {
+      sections.push('- **NEVER** Change database schemas without migrations');
+      sections.push('- **NEVER** Break public API contracts');
+    }
+
+    sections.push(
+      '',
+      '### Testing & Quality',
+      `- **Strategy:** ${config.testingStrategy}`,
+      '- **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".'
+    );
+
+    if (enforcementModulesSection) {
+      sections.push('', enforcementModulesSection);
+    }
+
+    if (mistakesToAvoidSection) {
+      sections.push('', mistakesToAvoidSection);
+    }
+
+    if (questionsToAskSection) {
+      sections.push('', questionsToAskSection);
+    }
+
+    if (blindSpotsSection) {
+      sections.push('', blindSpotsSection);
+    }
+
+    if (skillsSection) {
+      sections.push('', skillsSection);
+    }
+
+    sections.push(
+      '## 6. Interaction Style',
+      `**Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}`
+    );
+
+    return sections.join('\n');
   }, [config]);
 
   const systemPrompt = useMemo(() => {
@@ -1083,6 +1236,161 @@ INSTRUCTIONS:
                   className="w-4 h-4 rounded border-border"
                 />
               </div>
+            </div>
+          </Card>
+
+          {/* SYNC Framework Configuration */}
+          <Card title="6a. SYNC Framework">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-surfaceHighlight rounded-lg border border-border">
+                <div>
+                  <Label>Enable SYNC Framework</Label>
+                  <p className="text-xs text-textMuted">A rigorously structured, fact-enforced framework for LLM-driven development</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.syncFrameworkEnabled}
+                  onChange={(e) => setConfig(prev => ({ ...prev, syncFrameworkEnabled: e.target.checked }))}
+                  className="w-4 h-4 rounded border-border"
+                />
+              </div>
+
+              {config.syncFrameworkEnabled && SYNC_FRAMEWORK && (
+                <>
+                  {/* Persona Mode Selector */}
+                  <div className="space-y-2">
+                    <Label>Persona Mode</Label>
+                    <select
+                      value={config.syncPersonaMode}
+                      onChange={(e) => setConfig(prev => ({ ...prev, syncPersonaMode: e.target.value as SYNCPersonaMode }))}
+                      className="w-full bg-surfaceHighlight border border-border rounded-lg px-3 py-2.5 text-sm text-textMain focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    >
+                      {SYNC_FRAMEWORK.personaModes.map(mode => (
+                        <option key={mode.key} value={mode.key}>
+                          {mode.name} - {mode.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Phase Selection */}
+                  <div className="space-y-2">
+                    <Label>Enabled Phases</Label>
+                    <p className="text-xs text-textMuted mb-2">Select which SYNC phases to include in your workflow</p>
+                    <div className="space-y-2">
+                      {SYNC_FRAMEWORK.phases.map(phase => (
+                        <label key={phase.key} className="flex items-start p-3 bg-surfaceHighlight rounded-lg border border-border cursor-pointer hover:bg-border transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={config.syncEnabledPhases.includes(phase.key)}
+                            onChange={(e) => {
+                              setConfig(prev => ({
+                                ...prev,
+                                syncEnabledPhases: e.target.checked
+                                  ? [...prev.syncEnabledPhases, phase.key]
+                                  : prev.syncEnabledPhases.filter(p => p !== phase.key)
+                              }));
+                            }}
+                            className="w-4 h-4 mt-0.5 rounded border-border"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="font-semibold text-sm">{phase.emoji} {phase.name}</div>
+                            <div className="text-xs text-textMuted">{phase.description}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Agent Selection */}
+                  <div className="space-y-2">
+                    <Label>Enabled Agents</Label>
+                    <p className="text-xs text-textMuted mb-2">Select which specialized agents to use</p>
+                    <div className="space-y-2">
+                      {SYNC_FRAMEWORK.agents.map(agent => (
+                        <label key={agent.key} className="flex items-start p-3 bg-surfaceHighlight rounded-lg border border-border cursor-pointer hover:bg-border transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={config.syncEnabledAgents.includes(agent.key)}
+                            onChange={(e) => {
+                              setConfig(prev => ({
+                                ...prev,
+                                syncEnabledAgents: e.target.checked
+                                  ? [...prev.syncEnabledAgents, agent.key]
+                                  : prev.syncEnabledAgents.filter(a => a !== agent.key)
+                              }));
+                            }}
+                            className="w-4 h-4 mt-0.5 rounded border-border"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="font-semibold text-sm">{agent.name}</div>
+                            <div className="text-xs text-textMuted">{agent.role} - {agent.analogy}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Mandate Selection */}
+                  <div className="space-y-2">
+                    <Label>Enabled Mandates</Label>
+                    <p className="text-xs text-textMuted mb-2">Select which non-negotiable laws to enforce</p>
+                    <div className="space-y-2">
+                      {SYNC_FRAMEWORK.mandates.map(mandate => (
+                        <label key={mandate.key} className="flex items-start p-3 bg-surfaceHighlight rounded-lg border border-border cursor-pointer hover:bg-border transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={config.syncEnabledMandates.includes(mandate.key)}
+                            onChange={(e) => {
+                              setConfig(prev => ({
+                                ...prev,
+                                syncEnabledMandates: e.target.checked
+                                  ? [...prev.syncEnabledMandates, mandate.key]
+                                  : prev.syncEnabledMandates.filter(m => m !== mandate.key)
+                              }));
+                            }}
+                            className="w-4 h-4 mt-0.5 rounded border-border"
+                          />
+                          <div className="ml-3 flex-1">
+                            <div className="font-semibold text-sm">{mandate.name}</div>
+                            <div className="text-xs text-textMuted">{mandate.description}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quick Enable All Button */}
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        setConfig(prev => ({
+                          ...prev,
+                          syncEnabledPhases: SYNC_FRAMEWORK.phases.map(p => p.key),
+                          syncEnabledAgents: SYNC_FRAMEWORK.agents.map(a => a.key),
+                          syncEnabledMandates: SYNC_FRAMEWORK.mandates.map(m => m.key)
+                        }));
+                      }}
+                      className="flex-1"
+                    >
+                      Enable All
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setConfig(prev => ({
+                          ...prev,
+                          syncEnabledPhases: [],
+                          syncEnabledAgents: [],
+                          syncEnabledMandates: []
+                        }));
+                      }}
+                      className="flex-1"
+                    >
+                      Clear All
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </Card>
 
