@@ -1111,7 +1111,7 @@
       {
         "key": "prototype",
         "name": "PROTOTYPE",
-        "emoji": "��",
+        "emoji": "🔧",
         "description": "OWASP-Compliant Implementation",
         "purpose": "Implement following verified plan with quality gates",
         "steps": [
