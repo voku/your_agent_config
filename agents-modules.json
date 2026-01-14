@@ -1065,109 +1065,110 @@
   ],
   "syncFramework": {
     "title": "SYNC Framework",
-    "description": "A rigorously structured, fact-enforced framework for LLM-driven development",
+    "description": "Fact-enforced methodology for LLM-driven development emphasizing planning, reflection, and systematic enforcement",
     "motto": "If your value ends at syntax, AI already replaced you.",
     "phases": [
       {
         "key": "align",
         "name": "ALIGN",
         "emoji": "🧩",
-        "description": "Because Prompting ≠ Planning",
-        "purpose": "Force brutal clarity on what you are building before any code is written",
-        "questions": [
-          "Do you even know what you are building?",
-          "What is the verifiable problem?",
-          "What defines clear, measurable success?",
-          "What are the known facts and constraints?",
-          "What is missing or unknown?"
+        "description": "Verifiable Problem Definition",
+        "purpose": "Establish measurable objectives and constraints before coding",
+        "steps": [
+          "Document business drivers and strategic goals",
+          "Define measurable success criteria (Quality Attribute Requirements)",
+          "List known constraints (technical, budget, team skills, existing systems)",
+          "Identify unknowns and risks",
+          "Checkpoint: Verify strategic alignment with stakeholders"
         ],
         "outputs": [
-          "Verifiable problem statement",
-          "Clear success criteria",
-          "Known facts and constraints documented",
-          "List of unknowns and missing information"
+          "Problem statement",
+          "Success criteria (QARs)",
+          "Constraints list",
+          "Risk register"
         ]
       },
       {
         "key": "ideate",
         "name": "IDEATE",
         "emoji": "🧠",
-        "description": "Think Before You Type (or Prompt)",
-        "purpose": "Generate and evaluate multiple solution paths before implementation",
-        "questions": [
-          "What are the alternative approaches?",
-          "How do they score on DX, security, and maintainability?",
-          "What are the trade-offs for each option?",
-          "Which solution is best based on facts, not vibes?"
+        "description": "Multi-Path Solution Evaluation",
+        "purpose": "Generate and objectively compare 2-3 solution approaches",
+        "steps": [
+          "Generate 2-3 distinct approaches using proven patterns",
+          "Score each approach (1-5) against QARs: security, DX, maintainability, performance",
+          "Map approaches to constraints (budget, team cognitive load, timeline)",
+          "Document trade-offs with factual justification",
+          "Create ADR (Architectural Decision Record) for chosen approach"
         ],
         "outputs": [
-          "Multiple solution paths generated",
-          "Solutions scored on DX, security, maintainability",
-          "Trade-off analysis with factual backing",
-          "Selected approach with justification"
+          "Solution alternatives (2-3)",
+          "Scored comparison matrix",
+          "Trade-off analysis",
+          "ADR documenting decision"
         ]
       },
       {
         "key": "prototype",
         "name": "PROTOTYPE",
-        "emoji": "🔧",
-        "description": "Generate Code That Does not Suck",
-        "purpose": "Write code that is safe, readable, and maintainable from the start",
-        "questions": [
-          "Does this follow the verified plan?",
-          "Will this pass static analysis at max level?",
-          "Is this DX clear (no hidden state, no weird side-effects)?",
-          "Does this respect OWASP, type safety, clean structure?",
-          "Would the MandateAuditorAgent approve this?"
+        "emoji": "��",
+        "description": "OWASP-Compliant Implementation",
+        "purpose": "Implement following verified plan with quality gates",
+        "steps": [
+          "Follow verified plan from IDEATE phase",
+          "Pass static analysis at highest level (zero warnings)",
+          "Ensure clear DX: strong typing, no hidden state, predictable naming",
+          "Validate OWASP compliance and type safety",
+          "Document public APIs and complex logic",
+          "Checkpoint: MandateAuditor approval before merge"
         ],
         "outputs": [
-          "Code following verified plan",
-          "Passing static analysis (max level)",
-          "Clear DX without hidden behavior",
-          "OWASP-compliant, type-safe implementation",
-          "MandateAuditorAgent approval"
+          "Type-safe, linted code",
+          "Passing tests",
+          "API documentation",
+          "Audit approval"
         ]
       },
       {
         "key": "reflect",
         "name": "REFLECT",
         "emoji": "🔍",
-        "description": "Find the Blind Spots Before They Find You",
-        "purpose": "Debug thinking, not just code, through systematic reflection",
-        "questions": [
-          "What are the factual observations about this implementation?",
-          "What side-effects exist or could emerge?",
-          "What would make someone say WTF when reading this?",
-          "How does this change the overall architecture?",
-          "What assumptions did we make that might be wrong?"
+        "description": "Systematic Blind Spot Identification",
+        "purpose": "Debug thinking through critical evaluation",
+        "steps": [
+          "Review implementation against plan - where did it deviate?",
+          "Identify side-effects and hidden dependencies",
+          "Run 'WTF check' - what would confuse a new team member?",
+          "Analyze architectural delta - what changed from design?",
+          "Challenge assumptions - what might be wrong?",
+          "Document findings in reflection report"
         ],
         "outputs": [
-          "Fact-based reflection document",
-          "Side-effect inspection results",
-          "WTF check findings",
-          "Architectural delta analysis",
-          "Validated or challenged assumptions"
+          "Deviation analysis",
+          "Side-effect inventory",
+          "Clarity issues",
+          "Updated assumptions"
         ]
       },
       {
         "key": "learn",
         "name": "LEARN",
         "emoji": "📚",
-        "description": "Ship, Review, Codify, Evolve",
-        "purpose": "Extract learnings to avoid repeating mistakes across projects",
-        "questions": [
-          "What worked well in this implementation?",
-          "What failed or created problems?",
-          "What patterns can be reused?",
-          "What rules need to be tightened?",
-          "How does this inform our engineering culture?"
+        "description": "Pattern Extraction & Rule Evolution",
+        "purpose": "Extract reusable patterns to avoid repeating mistakes",
+        "steps": [
+          "Conduct 'Prediction vs Reality' analysis",
+          "Document what worked well (success patterns)",
+          "Catalog failure modes and anti-patterns",
+          "Identify patterns for shared library or reference architecture",
+          "Update enforcement rules based on learnings",
+          "Propose framework improvements for next iteration"
         ],
         "outputs": [
-          "Success patterns documented",
-          "Failure modes cataloged",
-          "Reusable patterns extracted",
-          "Updated enforcement rules",
-          "Engineering culture insights"
+          "Success patterns",
+          "Anti-patterns catalog",
+          "Updated rules",
+          "Framework improvements"
         ]
       }
     ],
@@ -1176,13 +1177,11 @@
         "key": "planner",
         "name": "PlannerAgent",
         "role": "Project Architect",
-        "analogy": "The architect who breaks work into slices and defines scope",
+        "analogy": "The architect who decomposes work and defines measurable success",
         "responsibilities": [
-          "Break work into manageable slices",
-          "Define scope and boundaries",
-          "Identify constraints and dependencies",
-          "Establish success criteria",
-          "Document known facts and unknowns"
+          "Define scope and success criteria (QARs)",
+          "Identify constraints and risks",
+          "Document strategic alignment"
         ],
         "enforcedMandates": [
           "verifiability",
@@ -1193,13 +1192,11 @@
         "key": "executor",
         "name": "ExecutorAgent",
         "role": "Implementation Developer",
-        "analogy": "The senior dev who codes with strict adherence to standards",
+        "analogy": "The senior dev who codes with strict adherence to verified plan",
         "responsibilities": [
-          "Implement code following the verified plan",
-          "Ensure security compliance (OWASP)",
-          "Maintain high DX (clear, typed, predictable)",
-          "Pass all static analysis checks",
-          "Write comprehensive documentation"
+          "Implement following ADR decisions",
+          "Enforce security (OWASP) and DX standards",
+          "Pass all quality gates"
         ],
         "enforcedMandates": [
           "security",
@@ -1213,13 +1210,12 @@
         "key": "reflection",
         "name": "ReflectionAgent",
         "role": "Senior Reviewer",
-        "analogy": "The experienced reviewer who finds blind spots in thinking",
+        "analogy": "The critical challenger who finds blind spots",
         "responsibilities": [
-          "Evaluate completed work critically",
-          "Identify blind spots and edge cases",
-          "Analyze side-effects and implications",
-          "Perform WTF checks on code clarity",
-          "Force systemic improvements"
+          "Evaluate against plan",
+          "Identify edge cases and side-effects",
+          "Challenge assumptions",
+          "WTF check for clarity"
         ],
         "enforcedMandates": [
           "verifiability",
@@ -1229,14 +1225,13 @@
       {
         "key": "knowledge",
         "name": "KnowledgeSynthesizerAgent",
-        "role": "Staff Engineer / Systems Thinker",
-        "analogy": "The staff engineer who extracts patterns for reuse",
+        "role": "Staff Engineer",
+        "analogy": "The systems thinker who extracts reusable patterns",
         "responsibilities": [
-          "Extract reusable patterns from implementations",
+          "Synthesize learnings",
+          "Build pattern library",
           "Propose framework evolution",
-          "Document architectural insights",
-          "Identify cross-cutting concerns",
-          "Build institutional knowledge"
+          "Manage architectural knowledge"
         ],
         "enforcedMandates": [
           "documentation",
@@ -1247,13 +1242,12 @@
         "key": "auditor",
         "name": "MandateAuditorAgent",
         "role": "Tech Lead / Compliance",
-        "analogy": "The tech lead who blocks progress if rules are violated",
+        "analogy": "The gatekeeper who blocks progress on violations",
         "responsibilities": [
-          "Block progress on mandate violations",
-          "Enforce security requirements",
-          "Verify verifiability of decisions",
-          "Ensure phase completion before progression",
-          "Maintain quality gates"
+          "Block on mandate violations",
+          "Verify phase completion",
+          "Enforce quality gates",
+          "Validate ADR compliance"
         ],
         "enforcedMandates": [
           "security",
@@ -1265,14 +1259,13 @@
       {
         "key": "interaction",
         "name": "InteractionAgent",
-        "role": "Team Facilitator / QA",
-        "analogy": "The facilitator who ensures clear communication and decisions",
+        "role": "Team Facilitator",
+        "analogy": "The facilitator who ensures clarity and alignment",
         "responsibilities": [
-          "Handle human check-ins and clarifications",
-          "Verify clarity of requirements",
-          "Enforce decision checkpoints",
-          "Facilitate team alignment",
-          "Document communication outcomes"
+          "Clarify requirements",
+          "Document decisions",
+          "Facilitate checkpoints",
+          "Track communication outcomes"
         ],
         "enforcedMandates": [
           "verifiability"
@@ -1283,95 +1276,83 @@
       {
         "key": "security",
         "name": "Security",
-        "description": "No unvalidated inputs or insecure outputs",
-        "ensures": "All security vulnerabilities are prevented",
+        "description": "OWASP Top 10 compliance",
+        "ensures": "No vulnerabilities in implementation",
         "basedOn": "OWASP Top 10",
         "requirements": [
-          "All user inputs must be validated",
-          "All outputs must be sanitized",
-          "No SQL injection vulnerabilities",
-          "No XSS vulnerabilities",
-          "Proper authentication and authorization",
-          "Secure data storage and transmission"
+          "Validate all inputs",
+          "Sanitize all outputs",
+          "No SQL injection/XSS",
+          "Secure auth/data storage"
         ]
       },
       {
         "key": "dx",
-        "name": "Developer Experience (DX)",
-        "description": "Code must be typed, clear, and maintainable",
-        "ensures": "Code is understandable and maintainable",
+        "name": "Developer Experience",
+        "description": "Code must be clear and maintainable",
+        "ensures": "Understandable, evolvable codebase",
         "requirements": [
-          "Use strong typing (no any type)",
-          "Predictable naming conventions",
-          "No magic strings or numbers",
-          "No hidden state or side-effects",
-          "Clear function signatures",
-          "Self-documenting code structure"
+          "Strong typing (no 'any')",
+          "Predictable naming",
+          "No magic values",
+          "No hidden state/side-effects"
         ]
       },
       {
         "key": "staticAnalysis",
         "name": "Static Analysis",
-        "description": "Must pass at highest level with no warnings",
-        "ensures": "Code quality is maintained automatically",
+        "description": "Highest level, zero warnings",
+        "ensures": "Automated quality maintenance",
         "requirements": [
-          "Zero linter warnings",
-          "Zero type errors",
-          "All checks pass at maximum strictness",
-          "No disabled rules without justification",
-          "Consistent code style"
+          "Zero linter/type errors",
+          "Max strictness enabled",
+          "Consistent style"
         ]
       },
       {
         "key": "documentation",
         "name": "Documentation",
-        "description": "Full documentation using modern syntax",
-        "ensures": "Code intent and usage is clear",
+        "description": "APIs and decisions documented",
+        "ensures": "Clear intent and usage",
         "requirements": [
-          "All public APIs documented",
-          "Complex logic explained with comments",
-          "Examples provided for non-obvious usage",
-          "Architecture decisions recorded",
-          "README kept up-to-date"
+          "Public APIs documented",
+          "Complex logic explained",
+          "ADRs for architectural decisions",
+          "Up-to-date README"
         ]
       },
       {
         "key": "style",
         "name": "Style",
-        "description": "Consistent formatting and layout enforced",
-        "ensures": "Codebase looks uniform and professional",
+        "description": "Consistent formatting enforced",
+        "ensures": "Uniform, professional codebase",
         "requirements": [
-          "Automated formatter used (e.g., Prettier)",
-          "Consistent indentation",
-          "Consistent naming patterns",
-          "Consistent file structure",
-          "No trailing whitespace"
+          "Automated formatter (e.g., Prettier)",
+          "Consistent naming/indentation/structure"
         ]
       },
       {
         "key": "verifiability",
         "name": "Verifiability",
-        "description": "All decisions must have traceable, factual reasoning",
-        "ensures": "Engineering decisions can be audited and understood",
+        "description": "Traceable, factual reasoning",
+        "ensures": "Auditable decisions",
         "requirements": [
           "Document why, not just what",
-          "Link to source materials (RFCs, docs, discussions)",
+          "Link to sources (RFCs, docs)",
           "State assumptions explicitly",
-          "Track decision alternatives considered",
-          "Provide evidence for claims"
+          "Track alternatives considered"
         ]
       },
       {
         "key": "phaseEnforcement",
         "name": "Phase Enforcement",
-        "description": "Cannot skip phases - each must complete or be justified",
-        "ensures": "Systematic approach is maintained",
+        "description": "Complete each phase before next",
+        "ensures": "Systematic approach maintained",
         "requirements": [
-          "ALIGN phase completed before IDEATE",
-          "IDEATE phase completed before PROTOTYPE",
-          "PROTOTYPE phase reviewed in REFLECT",
-          "LEARN phase captures insights",
-          "Phase skipping requires explicit justification"
+          "ALIGN before IDEATE",
+          "IDEATE (with ADR) before PROTOTYPE",
+          "REFLECT after PROTOTYPE",
+          "LEARN captures insights"
         ]
       }
     ],
@@ -1379,16 +1360,21 @@
       {
         "key": "strict",
         "name": "Strict Mode",
-        "description": "No ambiguity allowed - everything must be verifiable",
-        "behavior": "Everything must be verifiable and mandate-compliant before progressing. No assumptions, no shortcuts, no bypassing gates."
+        "description": "No ambiguity - full verifiability required",
+        "behavior": "All decisions must be verifiable and mandate-compliant before proceeding. No assumptions, no shortcuts."
       },
       {
         "key": "adaptive",
         "name": "Adaptive Mode",
-        "description": "Allows temporary ambiguity with risk awareness",
-        "behavior": "Allows temporary ambiguity but logs it. Prioritizes progress with documented risk awareness. Suitable for rapid iteration."
+        "description": "Progress-focused with logged risks",
+        "behavior": "Allows temporary ambiguity but logs it with risk awareness. Suitable for rapid iteration."
       }
     ],
-    "howItWorksTogether": "Planning = PlannerAgent adds success criteria to issues. Execution = ExecutorAgent codes with security + static analysis gates. Review = ReflectionAgent provides fact-based reasoning. Merge = MandateAuditorAgent blocks if DX/security rules violated."
+    "howItWorksTogether": "PlannerAgent defines QARs and creates alignment. ExecutorAgent codes following ADR decisions with quality gates. ReflectionAgent validates against plan. MandateAuditorAgent blocks on violations. KnowledgeSynthesizerAgent extracts patterns for reuse.",
+    "keyTerms": {
+      "QAR": "Quality Attribute Requirement - measurable success criterion (e.g., 'API responds < 200ms at p95')",
+      "ADR": "Architectural Decision Record - documents why a decision was made, with alternatives considered",
+      "WTF check": "Would This Frustrate? - clarity test from fresh team member perspective"
+    }
   }
 }

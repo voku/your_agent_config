@@ -649,10 +649,10 @@ ${config.syncEnabledPhases.map(phaseKey => {
 
 **Purpose**: ${phase.purpose}
 
-**Key Questions**:
-${phase.questions.map(q => `- ${q}`).join('\n')}
+**Steps**:
+${phase.steps.map(s => `- ${s}`).join('\n')}
 
-**Expected Outputs**:
+**Outputs**:
 ${phase.outputs.map(o => `- ${o}`).join('\n')}`;
 }).join('\n\n')}` : ''}
 
@@ -686,6 +686,11 @@ ${config.syncEnabledMandates.map(mandateKey => {
 **Requirements**:
 ${mandate.requirements.map(r => `- ${r}`).join('\n')}`;
 }).join('\n\n')}` : ''}
+
+${SYNC_FRAMEWORK.keyTerms && Object.keys(SYNC_FRAMEWORK.keyTerms).length > 0 ? `
+### Key Terms
+
+${Object.entries(SYNC_FRAMEWORK.keyTerms).map(([term, definition]) => `- **${term}**: ${definition}`).join('\n')}` : ''}
 
 ---
 ` : '';

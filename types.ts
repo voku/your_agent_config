@@ -242,7 +242,7 @@ export interface SYNCPhaseDefinition {
   emoji: string;
   description: string;
   purpose: string;
-  questions: string[];
+  steps: string[];
   outputs: string[];
 }
 
@@ -280,6 +280,7 @@ export interface SYNCFrameworkTemplate {
   mandates: SYNCMandateDefinition[];
   personaModes: SYNCPersonaModeDefinition[];
   howItWorksTogether: string;
+  keyTerms?: Record<string, string>;
 }
 
 export interface AgentConfig {
