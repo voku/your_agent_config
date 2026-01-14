@@ -734,50 +734,127 @@ ${module.conflicts.length > 0 ? `
 }).join('\n\n---\n\n')}
 ` : '';
     
-    return `# ${config.projectName} - AGENTS.md
+    const sections = [
+      `# ${config.projectName} - AGENTS.md`,
+      '',
+      '> **⚠️ SYSTEM CONTEXT FILE**',
+      '> This file governs the behavior of AI agents (Cursor, Copilot, Windsurf) within this repository.',
+    ];
 
-> **⚠️ SYSTEM CONTEXT FILE**
-> This file governs the behavior of AI agents (Cursor, Copilot, Windsurf) within this repository.
-${globalRulesSection ? '\n' + globalRulesSection : ''}${syncFrameworkSection ? '\n' + syncFrameworkSection : ''}
-${additionalResourcesSection ? '\n' + additionalResourcesSection : ''}${developmentPrinciplesSection ? '\n' + developmentPrinciplesSection : ''}
-## 1. Project Identity & Mission
-**Goal:** ${config.mission}
-**North Star:** ${config.northStar}
-${preImplementationChecklistSection ? '\n' + preImplementationChecklistSection : ''}
-## 2. Status & Stability
-**Phase:** ${isProto ? '🌱 PROTOTYPE' : '🌳 PRODUCTION'}
-**Breaking Changes:** ${isProto ? '✅ ALLOWED (Improve architecture freely)' : '⛔ FORBIDDEN (Strict backward compatibility)'}
-**Refactoring Policy:** ${isProto ? 'Aggressive refactoring encouraged.' : 'Conservative. Discuss before large changes.'}
-${aiWorkflowSection ? '\n' + aiWorkflowSection : ''}
-## 3. Tech Stack & Architecture
-- **Languages:** ${config.languages}
-- **Frameworks:** ${config.frameworks}
-- **Package Manager:** ${config.packageManager}
-- **Styling:** ${config.styling}
-- **State Management:** ${config.stateManagement}
-- **Backend/Services:** ${config.backend}
-${llmOptimizedPatternsSection ? '\n' + llmOptimizedPatternsSection : ''}${fixPreExistingIssuesSection ? '\n' + fixPreExistingIssuesSection : ''}
-## 4. Project Structure
-**Key Directories:**
-\`\`\`
-${config.directoryStructure}
-\`\`\`
+    if (globalRulesSection) {
+      sections.push('', globalRulesSection);
+    }
 
-**Context Map:**
-${config.docMap.map(d => `- \`${d.path}\`: ${d.description}`).join('\n')}
-${shellCommandsSection ? '\n' + shellCommandsSection : ''}
-## 5. Rules of Engagement
-### ⛔ The NEVER List
-${config.neverList.map(item => `- **NEVER** ${item}`).join('\n')}
-${!isProto ? '- **NEVER** Change database schemas without migrations\n- **NEVER** Break public API contracts' : ''}
+    if (syncFrameworkSection) {
+      sections.push('', syncFrameworkSection);
+    }
 
-### Testing & Quality
-- **Strategy:** ${config.testingStrategy}
-- **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".
-${enforcementModulesSection ? '\n' + enforcementModulesSection : ''}${mistakesToAvoidSection ? '\n' + mistakesToAvoidSection : ''}${questionsToAskSection ? '\n' + questionsToAskSection : ''}${blindSpotsSection ? '\n' + blindSpotsSection : ''}${skillsSection ? '\n' + skillsSection : ''}
-## 6. Interaction Style
-**Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}
-`;
+    if (additionalResourcesSection) {
+      sections.push('', additionalResourcesSection);
+    }
+
+    if (developmentPrinciplesSection) {
+      sections.push('', developmentPrinciplesSection);
+    }
+
+    sections.push(
+      '## 1. Project Identity & Mission',
+      `**Goal:** ${config.mission}`,
+      `**North Star:** ${config.northStar}`
+    );
+
+    if (preImplementationChecklistSection) {
+      sections.push('', preImplementationChecklistSection);
+    }
+
+    sections.push(
+      '## 2. Status & Stability',
+      `**Phase:** ${isProto ? '🌱 PROTOTYPE' : '🌳 PRODUCTION'}`,
+      `**Breaking Changes:** ${isProto ? '✅ ALLOWED (Improve architecture freely)' : '⛔ FORBIDDEN (Strict backward compatibility)'}`,
+      `**Refactoring Policy:** ${isProto ? 'Aggressive refactoring encouraged.' : 'Conservative. Discuss before large changes.'}`
+    );
+
+    if (aiWorkflowSection) {
+      sections.push('', aiWorkflowSection);
+    }
+
+    sections.push(
+      '## 3. Tech Stack & Architecture',
+      `- **Languages:** ${config.languages}`,
+      `- **Frameworks:** ${config.frameworks}`,
+      `- **Package Manager:** ${config.packageManager}`,
+      `- **Styling:** ${config.styling}`,
+      `- **State Management:** ${config.stateManagement}`,
+      `- **Backend/Services:** ${config.backend}`
+    );
+
+    if (llmOptimizedPatternsSection) {
+      sections.push('', llmOptimizedPatternsSection);
+    }
+
+    if (fixPreExistingIssuesSection) {
+      sections.push('', fixPreExistingIssuesSection);
+    }
+
+    sections.push(
+      '## 4. Project Structure',
+      '**Key Directories:**',
+      '```',
+      config.directoryStructure,
+      '```',
+      '',
+      '**Context Map:**',
+      config.docMap.map(d => `- \`${d.path}\`: ${d.description}`).join('\n')
+    );
+
+    if (shellCommandsSection) {
+      sections.push('', shellCommandsSection);
+    }
+
+    sections.push(
+      '## 5. Rules of Engagement',
+      '### ⛔ The NEVER List',
+      config.neverList.map(item => `- **NEVER** ${item}`).join('\n')
+    );
+
+    if (!isProto) {
+      sections.push('- **NEVER** Change database schemas without migrations');
+      sections.push('- **NEVER** Break public API contracts');
+    }
+
+    sections.push(
+      '',
+      '### Testing & Quality',
+      `- **Strategy:** ${config.testingStrategy}`,
+      '- **Mocking:** Avoid mocks unless strictly necessary. Favor real integrations to prevent "testing the mocks".'
+    );
+
+    if (enforcementModulesSection) {
+      sections.push('', enforcementModulesSection);
+    }
+
+    if (mistakesToAvoidSection) {
+      sections.push('', mistakesToAvoidSection);
+    }
+
+    if (questionsToAskSection) {
+      sections.push('', questionsToAskSection);
+    }
+
+    if (blindSpotsSection) {
+      sections.push('', blindSpotsSection);
+    }
+
+    if (skillsSection) {
+      sections.push('', skillsSection);
+    }
+
+    sections.push(
+      '## 6. Interaction Style',
+      `**Preferred Tone:** ${config.aiStyle === AIStyle.TERSE ? 'Terse (Code only, minimal explanation)' : config.aiStyle === AIStyle.SOCRATIC ? 'Socratic (Guide me, don\'t just solve)' : 'Explanatory (Teach me while coding)'}`
+    );
+
+    return sections.join('\n');
   }, [config]);
 
   const systemPrompt = useMemo(() => {
