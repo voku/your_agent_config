@@ -42,28 +42,37 @@
       "key": "security-operations",
       "name": "Security & Operations",
       "description": "Critical safety nets for production systems",
-      "categories": ["security", "operations"],
+      "categories": [
+        "security",
+        "operations"
+      ],
       "displayOrder": 1
     },
     {
       "key": "engineering",
       "name": "Engineering Discipline",
       "description": "Code quality and testing practices",
-      "categories": ["engineering"],
+      "categories": [
+        "engineering"
+      ],
       "displayOrder": 2
     },
     {
       "key": "process",
       "name": "Process & Workflow",
       "description": "Team collaboration and development modes",
-      "categories": ["process"],
+      "categories": [
+        "process"
+      ],
       "displayOrder": 3
     },
     {
       "key": "architecture",
       "name": "Architecture & Design",
       "description": "System structure and API contracts",
-      "categories": ["architecture"],
+      "categories": [
+        "architecture"
+      ],
       "displayOrder": 4
     }
   ],
@@ -94,28 +103,52 @@
       "key": "startup-mvp",
       "name": "Startup MVP",
       "description": "Fast iteration with essential safety",
-      "modules": ["security", "documentation"],
-      "advisory": ["security", "documentation"]
+      "modules": [
+        "security",
+        "documentation"
+      ],
+      "advisory": [
+        "security",
+        "documentation"
+      ]
     },
     {
       "key": "enterprise-api",
       "name": "Enterprise API",
       "description": "Full safety for production systems",
-      "modules": ["security", "ops-production-safety", "database-data-integrity", "tdd", "code-review", "api-design", "documentation", "performance"],
+      "modules": [
+        "security",
+        "ops-production-safety",
+        "database-data-integrity",
+        "tdd",
+        "code-review",
+        "api-design",
+        "documentation",
+        "performance"
+      ],
       "advisory": []
     },
     {
       "key": "open-source-library",
       "name": "Open Source Library",
       "description": "Quality code, no ops overhead",
-      "modules": ["tdd", "code-review", "documentation", "api-design"],
+      "modules": [
+        "tdd",
+        "code-review",
+        "documentation",
+        "api-design"
+      ],
       "advisory": []
     },
     {
       "key": "legacy-modernization",
       "name": "Legacy Modernization",
       "description": "Safe incremental refactoring",
-      "modules": ["legacy-migration", "tdd", "documentation"],
+      "modules": [
+        "legacy-migration",
+        "tdd",
+        "documentation"
+      ],
       "advisory": []
     }
   ],
@@ -471,70 +504,96 @@
       "key": "tech-stack-advisor",
       "title": "🚀 Tech Stack Advisor",
       "description": "Ask an LLM to suggest the best stack. Returns JSON to auto-fill stack fields.",
-      "expectedFields": ["languages", "frameworks", "packageManager", "styling", "stateManagement", "backend"],
+      "expectedFields": [
+        "languages",
+        "frameworks",
+        "packageManager",
+        "styling",
+        "stateManagement",
+        "backend"
+      ],
       "promptTemplate": "I am starting a software project called \"{{projectName}}\".\nMission: {{mission}}\nPhase: {{phase}}\n\nPlease recommend a complete technical stack best suited for this mission.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"languages\": \"...\",\n  \"frameworks\": \"...\",\n  \"packageManager\": \"...\",\n  \"styling\": \"...\",\n  \"stateManagement\": \"...\",\n  \"backend\": \"...\"\n}"
     },
     {
       "key": "safety-guardrails",
       "title": "🛡️ Safety Guardrails",
       "description": "Generate specific 'NEVER' rules. Returns JSON to merge into your list.",
-      "expectedFields": ["neverList"],
+      "expectedFields": [
+        "neverList"
+      ],
       "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Mgmt: {{stateManagement}}\n\nPlease suggest 5-7 critical \"NEVER\" rules for an AI coding agent.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"neverList\": [\"Never use 'any'\", \"Never mutate state directly\", ...]\n}"
     },
     {
       "key": "mission-refinement",
       "title": "✨ Mission Refinement",
       "description": "Polishes your mission. Returns JSON to update the mission field.",
-      "expectedFields": ["mission"],
+      "expectedFields": [
+        "mission"
+      ],
       "promptTemplate": "My project's mission is: \"{{mission}}\".\nNorth Star: \"{{northStar}}\"\n\nPlease refine this mission statement to be concise yet inspiring for a developer team.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mission\": \"The single best refined mission statement here\"\n}"
     },
     {
       "key": "architecture-map",
       "title": "🗺️ Architecture Map",
       "description": "Suggests directory structure. Returns JSON to update structure and docs.",
-      "expectedFields": ["directoryStructure", "docMap"],
+      "expectedFields": [
+        "directoryStructure",
+        "docMap"
+      ],
       "promptTemplate": "I am building a {{phase}} project using {{frameworks}} and {{backend}}.\n\nPlease suggest a robust, scalable directory structure.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"directoryStructure\": \"src/components\\nsrc/hooks\\n...\",\n  \"docMap\": [\n    { \"path\": \"docs/architecture.md\", \"description\": \"High level overview\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
     },
     {
       "key": "key-files-detector",
       "title": "📂 Key Files Detector",
       "description": "Identifies important files AI agents should read. Returns JSON to add to context map.",
-      "expectedFields": ["docMap"],
+      "expectedFields": [
+        "docMap"
+      ],
       "promptTemplate": "I am using the following tech stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Management: {{stateManagement}}\n- Backend: {{backend}}\n\nBased on this stack, suggest 3-5 key file paths that an AI coding agent should read to understand the architecture and conventions of this project.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"docMap\": [\n    { \"path\": \"src/types.ts\", \"description\": \"Type definitions and interfaces\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
     },
     {
       "key": "development-principles",
       "title": "🎯 Development Principles Generator",
       "description": "Generate core development principles. Returns JSON to add to principles list.",
-      "expectedFields": ["developmentPrinciples"],
+      "expectedFields": [
+        "developmentPrinciples"
+      ],
       "promptTemplate": "I am building \"{{projectName}}\" with the following mission:\n{{mission}}\n\nNorth Star: {{northStar}}\nPhase: {{phase}}\n\nPlease suggest 5-7 core development principles that should guide all development decisions.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"developmentPrinciples\": [\"Zero downtime deployments\", \"Security first\", \"User experience over features\", ...]\n}"
     },
     {
       "key": "ai-mistakes",
       "title": "⚠️ AI Mistakes Generator",
       "description": "Generate common mistakes AI should avoid. Returns JSON to add to mistakes list.",
-      "expectedFields": ["mistakesToAvoid"],
+      "expectedFields": [
+        "mistakesToAvoid"
+      ],
       "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 common mistakes AI assistants make when working with this tech stack.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mistakesToAvoid\": [\"Don't implement without understanding existing patterns\", \"Don't skip the discovery phase\", ...]\n}"
     },
     {
       "key": "questions-generator",
       "title": "❓ Questions Generator",
       "description": "Generate self-check questions for AI. Returns JSON to add to questions list.",
-      "expectedFields": ["questionsToAsk"],
+      "expectedFields": [
+        "questionsToAsk"
+      ],
       "promptTemplate": "I am building a {{phase}} project called \"{{projectName}}\".\n\nPlease suggest 5-7 questions an AI assistant should ask itself before starting any implementation.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"questionsToAsk\": [\"What similar functionality already exists?\", \"What existing tests can guide my understanding?\", ...]\n}"
     },
     {
       "key": "blind-spots",
       "title": "👁️ Blind Spots Generator",
       "description": "Generate AI blind spots and mitigations. Returns JSON to add to blind spots list.",
-      "expectedFields": ["blindSpots"],
+      "expectedFields": [
+        "blindSpots"
+      ],
       "promptTemplate": "I am using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 potential blind spots an AI assistant might have when working on this project, along with mitigation strategies.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"blindSpots\": [\"Local environment unknown – confirm tool availability before relying on them\", \"Hidden dependencies – request explicit dependency lists\", ...]\n}"
     },
     {
       "key": "skills-generator",
       "title": "🔧 Skills Generator",
       "description": "Generate agent skills for specialized tasks. Returns JSON to add to skills list.",
-      "expectedFields": ["skills"],
+      "expectedFields": [
+        "skills"
+      ],
       "promptTemplate": "I am building \"{{projectName}}\" using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nMission: {{mission}}\n\nGenerate 3-5 focused Agent Skills following the Agent Skills specification:\n\n**Requirements**:\n1. Each skill must be focused on ONE specific, repeatable task\n2. Name: lowercase-with-hyphens (max 64 chars)\n3. Description: Include BOTH what it does AND when to use it (specific keywords/triggers)\n4. Consider these best practices:\n   - Skills compose better when focused rather than trying to do everything\n   - Include \"when to use\" keywords (e.g., \"when user mentions X\", \"for Y tasks\")\n   - Specify if references/, scripts/, or assets/ directories are needed\n   - Keep SKILL.md under 500 lines, move details to references/\n\n**Examples of good skills**:\n- pdf-processing: \"Extract text and tables from PDFs, fill forms, merge documents. Use when working with PDF documents or when user mentions PDFs, forms, or document extraction.\"\n- code-review: \"Perform systematic code reviews following project standards. Use when user asks to review code, check quality, or mentions code review.\"\n- api-documentation: \"Generate OpenAPI/Swagger documentation from code. Use when documenting APIs or when user mentions API docs, Swagger, or OpenAPI.\"\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"skills\": [\n    {\n      \"name\": \"skill-name\",\n      \"description\": \"What it does and when to use it with specific keywords\",\n      \"path\": \"skills/skill-name\",\n      \"license\": \"MIT\",\n      \"compatibility\": \"Any environment requirements\",\n      \"allowedTools\": \"optional space-delimited list\",\n      \"hasReferences\": false,\n      \"hasScripts\": false,\n      \"hasAssets\": false,\n      \"metadata\": {\n        \"author\": \"your-org\",\n        \"version\": \"1.0\"\n      }\n    }\n  ]\n}"
     }
   ],
@@ -592,8 +651,12 @@
           "explanation": "Before fixing a bug, write a test that reproduces it. This proves the bug exists and prevents regression."
         }
       ],
-      "conflicts": ["exploratory-spike"],
-      "implies": ["code-review"]
+      "conflicts": [
+        "exploratory-spike"
+      ],
+      "implies": [
+        "code-review"
+      ]
     },
     {
       "key": "security",
@@ -646,7 +709,9 @@
         }
       ],
       "conflicts": [],
-      "implies": ["code-review"]
+      "implies": [
+        "code-review"
+      ]
     },
     {
       "key": "refactoring",
@@ -771,7 +836,9 @@
         ]
       },
       "conflicts": [],
-      "implies": ["security"]
+      "implies": [
+        "security"
+      ]
     },
     {
       "key": "legacy-migration",
@@ -801,7 +868,9 @@
           "Set time-boxed milestones with clear success criteria"
         ]
       },
-      "conflicts": ["refactoring"],
+      "conflicts": [
+        "refactoring"
+      ],
       "implies": []
     },
     {
@@ -832,7 +901,11 @@
           "Keep spikes focused on answering specific questions"
         ]
       },
-      "conflicts": ["tdd", "security", "ops-production-safety"],
+      "conflicts": [
+        "tdd",
+        "security",
+        "ops-production-safety"
+      ],
       "implies": []
     },
     {
@@ -923,7 +996,9 @@
         }
       ],
       "conflicts": [],
-      "implies": ["documentation"]
+      "implies": [
+        "documentation"
+      ]
     },
     {
       "key": "database-data-integrity",
@@ -987,5 +1062,333 @@
       "conflicts": [],
       "implies": []
     }
-  ]
+  ],
+  "syncFramework": {
+    "title": "SYNC Framework",
+    "description": "A rigorously structured, fact-enforced framework for LLM-driven development",
+    "motto": "If your value ends at syntax, AI already replaced you.",
+    "phases": [
+      {
+        "key": "align",
+        "name": "ALIGN",
+        "emoji": "🧩",
+        "description": "Because Prompting ≠ Planning",
+        "purpose": "Force brutal clarity on what you are building before any code is written",
+        "questions": [
+          "Do you even know what you are building?",
+          "What is the verifiable problem?",
+          "What defines clear, measurable success?",
+          "What are the known facts and constraints?",
+          "What is missing or unknown?"
+        ],
+        "outputs": [
+          "Verifiable problem statement",
+          "Clear success criteria",
+          "Known facts and constraints documented",
+          "List of unknowns and missing information"
+        ]
+      },
+      {
+        "key": "ideate",
+        "name": "IDEATE",
+        "emoji": "🧠",
+        "description": "Think Before You Type (or Prompt)",
+        "purpose": "Generate and evaluate multiple solution paths before implementation",
+        "questions": [
+          "What are the alternative approaches?",
+          "How do they score on DX, security, and maintainability?",
+          "What are the trade-offs for each option?",
+          "Which solution is best based on facts, not vibes?"
+        ],
+        "outputs": [
+          "Multiple solution paths generated",
+          "Solutions scored on DX, security, maintainability",
+          "Trade-off analysis with factual backing",
+          "Selected approach with justification"
+        ]
+      },
+      {
+        "key": "prototype",
+        "name": "PROTOTYPE",
+        "emoji": "🔧",
+        "description": "Generate Code That Does not Suck",
+        "purpose": "Write code that is safe, readable, and maintainable from the start",
+        "questions": [
+          "Does this follow the verified plan?",
+          "Will this pass static analysis at max level?",
+          "Is this DX clear (no hidden state, no weird side-effects)?",
+          "Does this respect OWASP, type safety, clean structure?",
+          "Would the MandateAuditorAgent approve this?"
+        ],
+        "outputs": [
+          "Code following verified plan",
+          "Passing static analysis (max level)",
+          "Clear DX without hidden behavior",
+          "OWASP-compliant, type-safe implementation",
+          "MandateAuditorAgent approval"
+        ]
+      },
+      {
+        "key": "reflect",
+        "name": "REFLECT",
+        "emoji": "🔍",
+        "description": "Find the Blind Spots Before They Find You",
+        "purpose": "Debug thinking, not just code, through systematic reflection",
+        "questions": [
+          "What are the factual observations about this implementation?",
+          "What side-effects exist or could emerge?",
+          "What would make someone say WTF when reading this?",
+          "How does this change the overall architecture?",
+          "What assumptions did we make that might be wrong?"
+        ],
+        "outputs": [
+          "Fact-based reflection document",
+          "Side-effect inspection results",
+          "WTF check findings",
+          "Architectural delta analysis",
+          "Validated or challenged assumptions"
+        ]
+      },
+      {
+        "key": "learn",
+        "name": "LEARN",
+        "emoji": "📚",
+        "description": "Ship, Review, Codify, Evolve",
+        "purpose": "Extract learnings to avoid repeating mistakes across projects",
+        "questions": [
+          "What worked well in this implementation?",
+          "What failed or created problems?",
+          "What patterns can be reused?",
+          "What rules need to be tightened?",
+          "How does this inform our engineering culture?"
+        ],
+        "outputs": [
+          "Success patterns documented",
+          "Failure modes cataloged",
+          "Reusable patterns extracted",
+          "Updated enforcement rules",
+          "Engineering culture insights"
+        ]
+      }
+    ],
+    "agents": [
+      {
+        "key": "planner",
+        "name": "PlannerAgent",
+        "role": "Project Architect",
+        "analogy": "The architect who breaks work into slices and defines scope",
+        "responsibilities": [
+          "Break work into manageable slices",
+          "Define scope and boundaries",
+          "Identify constraints and dependencies",
+          "Establish success criteria",
+          "Document known facts and unknowns"
+        ],
+        "enforcedMandates": [
+          "verifiability",
+          "phaseEnforcement"
+        ]
+      },
+      {
+        "key": "executor",
+        "name": "ExecutorAgent",
+        "role": "Implementation Developer",
+        "analogy": "The senior dev who codes with strict adherence to standards",
+        "responsibilities": [
+          "Implement code following the verified plan",
+          "Ensure security compliance (OWASP)",
+          "Maintain high DX (clear, typed, predictable)",
+          "Pass all static analysis checks",
+          "Write comprehensive documentation"
+        ],
+        "enforcedMandates": [
+          "security",
+          "dx",
+          "staticAnalysis",
+          "documentation",
+          "style"
+        ]
+      },
+      {
+        "key": "reflection",
+        "name": "ReflectionAgent",
+        "role": "Senior Reviewer",
+        "analogy": "The experienced reviewer who finds blind spots in thinking",
+        "responsibilities": [
+          "Evaluate completed work critically",
+          "Identify blind spots and edge cases",
+          "Analyze side-effects and implications",
+          "Perform WTF checks on code clarity",
+          "Force systemic improvements"
+        ],
+        "enforcedMandates": [
+          "verifiability",
+          "dx"
+        ]
+      },
+      {
+        "key": "knowledge",
+        "name": "KnowledgeSynthesizerAgent",
+        "role": "Staff Engineer / Systems Thinker",
+        "analogy": "The staff engineer who extracts patterns for reuse",
+        "responsibilities": [
+          "Extract reusable patterns from implementations",
+          "Propose framework evolution",
+          "Document architectural insights",
+          "Identify cross-cutting concerns",
+          "Build institutional knowledge"
+        ],
+        "enforcedMandates": [
+          "documentation",
+          "verifiability"
+        ]
+      },
+      {
+        "key": "auditor",
+        "name": "MandateAuditorAgent",
+        "role": "Tech Lead / Compliance",
+        "analogy": "The tech lead who blocks progress if rules are violated",
+        "responsibilities": [
+          "Block progress on mandate violations",
+          "Enforce security requirements",
+          "Verify verifiability of decisions",
+          "Ensure phase completion before progression",
+          "Maintain quality gates"
+        ],
+        "enforcedMandates": [
+          "security",
+          "verifiability",
+          "phaseEnforcement",
+          "staticAnalysis"
+        ]
+      },
+      {
+        "key": "interaction",
+        "name": "InteractionAgent",
+        "role": "Team Facilitator / QA",
+        "analogy": "The facilitator who ensures clear communication and decisions",
+        "responsibilities": [
+          "Handle human check-ins and clarifications",
+          "Verify clarity of requirements",
+          "Enforce decision checkpoints",
+          "Facilitate team alignment",
+          "Document communication outcomes"
+        ],
+        "enforcedMandates": [
+          "verifiability"
+        ]
+      }
+    ],
+    "mandates": [
+      {
+        "key": "security",
+        "name": "Security",
+        "description": "No unvalidated inputs or insecure outputs",
+        "ensures": "All security vulnerabilities are prevented",
+        "basedOn": "OWASP Top 10",
+        "requirements": [
+          "All user inputs must be validated",
+          "All outputs must be sanitized",
+          "No SQL injection vulnerabilities",
+          "No XSS vulnerabilities",
+          "Proper authentication and authorization",
+          "Secure data storage and transmission"
+        ]
+      },
+      {
+        "key": "dx",
+        "name": "Developer Experience (DX)",
+        "description": "Code must be typed, clear, and maintainable",
+        "ensures": "Code is understandable and maintainable",
+        "requirements": [
+          "Use strong typing (no any type)",
+          "Predictable naming conventions",
+          "No magic strings or numbers",
+          "No hidden state or side-effects",
+          "Clear function signatures",
+          "Self-documenting code structure"
+        ]
+      },
+      {
+        "key": "staticAnalysis",
+        "name": "Static Analysis",
+        "description": "Must pass at highest level with no warnings",
+        "ensures": "Code quality is maintained automatically",
+        "requirements": [
+          "Zero linter warnings",
+          "Zero type errors",
+          "All checks pass at maximum strictness",
+          "No disabled rules without justification",
+          "Consistent code style"
+        ]
+      },
+      {
+        "key": "documentation",
+        "name": "Documentation",
+        "description": "Full documentation using modern syntax",
+        "ensures": "Code intent and usage is clear",
+        "requirements": [
+          "All public APIs documented",
+          "Complex logic explained with comments",
+          "Examples provided for non-obvious usage",
+          "Architecture decisions recorded",
+          "README kept up-to-date"
+        ]
+      },
+      {
+        "key": "style",
+        "name": "Style",
+        "description": "Consistent formatting and layout enforced",
+        "ensures": "Codebase looks uniform and professional",
+        "requirements": [
+          "Automated formatter used (e.g., Prettier)",
+          "Consistent indentation",
+          "Consistent naming patterns",
+          "Consistent file structure",
+          "No trailing whitespace"
+        ]
+      },
+      {
+        "key": "verifiability",
+        "name": "Verifiability",
+        "description": "All decisions must have traceable, factual reasoning",
+        "ensures": "Engineering decisions can be audited and understood",
+        "requirements": [
+          "Document why, not just what",
+          "Link to source materials (RFCs, docs, discussions)",
+          "State assumptions explicitly",
+          "Track decision alternatives considered",
+          "Provide evidence for claims"
+        ]
+      },
+      {
+        "key": "phaseEnforcement",
+        "name": "Phase Enforcement",
+        "description": "Cannot skip phases - each must complete or be justified",
+        "ensures": "Systematic approach is maintained",
+        "requirements": [
+          "ALIGN phase completed before IDEATE",
+          "IDEATE phase completed before PROTOTYPE",
+          "PROTOTYPE phase reviewed in REFLECT",
+          "LEARN phase captures insights",
+          "Phase skipping requires explicit justification"
+        ]
+      }
+    ],
+    "personaModes": [
+      {
+        "key": "strict",
+        "name": "Strict Mode",
+        "description": "No ambiguity allowed - everything must be verifiable",
+        "behavior": "Everything must be verifiable and mandate-compliant before progressing. No assumptions, no shortcuts, no bypassing gates."
+      },
+      {
+        "key": "adaptive",
+        "name": "Adaptive Mode",
+        "description": "Allows temporary ambiguity with risk awareness",
+        "behavior": "Allows temporary ambiguity but logs it. Prioritizes progress with documented risk awareness. Suitable for rapid iteration."
+      }
+    ],
+    "howItWorksTogether": "Planning = PlannerAgent adds success criteria to issues. Execution = ExecutorAgent codes with security + static analysis gates. Review = ReflectionAgent provides fact-based reasoning. Merge = MandateAuditorAgent blocks if DX/security rules violated."
+  }
 }
