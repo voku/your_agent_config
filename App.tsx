@@ -551,23 +551,18 @@ ${config.shellCommands.map(cmd => `# ${cmd.description}\n${cmd.command}`).join('
 \`\`\`
 ` : '';
 
-    const mistakesToAvoidSection = config.mistakesToAvoid.length > 0 ? `
-## Common AI Assistant Mistakes to Avoid
+    // Unified AI Assistant Guidance Section
+    const aiAssistantGuidanceSection = (config.mistakesToAvoid.length > 0 || config.questionsToAsk.length > 0 || config.blindSpots.length > 0) ? `
+## AI Assistant Guidance
 
-${config.mistakesToAvoid.map((m, i) => `${i + 1}. **${m.text}**`).join('\n')}
-` : '';
+${config.mistakesToAvoid.length > 0 ? `### Common Mistakes to Avoid
 
-    const questionsToAskSection = config.questionsToAsk.length > 0 ? `
-## Questions AI Assistants Should Ask
+${config.mistakesToAvoid.map((m, i) => `${i + 1}. **${m.text}**`).join('\n')}` : ''}${config.mistakesToAvoid.length > 0 && (config.questionsToAsk.length > 0 || config.blindSpots.length > 0) ? '\n\n' : ''}${config.questionsToAsk.length > 0 ? `### Questions to Ask Before Implementation
 
 Before starting implementation, consider:
-${config.questionsToAsk.map(q => `- "${q.text}"`).join('\n')}
-` : '';
+${config.questionsToAsk.map(q => `- "${q.text}"`).join('\n')}` : ''}${config.questionsToAsk.length > 0 && config.blindSpots.length > 0 ? '\n\n' : ''}${config.blindSpots.length > 0 ? `### Blind Spots and Mitigations
 
-    const blindSpotsSection = config.blindSpots.length > 0 ? `
-## AI Assistant Blind Spots and Mitigations
-
-${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}
+${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}` : ''}
 ` : '';
 
     const skillsSection = config.skills.length > 0 ? `
@@ -838,16 +833,8 @@ ${module.conflicts.length > 0 ? `
       sections.push('', enforcementModulesSection);
     }
 
-    if (mistakesToAvoidSection) {
-      sections.push('', mistakesToAvoidSection);
-    }
-
-    if (questionsToAskSection) {
-      sections.push('', questionsToAskSection);
-    }
-
-    if (blindSpotsSection) {
-      sections.push('', blindSpotsSection);
+    if (aiAssistantGuidanceSection) {
+      sections.push('', aiAssistantGuidanceSection);
     }
 
     if (skillsSection) {
