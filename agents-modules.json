@@ -708,7 +708,9 @@
           "explanation": "Never insert unsanitized user input into HTML. Use textContent or sanitize with DOMPurify."
         }
       ],
-      "conflicts": [],
+      "conflicts": [
+        "exploratory-spike"
+      ],
       "implies": [
         "code-review"
       ]
@@ -741,7 +743,9 @@
           "Apply consistent naming conventions across the codebase"
         ]
       },
-      "conflicts": [],
+      "conflicts": [
+        "legacy-migration"
+      ],
       "implies": []
     },
     {
@@ -835,7 +839,9 @@
           "Set up alerting for critical error rates"
         ]
       },
-      "conflicts": [],
+      "conflicts": [
+        "exploratory-spike"
+      ],
       "implies": [
         "security"
       ]
