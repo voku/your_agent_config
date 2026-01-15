@@ -552,18 +552,42 @@ ${config.shellCommands.map(cmd => `# ${cmd.description}\n${cmd.command}`).join('
 ` : '';
 
     // Unified AI Assistant Guidance Section
-    const aiAssistantGuidanceSection = (config.mistakesToAvoid.length > 0 || config.questionsToAsk.length > 0 || config.blindSpots.length > 0) ? `
-## AI Assistant Guidance
+    const aiAssistantGuidanceSection = (() => {
+      const hasMistakes = config.mistakesToAvoid.length > 0;
+      const hasQuestions = config.questionsToAsk.length > 0;
+      const hasBlindSpots = config.blindSpots.length > 0;
+      
+      if (!hasMistakes && !hasQuestions && !hasBlindSpots) {
+        return '';
+      }
+      
+      const subsections = [];
+      
+      if (hasMistakes) {
+        subsections.push(`### Common Mistakes to Avoid
 
-${config.mistakesToAvoid.length > 0 ? `### Common Mistakes to Avoid
-
-${config.mistakesToAvoid.map((m, i) => `${i + 1}. **${m.text}**`).join('\n')}` : ''}${config.mistakesToAvoid.length > 0 && (config.questionsToAsk.length > 0 || config.blindSpots.length > 0) ? '\n\n' : ''}${config.questionsToAsk.length > 0 ? `### Questions to Ask Before Implementation
+${config.mistakesToAvoid.map((m, i) => `${i + 1}. **${m.text}**`).join('\n')}`);
+      }
+      
+      if (hasQuestions) {
+        subsections.push(`### Questions to Ask Before Implementation
 
 Before starting implementation, consider:
-${config.questionsToAsk.map(q => `- "${q.text}"`).join('\n')}` : ''}${config.questionsToAsk.length > 0 && config.blindSpots.length > 0 ? '\n\n' : ''}${config.blindSpots.length > 0 ? `### Blind Spots and Mitigations
+${config.questionsToAsk.map(q => `- "${q.text}"`).join('\n')}`);
+      }
+      
+      if (hasBlindSpots) {
+        subsections.push(`### Blind Spots and Mitigations
 
-${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}` : ''}
-` : '';
+${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}`);
+      }
+      
+      return `
+## AI Assistant Guidance
+
+${subsections.join('\n\n')}
+`;
+    })();
 
     const skillsSection = config.skills.length > 0 ? `
 ## Available Skills
