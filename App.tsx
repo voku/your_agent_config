@@ -3,7 +3,7 @@ import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalRes
 import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon, SunIcon, MoonIcon, GithubIcon } from './components/UIComponents';
 import { ComboInput } from './components/ComboInput';
 import { PROJECT_PRESETS, FIELD_PRESETS, MODULE_PRESETS } from './presets';
-import { CATEGORIES, MODULES, hasConflict, getConflictingModules, getImpliedModules, getSeverityInfo, WORKFLOW_TEMPLATES, LLM_HELPERS, interpolateTemplate, SYNC_FRAMEWORK } from './modules';
+import { CATEGORIES, MODULES, hasConflict, getConflictingModules, getImpliedModules, getSeverityInfo, WORKFLOW_TEMPLATES, LLM_HELPERS, interpolateTemplate, SYNC_FRAMEWORK, syncConflictsWithModule, getModulesConflictingWithSync } from './modules';
 
 const INITIAL_STATE: AgentConfig = {
   projectName: "My Awesome Project",
@@ -551,24 +551,43 @@ ${config.shellCommands.map(cmd => `# ${cmd.description}\n${cmd.command}`).join('
 \`\`\`
 ` : '';
 
-    const mistakesToAvoidSection = config.mistakesToAvoid.length > 0 ? `
-## Common AI Assistant Mistakes to Avoid
+    // Unified AI Assistant Guidance Section
+    const aiAssistantGuidanceSection = (() => {
+      const hasMistakes = config.mistakesToAvoid.length > 0;
+      const hasQuestions = config.questionsToAsk.length > 0;
+      const hasBlindSpots = config.blindSpots.length > 0;
+      
+      if (!hasMistakes && !hasQuestions && !hasBlindSpots) {
+        return '';
+      }
+      
+      const subsections = [];
+      
+      if (hasMistakes) {
+        subsections.push(`### Common Mistakes to Avoid
 
-${config.mistakesToAvoid.map((m, i) => `${i + 1}. **${m.text}**`).join('\n')}
-` : '';
-
-    const questionsToAskSection = config.questionsToAsk.length > 0 ? `
-## Questions AI Assistants Should Ask
+${config.mistakesToAvoid.map((m, i) => `${i + 1}. **${m.text}**`).join('\n')}`);
+      }
+      
+      if (hasQuestions) {
+        subsections.push(`### Questions to Ask Before Implementation
 
 Before starting implementation, consider:
-${config.questionsToAsk.map(q => `- "${q.text}"`).join('\n')}
-` : '';
+${config.questionsToAsk.map(q => `- "${q.text}"`).join('\n')}`);
+      }
+      
+      if (hasBlindSpots) {
+        subsections.push(`### Blind Spots and Mitigations
 
-    const blindSpotsSection = config.blindSpots.length > 0 ? `
-## AI Assistant Blind Spots and Mitigations
+${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}`);
+      }
+      
+      return `
+## AI Assistant Guidance
 
-${config.blindSpots.map(b => `- **${b.text}**`).join('\n')}
-` : '';
+${subsections.join('\n\n')}
+`;
+    })();
 
     const skillsSection = config.skills.length > 0 ? `
 ## Available Skills
@@ -838,16 +857,8 @@ ${module.conflicts.length > 0 ? `
       sections.push('', enforcementModulesSection);
     }
 
-    if (mistakesToAvoidSection) {
-      sections.push('', mistakesToAvoidSection);
-    }
-
-    if (questionsToAskSection) {
-      sections.push('', questionsToAskSection);
-    }
-
-    if (blindSpotsSection) {
-      sections.push('', blindSpotsSection);
+    if (aiAssistantGuidanceSection) {
+      sections.push('', aiAssistantGuidanceSection);
     }
 
     if (skillsSection) {
@@ -1246,6 +1257,11 @@ INSTRUCTIONS:
                 <div>
                   <Label>Enable SYNC Framework</Label>
                   <p className="text-xs text-textMuted">A rigorously structured, fact-enforced framework for LLM-driven development</p>
+                  {config.syncFrameworkEnabled && getModulesConflictingWithSync().some(m => config.enabledModules.includes(m)) && (
+                    <p className="text-xs text-red-600 mt-1">
+                      ⚠️ Conflicts with enabled modules: {getModulesConflictingWithSync().filter(m => config.enabledModules.includes(m)).join(', ')}
+                    </p>
+                  )}
                 </div>
                 <input
                   type="checkbox"
@@ -1430,11 +1446,14 @@ INSTRUCTIONS:
                   {category.modules.map(module => {
                     const isEnabled = config.enabledModules.includes(module.key);
                     const conflictingWith = getConflictingModules(module.key).filter(k => config.enabledModules.includes(k));
-                    const hasActiveConflict = conflictingWith.length > 0;
-                    const isConflicting = !isEnabled && hasConflict(config.enabledModules, module.key);
+                    const conflictsWithSync = config.syncFrameworkEnabled && syncConflictsWithModule(module.key);
+                    const hasActiveConflict = conflictingWith.length > 0 || conflictsWithSync;
+                    const isConflicting = !isEnabled && hasConflict(config.enabledModules, module.key, config.syncFrameworkEnabled);
                     const impliedBy = getImpliedModules(module.key);
                     const isAdvisory = config.advisoryModules.includes(module.key);
                     const severityInfo = getSeverityInfo(module.severity);
+                    
+                    const conflictsList = [...conflictingWith, ...(conflictsWithSync ? ['SYNC Framework'] : [])];
                     
                     return (
                       <div 
@@ -1465,7 +1484,7 @@ INSTRUCTIONS:
                               </span>
                               {(isConflicting || hasActiveConflict) && (
                                 <span className="text-xs px-2 py-0.5 rounded border bg-red-500/10 text-red-600 border-red-500/30">
-                                  ⚠️ Conflicts with: {conflictingWith.join(', ')}
+                                  ⚠️ Conflicts with: {conflictsList.join(', ')}
                                 </span>
                               )}
                             </div>

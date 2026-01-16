@@ -55,7 +55,7 @@ export const CATEGORIES: ModuleCategory[] = schema.displayGroups
 /**
  * Check if enabling a new module would create a conflict with already enabled modules
  */
-export function hasConflict(enabledModules: string[], newModule: string): boolean {
+export function hasConflict(enabledModules: string[], newModule: string, syncFrameworkEnabled = false): boolean {
   const module = MODULES.find(m => m.key === newModule);
   if (!module) return false;
   
@@ -70,7 +70,11 @@ export function hasConflict(enabledModules: string[], newModule: string): boolea
     return enabledModule?.conflicts.includes(newModule) ?? false;
   });
   
-  return newModuleConflicts || enabledModulesConflict;
+  // Check if SYNC Framework conflicts with this module
+  const syncConflictsWithNewModule = syncFrameworkEnabled && 
+    SYNC_FRAMEWORK?.conflicts?.includes(newModule);
+  
+  return newModuleConflicts || enabledModulesConflict || syncConflictsWithNewModule || false;
 }
 
 /**
@@ -97,6 +101,20 @@ export function getConflictingModules(moduleKey: string): string[] {
 export function getImpliedModules(moduleKey: string): string[] {
   const module = MODULES.find(m => m.key === moduleKey);
   return module?.implies || [];
+}
+
+/**
+ * Check if SYNC Framework conflicts with a given module
+ */
+export function syncConflictsWithModule(moduleKey: string): boolean {
+  return SYNC_FRAMEWORK?.conflicts?.includes(moduleKey) ?? false;
+}
+
+/**
+ * Get modules that conflict with SYNC Framework
+ */
+export function getModulesConflictingWithSync(): string[] {
+  return SYNC_FRAMEWORK?.conflicts || [];
 }
 
 /**

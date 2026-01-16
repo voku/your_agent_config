@@ -180,7 +180,7 @@
       "name": "Legacy Project (Cash Cow)",
       "description": "Modernizing existing legacy applications",
       "languages": "JavaScript, TypeScript (gradual migration)",
-      "frameworks": "jQuery → React (incremental), Bootstrap",
+      "frameworks": "jQuery \u2192 React (incremental), Bootstrap",
       "packageManager": "npm",
       "styling": "Bootstrap, SASS",
       "stateManagement": "Context API",
@@ -488,12 +488,12 @@
     "globalRules": {
       "title": "Global Rules (Must Follow)",
       "description": "World-class engineering principles",
-      "motto": "Every mission assigned is delivered with 100% quality and state-of-the-art execution — no hacks, no workarounds, no partial deliverables and no mock-driven confidence. Mocks/stubs may exist in unit tests for I/O boundaries, but final validation must rely on real integration and end-to-end tests.",
+      "motto": "Every mission assigned is delivered with 100% quality and state-of-the-art execution \u2014 no hacks, no workarounds, no partial deliverables and no mock-driven confidence. Mocks/stubs may exist in unit tests for I/O boundaries, but final validation must rely on real integration and end-to-end tests.",
       "principles": [
         "Deliver end-to-end, production-like solutions with clean, modular, and maintainable architecture.",
         "Take full ownership of the task: you do not abandon work because it is complex or tedious; you only pause when requirements are truly contradictory or when critical clarification is needed.",
         "Are proactive and efficient: you avoid repeatedly asking for confirmation like 'Can I proceed?' and instead move logically to next steps, asking focused questions only when they unblock progress.",
-        "Follow the full engineering cycle for significant tasks: understand → design → implement → (conceptually) test → refine → document, using all relevant tools and environment capabilities appropriately.",
+        "Follow the full engineering cycle for significant tasks: understand \u2192 design \u2192 implement \u2192 (conceptually) test \u2192 refine \u2192 document, using all relevant tools and environment capabilities appropriately.",
         "Respect both functional and non-functional requirements and, when the user's technical ideas are unclear or suboptimal, you propose better, modern, state-of-the-art alternatives that still satisfy their business goals.",
         "Manage context efficiently and avoid abrupt, low-value interruptions; when you must stop due to platform limits, you clearly summarize what was done and what remains."
       ]
@@ -502,7 +502,7 @@
   "llmHelpers": [
     {
       "key": "tech-stack-advisor",
-      "title": "🚀 Tech Stack Advisor",
+      "title": "\ud83d\ude80 Tech Stack Advisor",
       "description": "Ask an LLM to suggest the best stack. Returns JSON to auto-fill stack fields.",
       "expectedFields": [
         "languages",
@@ -512,89 +512,89 @@
         "stateManagement",
         "backend"
       ],
-      "promptTemplate": "I am starting a software project called \"{{projectName}}\".\nMission: {{mission}}\nPhase: {{phase}}\n\nPlease recommend a complete technical stack best suited for this mission.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"languages\": \"...\",\n  \"frameworks\": \"...\",\n  \"packageManager\": \"...\",\n  \"styling\": \"...\",\n  \"stateManagement\": \"...\",\n  \"backend\": \"...\"\n}"
+      "promptTemplate": "I am starting a software project called \"{{projectName}}\".\nMission: {{mission}}\nPhase: {{phase}}\n\nPlease recommend a complete technical stack best suited for this mission.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"languages\": \"...\",\n  \"frameworks\": \"...\",\n  \"packageManager\": \"...\",\n  \"styling\": \"...\",\n  \"stateManagement\": \"...\",\n  \"backend\": \"...\"\n}"
     },
     {
       "key": "safety-guardrails",
-      "title": "🛡️ Safety Guardrails",
+      "title": "\ud83d\udee1\ufe0f Safety Guardrails",
       "description": "Generate specific 'NEVER' rules. Returns JSON to merge into your list.",
       "expectedFields": [
         "neverList"
       ],
-      "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Mgmt: {{stateManagement}}\n\nPlease suggest 5-7 critical \"NEVER\" rules for an AI coding agent.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"neverList\": [\"Never use 'any'\", \"Never mutate state directly\", ...]\n}"
+      "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Mgmt: {{stateManagement}}\n\nPlease suggest 5-7 critical \"NEVER\" rules for an AI coding agent.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"neverList\": [\"Never use 'any'\", \"Never mutate state directly\", ...]\n}"
     },
     {
       "key": "mission-refinement",
-      "title": "✨ Mission Refinement",
+      "title": "\u2728 Mission Refinement",
       "description": "Polishes your mission. Returns JSON to update the mission field.",
       "expectedFields": [
         "mission"
       ],
-      "promptTemplate": "My project's mission is: \"{{mission}}\".\nNorth Star: \"{{northStar}}\"\n\nPlease refine this mission statement to be concise yet inspiring for a developer team.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mission\": \"The single best refined mission statement here\"\n}"
+      "promptTemplate": "My project's mission is: \"{{mission}}\".\nNorth Star: \"{{northStar}}\"\n\nPlease refine this mission statement to be concise yet inspiring for a developer team.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mission\": \"The single best refined mission statement here\"\n}"
     },
     {
       "key": "architecture-map",
-      "title": "🗺️ Architecture Map",
+      "title": "\ud83d\uddfa\ufe0f Architecture Map",
       "description": "Suggests directory structure. Returns JSON to update structure and docs.",
       "expectedFields": [
         "directoryStructure",
         "docMap"
       ],
-      "promptTemplate": "I am building a {{phase}} project using {{frameworks}} and {{backend}}.\n\nPlease suggest a robust, scalable directory structure.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"directoryStructure\": \"src/components\\nsrc/hooks\\n...\",\n  \"docMap\": [\n    { \"path\": \"docs/architecture.md\", \"description\": \"High level overview\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
+      "promptTemplate": "I am building a {{phase}} project using {{frameworks}} and {{backend}}.\n\nPlease suggest a robust, scalable directory structure.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"directoryStructure\": \"src/components\\nsrc/hooks\\n...\",\n  \"docMap\": [\n    { \"path\": \"docs/architecture.md\", \"description\": \"High level overview\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
     },
     {
       "key": "key-files-detector",
-      "title": "📂 Key Files Detector",
+      "title": "\ud83d\udcc2 Key Files Detector",
       "description": "Identifies important files AI agents should read. Returns JSON to add to context map.",
       "expectedFields": [
         "docMap"
       ],
-      "promptTemplate": "I am using the following tech stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Management: {{stateManagement}}\n- Backend: {{backend}}\n\nBased on this stack, suggest 3-5 key file paths that an AI coding agent should read to understand the architecture and conventions of this project.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"docMap\": [\n    { \"path\": \"src/types.ts\", \"description\": \"Type definitions and interfaces\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
+      "promptTemplate": "I am using the following tech stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- State Management: {{stateManagement}}\n- Backend: {{backend}}\n\nBased on this stack, suggest 3-5 key file paths that an AI coding agent should read to understand the architecture and conventions of this project.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"docMap\": [\n    { \"path\": \"src/types.ts\", \"description\": \"Type definitions and interfaces\" },\n    { \"path\": \"prisma/schema.prisma\", \"description\": \"Database schema\" }\n  ]\n}"
     },
     {
       "key": "development-principles",
-      "title": "🎯 Development Principles Generator",
+      "title": "\ud83c\udfaf Development Principles Generator",
       "description": "Generate core development principles. Returns JSON to add to principles list.",
       "expectedFields": [
         "developmentPrinciples"
       ],
-      "promptTemplate": "I am building \"{{projectName}}\" with the following mission:\n{{mission}}\n\nNorth Star: {{northStar}}\nPhase: {{phase}}\n\nPlease suggest 5-7 core development principles that should guide all development decisions.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"developmentPrinciples\": [\"Zero downtime deployments\", \"Security first\", \"User experience over features\", ...]\n}"
+      "promptTemplate": "I am building \"{{projectName}}\" with the following mission:\n{{mission}}\n\nNorth Star: {{northStar}}\nPhase: {{phase}}\n\nPlease suggest 5-7 core development principles that should guide all development decisions.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"developmentPrinciples\": [\"Zero downtime deployments\", \"Security first\", \"User experience over features\", ...]\n}"
     },
     {
       "key": "ai-mistakes",
-      "title": "⚠️ AI Mistakes Generator",
+      "title": "\u26a0\ufe0f AI Mistakes Generator",
       "description": "Generate common mistakes AI should avoid. Returns JSON to add to mistakes list.",
       "expectedFields": [
         "mistakesToAvoid"
       ],
-      "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 common mistakes AI assistants make when working with this tech stack.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mistakesToAvoid\": [\"Don't implement without understanding existing patterns\", \"Don't skip the discovery phase\", ...]\n}"
+      "promptTemplate": "I am using the following stack:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 common mistakes AI assistants make when working with this tech stack.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"mistakesToAvoid\": [\"Don't implement without understanding existing patterns\", \"Don't skip the discovery phase\", ...]\n}"
     },
     {
       "key": "questions-generator",
-      "title": "❓ Questions Generator",
+      "title": "\u2753 Questions Generator",
       "description": "Generate self-check questions for AI. Returns JSON to add to questions list.",
       "expectedFields": [
         "questionsToAsk"
       ],
-      "promptTemplate": "I am building a {{phase}} project called \"{{projectName}}\".\n\nPlease suggest 5-7 questions an AI assistant should ask itself before starting any implementation.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"questionsToAsk\": [\"What similar functionality already exists?\", \"What existing tests can guide my understanding?\", ...]\n}"
+      "promptTemplate": "I am building a {{phase}} project called \"{{projectName}}\".\n\nPlease suggest 5-7 questions an AI assistant should ask itself before starting any implementation.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"questionsToAsk\": [\"What similar functionality already exists?\", \"What existing tests can guide my understanding?\", ...]\n}"
     },
     {
       "key": "blind-spots",
-      "title": "👁️ Blind Spots Generator",
+      "title": "\ud83d\udc41\ufe0f Blind Spots Generator",
       "description": "Generate AI blind spots and mitigations. Returns JSON to add to blind spots list.",
       "expectedFields": [
         "blindSpots"
       ],
-      "promptTemplate": "I am using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 potential blind spots an AI assistant might have when working on this project, along with mitigation strategies.\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"blindSpots\": [\"Local environment unknown – confirm tool availability before relying on them\", \"Hidden dependencies – request explicit dependency lists\", ...]\n}"
+      "promptTemplate": "I am using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nPlease suggest 5-7 potential blind spots an AI assistant might have when working on this project, along with mitigation strategies.\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"blindSpots\": [\"Local environment unknown \u2013 confirm tool availability before relying on them\", \"Hidden dependencies \u2013 request explicit dependency lists\", ...]\n}"
     },
     {
       "key": "skills-generator",
-      "title": "🔧 Skills Generator",
+      "title": "\ud83d\udd27 Skills Generator",
       "description": "Generate agent skills for specialized tasks. Returns JSON to add to skills list.",
       "expectedFields": [
         "skills"
       ],
-      "promptTemplate": "I am building \"{{projectName}}\" using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nMission: {{mission}}\n\nGenerate 3-5 focused Agent Skills following the Agent Skills specification:\n\n**Requirements**:\n1. Each skill must be focused on ONE specific, repeatable task\n2. Name: lowercase-with-hyphens (max 64 chars)\n3. Description: Include BOTH what it does AND when to use it (specific keywords/triggers)\n4. Consider these best practices:\n   - Skills compose better when focused rather than trying to do everything\n   - Include \"when to use\" keywords (e.g., \"when user mentions X\", \"for Y tasks\")\n   - Specify if references/, scripts/, or assets/ directories are needed\n   - Keep SKILL.md under 500 lines, move details to references/\n\n**Examples of good skills**:\n- pdf-processing: \"Extract text and tables from PDFs, fill forms, merge documents. Use when working with PDF documents or when user mentions PDFs, forms, or document extraction.\"\n- code-review: \"Perform systematic code reviews following project standards. Use when user asks to review code, check quality, or mentions code review.\"\n- api-documentation: \"Generate OpenAPI/Swagger documentation from code. Use when documenting APIs or when user mentions API docs, Swagger, or OpenAPI.\"\n\n⚠️ CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"skills\": [\n    {\n      \"name\": \"skill-name\",\n      \"description\": \"What it does and when to use it with specific keywords\",\n      \"path\": \"skills/skill-name\",\n      \"license\": \"MIT\",\n      \"compatibility\": \"Any environment requirements\",\n      \"allowedTools\": \"optional space-delimited list\",\n      \"hasReferences\": false,\n      \"hasScripts\": false,\n      \"hasAssets\": false,\n      \"metadata\": {\n        \"author\": \"your-org\",\n        \"version\": \"1.0\"\n      }\n    }\n  ]\n}"
+      "promptTemplate": "I am building \"{{projectName}}\" using:\n- Languages: {{languages}}\n- Frameworks: {{frameworks}}\n- Backend: {{backend}}\n\nMission: {{mission}}\n\nGenerate 3-5 focused Agent Skills following the Agent Skills specification:\n\n**Requirements**:\n1. Each skill must be focused on ONE specific, repeatable task\n2. Name: lowercase-with-hyphens (max 64 chars)\n3. Description: Include BOTH what it does AND when to use it (specific keywords/triggers)\n4. Consider these best practices:\n   - Skills compose better when focused rather than trying to do everything\n   - Include \"when to use\" keywords (e.g., \"when user mentions X\", \"for Y tasks\")\n   - Specify if references/, scripts/, or assets/ directories are needed\n   - Keep SKILL.md under 500 lines, move details to references/\n\n**Examples of good skills**:\n- pdf-processing: \"Extract text and tables from PDFs, fill forms, merge documents. Use when working with PDF documents or when user mentions PDFs, forms, or document extraction.\"\n- code-review: \"Perform systematic code reviews following project standards. Use when user asks to review code, check quality, or mentions code review.\"\n- api-documentation: \"Generate OpenAPI/Swagger documentation from code. Use when documenting APIs or when user mentions API docs, Swagger, or OpenAPI.\"\n\n\u26a0\ufe0f CRITICAL INSTRUCTIONS - READ CAREFULLY:\n- Your response must be ONLY valid JSON\n- NO markdown code blocks (no ```json)\n- NO explanations before or after\n- NO additional text\n- Start with { and end with }\n\nReturn this exact JSON structure:\n{\n  \"skills\": [\n    {\n      \"name\": \"skill-name\",\n      \"description\": \"What it does and when to use it with specific keywords\",\n      \"path\": \"skills/skill-name\",\n      \"license\": \"MIT\",\n      \"compatibility\": \"Any environment requirements\",\n      \"allowedTools\": \"optional space-delimited list\",\n      \"hasReferences\": false,\n      \"hasScripts\": false,\n      \"hasAssets\": false,\n      \"metadata\": {\n        \"author\": \"your-org\",\n        \"version\": \"1.0\"\n      }\n    }\n  ]\n}"
     }
   ],
   "modules": [
@@ -625,7 +625,7 @@
           "If no tests exist for a file you need to edit, add characterization tests in a separate commit first"
         ],
         "soft": [
-          "Target ≥80% line coverage on new/changed code",
+          "Target \u226580% line coverage on new/changed code",
           "Prefer fast unit tests over slow integration tests",
           "Keep individual tests focused on a single behavior",
           "Use descriptive test names that explain the expected behavior"
@@ -708,7 +708,9 @@
           "explanation": "Never insert unsanitized user input into HTML. Use textContent or sanitize with DOMPurify."
         }
       ],
-      "conflicts": [],
+      "conflicts": [
+        "exploratory-spike"
+      ],
       "implies": [
         "code-review"
       ]
@@ -741,7 +743,9 @@
           "Apply consistent naming conventions across the codebase"
         ]
       },
-      "conflicts": [],
+      "conflicts": [
+        "legacy-migration"
+      ],
       "implies": []
     },
     {
@@ -835,7 +839,9 @@
           "Set up alerting for critical error rates"
         ]
       },
-      "conflicts": [],
+      "conflicts": [
+        "exploratory-spike"
+      ],
       "implies": [
         "security"
       ]
@@ -1071,7 +1077,7 @@
       {
         "key": "align",
         "name": "ALIGN",
-        "emoji": "🧩",
+        "emoji": "\ud83e\udde9",
         "description": "Verifiable Problem Definition",
         "purpose": "Establish measurable objectives and constraints before coding",
         "steps": [
@@ -1091,7 +1097,7 @@
       {
         "key": "ideate",
         "name": "IDEATE",
-        "emoji": "🧠",
+        "emoji": "\ud83e\udde0",
         "description": "Multi-Path Solution Evaluation",
         "purpose": "Generate and objectively compare 2-3 solution approaches",
         "steps": [
@@ -1111,7 +1117,7 @@
       {
         "key": "prototype",
         "name": "PROTOTYPE",
-        "emoji": "🔧",
+        "emoji": "\ud83d\udd27",
         "description": "OWASP-Compliant Implementation",
         "purpose": "Implement following verified plan with quality gates",
         "steps": [
@@ -1132,7 +1138,7 @@
       {
         "key": "reflect",
         "name": "REFLECT",
-        "emoji": "🔍",
+        "emoji": "\ud83d\udd0d",
         "description": "Systematic Blind Spot Identification",
         "purpose": "Debug thinking through critical evaluation",
         "steps": [
@@ -1153,7 +1159,7 @@
       {
         "key": "learn",
         "name": "LEARN",
-        "emoji": "📚",
+        "emoji": "\ud83d\udcda",
         "description": "Pattern Extraction & Rule Evolution",
         "purpose": "Extract reusable patterns to avoid repeating mistakes",
         "steps": [
@@ -1375,6 +1381,9 @@
       "QAR": "Quality Attribute Requirement - measurable success criterion (e.g., 'API responds < 200ms at p95')",
       "ADR": "Architectural Decision Record - documents why a decision was made, with alternatives considered",
       "WTF check": "Would This Frustrate? - clarity test from fresh team member perspective"
-    }
+    },
+    "conflicts": [
+      "exploratory-spike"
+    ]
   }
 }
