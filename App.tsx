@@ -1453,8 +1453,7 @@ INSTRUCTIONS:
                     const isAdvisory = config.advisoryModules.includes(module.key);
                     const severityInfo = getSeverityInfo(module.severity);
                     
-                    const conflictsList = [...conflictingWith];
-                    if (conflictsWithSync) conflictsList.push('SYNC Framework');
+                    const conflictsList = [...conflictingWith, ...(conflictsWithSync ? ['SYNC Framework'] : [])];
                     
                     return (
                       <div 

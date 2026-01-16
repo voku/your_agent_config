@@ -71,10 +71,10 @@ export function hasConflict(enabledModules: string[], newModule: string, syncFra
   });
   
   // Check if SYNC Framework conflicts with this module
-  const syncConflicts = syncFrameworkEnabled && 
+  const syncConflictsWithNewModule = syncFrameworkEnabled && 
     SYNC_FRAMEWORK?.conflicts?.includes(newModule);
   
-  return newModuleConflicts || enabledModulesConflict || syncConflicts || false;
+  return newModuleConflicts || enabledModulesConflict || syncConflictsWithNewModule || false;
 }
 
 /**
