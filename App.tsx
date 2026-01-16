@@ -3,7 +3,7 @@ import { AgentConfig, ProjectPhase, AIStyle, DocMapItem, ListItem, AdditionalRes
 import { Card, Label, Input, TextArea, Button, TrashIcon, CopyIcon, DownloadIcon, ImportIcon, SunIcon, MoonIcon, GithubIcon } from './components/UIComponents';
 import { ComboInput } from './components/ComboInput';
 import { PROJECT_PRESETS, FIELD_PRESETS, MODULE_PRESETS } from './presets';
-import { CATEGORIES, MODULES, hasConflict, getConflictingModules, getImpliedModules, getSeverityInfo, WORKFLOW_TEMPLATES, LLM_HELPERS, interpolateTemplate, SYNC_FRAMEWORK } from './modules';
+import { CATEGORIES, MODULES, hasConflict, getConflictingModules, getImpliedModules, getSeverityInfo, WORKFLOW_TEMPLATES, LLM_HELPERS, interpolateTemplate, SYNC_FRAMEWORK, syncConflictsWithModule, getModulesConflictingWithSync } from './modules';
 
 const INITIAL_STATE: AgentConfig = {
   projectName: "My Awesome Project",
@@ -1257,6 +1257,11 @@ INSTRUCTIONS:
                 <div>
                   <Label>Enable SYNC Framework</Label>
                   <p className="text-xs text-textMuted">A rigorously structured, fact-enforced framework for LLM-driven development</p>
+                  {config.syncFrameworkEnabled && getModulesConflictingWithSync().some(m => config.enabledModules.includes(m)) && (
+                    <p className="text-xs text-red-600 mt-1">
+                      ⚠️ Conflicts with enabled modules: {getModulesConflictingWithSync().filter(m => config.enabledModules.includes(m)).join(', ')}
+                    </p>
+                  )}
                 </div>
                 <input
                   type="checkbox"
@@ -1441,11 +1446,15 @@ INSTRUCTIONS:
                   {category.modules.map(module => {
                     const isEnabled = config.enabledModules.includes(module.key);
                     const conflictingWith = getConflictingModules(module.key).filter(k => config.enabledModules.includes(k));
-                    const hasActiveConflict = conflictingWith.length > 0;
-                    const isConflicting = !isEnabled && hasConflict(config.enabledModules, module.key);
+                    const conflictsWithSync = config.syncFrameworkEnabled && syncConflictsWithModule(module.key);
+                    const hasActiveConflict = conflictingWith.length > 0 || conflictsWithSync;
+                    const isConflicting = !isEnabled && hasConflict(config.enabledModules, module.key, config.syncFrameworkEnabled);
                     const impliedBy = getImpliedModules(module.key);
                     const isAdvisory = config.advisoryModules.includes(module.key);
                     const severityInfo = getSeverityInfo(module.severity);
+                    
+                    const conflictsList = [...conflictingWith];
+                    if (conflictsWithSync) conflictsList.push('SYNC Framework');
                     
                     return (
                       <div 
@@ -1476,7 +1485,7 @@ INSTRUCTIONS:
                               </span>
                               {(isConflicting || hasActiveConflict) && (
                                 <span className="text-xs px-2 py-0.5 rounded border bg-red-500/10 text-red-600 border-red-500/30">
-                                  ⚠️ Conflicts with: {conflictingWith.join(', ')}
+                                  ⚠️ Conflicts with: {conflictsList.join(', ')}
                                 </span>
                               )}
                             </div>
