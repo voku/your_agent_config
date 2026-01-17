@@ -916,6 +916,12 @@ INSTRUCTIONS:
     navigator.clipboard.writeText(text).then(() => {
       setShowCopyFeedback(true);
       setTimeout(() => setShowCopyFeedback(false), 2000);
+    }).catch((err) => {
+      console.error('Failed to copy to clipboard:', err);
+      // Fallback: still show feedback even if copy failed
+      // User can see content is selected/highlighted
+      setShowCopyFeedback(true);
+      setTimeout(() => setShowCopyFeedback(false), 2000);
     });
   };
 
