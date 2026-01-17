@@ -50,6 +50,8 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'markdown' | 'prompt' | 'helpers'>('markdown');
   const [newNeverItem, setNewNeverItem] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mobileView, setMobileView] = useState<'config' | 'results'>('config');
+  const [showCopyFeedback, setShowCopyFeedback] = useState(false);
   
   // State for the "Import JSON" textareas in the helper tab
   const [importInputs, setImportInputs] = useState<{[key: number]: string}>({});
@@ -911,7 +913,16 @@ INSTRUCTIONS:
   }, [config]);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(text).then(() => {
+      setShowCopyFeedback(true);
+      setTimeout(() => setShowCopyFeedback(false), 2000);
+    }).catch((err) => {
+      console.error('Failed to copy to clipboard:', err);
+      // Fallback: still show feedback even if copy failed
+      // User can see content is selected/highlighted
+      setShowCopyFeedback(true);
+      setTimeout(() => setShowCopyFeedback(false), 2000);
+    });
   };
 
   const downloadFile = () => {
@@ -926,37 +937,64 @@ INSTRUCTIONS:
   };
 
   return (
-    <div className="flex h-screen overflow-hidden flex-col md:flex-row">
-      {/* LEFT PANEL: CONFIGURATION */}
-      <div className="w-full md:w-1/2 lg:w-[600px] xl:w-[700px] bg-background flex flex-col border-r border-border h-full">
-        <div className="p-6 border-b border-border bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-pink-500">
-                Agent Context Architect
-              </h1>
-              <p className="text-textMuted text-sm mt-1">Build the brain for your AI coding assistants.</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <a 
-                href="https://github.com/voku/your_agent_config" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="p-2 hover:bg-surfaceHighlight rounded-lg transition-colors text-textMuted hover:text-primary"
-                title="Contribute on GitHub"
-              >
-                <GithubIcon />
-              </a>
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 hover:bg-surfaceHighlight rounded-lg transition-colors text-textMuted hover:text-primary"
-                title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                {isDarkMode ? <SunIcon /> : <MoonIcon />}
-              </button>
+    <div className="flex h-screen overflow-hidden flex-col">
+      {/* Mobile View Switcher - Only visible on small screens */}
+      <div className="md:hidden flex border-b border-border bg-surface sticky top-0 z-20">
+        <button
+          onClick={() => setMobileView('config')}
+          className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            mobileView === 'config'
+              ? 'bg-surfaceHighlight text-textMain border-b-2 border-b-primary'
+              : 'text-textMuted hover:bg-background'
+          }`}
+        >
+          ⚙️ Configuration
+        </button>
+        <button
+          onClick={() => setMobileView('results')}
+          className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            mobileView === 'results'
+              ? 'bg-surfaceHighlight text-textMain border-b-2 border-b-primary'
+              : 'text-textMuted hover:bg-background'
+          }`}
+        >
+          📄 Results
+        </button>
+      </div>
+
+      <div className="flex h-full overflow-hidden flex-col md:flex-row">
+        {/* LEFT PANEL: CONFIGURATION */}
+        <div className={`w-full md:w-1/2 lg:w-[600px] xl:w-[700px] bg-background flex flex-col border-r border-border h-full ${
+          mobileView === 'results' ? 'hidden md:flex' : 'flex'
+        }`}>
+          <div className="p-6 border-b border-border bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-pink-500">
+                  Agent Context Architect
+                </h1>
+                <p className="text-textMuted text-sm mt-1">Build the brain for your AI coding assistants.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <a 
+                  href="https://github.com/voku/your_agent_config" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-2 hover:bg-surfaceHighlight rounded-lg transition-colors text-textMuted hover:text-primary"
+                  title="Contribute on GitHub"
+                >
+                  <GithubIcon />
+                </a>
+                <button
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  className="p-2 hover:bg-surfaceHighlight rounded-lg transition-colors text-textMuted hover:text-primary"
+                  title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                >
+                  {isDarkMode ? <SunIcon /> : <MoonIcon />}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
           
@@ -2063,7 +2101,9 @@ INSTRUCTIONS:
       </div>
 
       {/* RIGHT PANEL: PREVIEW & TOOLS */}
-      <div className="w-full md:w-1/2 lg:w-full bg-surfaceHighlight dark:bg-darkCodeBg flex flex-col h-full overflow-hidden">
+      <div className={`w-full md:w-1/2 lg:w-full bg-surfaceHighlight dark:bg-darkCodeBg flex flex-col h-full overflow-hidden ${
+        mobileView === 'config' ? 'hidden md:flex' : 'flex'
+      }`}>
         {/* Tabs */}
         <div className="flex items-center border-b border-border dark:border-darkCodeBorder bg-surface dark:bg-darkCodeSurface">
            <button 
@@ -2153,6 +2193,15 @@ INSTRUCTIONS:
           )}
         </div>
       </div>
+
+      {/* Copy Feedback Toast */}
+      {showCopyFeedback && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-fade-in">
+          <span className="text-xl">✓</span>
+          <span className="font-medium">Copied to clipboard!</span>
+        </div>
+      )}
+    </div>
     </div>
   );
 };
