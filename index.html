@@ -54,6 +54,34 @@
         background-color: #09090b;
         color: #f4f4f5;
       }
+      
+      /* Animation for copy feedback */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+      }
+      
+      /* Fallback for hidden class when Tailwind CDN is blocked */
+      .hidden {
+        display: none !important;
+      }
+      
+      /* Mobile-first responsive utilities */
+      @media (min-width: 768px) {
+        .md\:flex {
+          display: flex !important;
+        }
+      }
     </style>
   <script type="importmap">
 {
