@@ -281,6 +281,7 @@ export interface SYNCFrameworkTemplate {
   personaModes: SYNCPersonaModeDefinition[];
   howItWorksTogether: string;
   keyTerms?: Record<string, string>;
+  conflicts: string[];
 }
 
 export interface AgentConfig {
